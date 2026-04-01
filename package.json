@@ -11,9 +11,11 @@
     "preview": "electron-vite preview",
     "test": "vitest run",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "cleanup": "pnpm run format && pnpm run lint:fix && pnpm run typecheck"
   },
   "engines": {
     "node": ">=20"
