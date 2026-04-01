@@ -78,18 +78,40 @@ All authoritative specs live in `docs/`:
 
 - `docs/VB6-Hotel-App-Modernization-Project-specs.md` — requirements, checkpoint gates, evaluation rubric
 - `docs/PRE-SEARCH.md` — legacy schema map, VB6 forms → React component mapping, logic extraction
-- `docs/StarHotel-Modernization-Design.md` — approved sequencing (Approach B+A), open questions
+- `docs/StarHotel-Modernization-Design.md` — pointer to sequencing (B+A); canonical detail in `DESIGN-DOC.md`
+- `docs/DECISIONS.md` — **T4, T5, T2** (Epic E0); canonical product/architecture gates
+- `docs/ROUTE-MAP.md` — legacy forms/modules → planned React routes
 - `docs/AUTOPLAN-Full-Review.md` — CEO/Design/Eng review consensus, failure modes
-- `docs/TODOS.md` — 8 ranked deferred items (T1–T8); check before making scope decisions
+- `docs/TODOS.md` — deferred items (T1, T3, T6–T8); T2/T4/T5 resolved in `DECISIONS.md`
 
-## Open Decisions (check `docs/TODOS.md` before acting)
+## Resolved gates (Epic E0)
 
-- **T4** Clean install vs. legacy `.mdb` data import → blocks schema freeze
-- **T5** Report scope (receipt-only vs. grouped financials) → blocks report sprint
-- **T2** Primary workflow priority (front desk / night audit / reporting) → needs stakeholder input
+**T4, T5, T2** are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md). Remaining deferrals: **T1, T3, T6–T8** in [`docs/TODOS.md`](docs/TODOS.md).
 
 ## Business Logic to Port
 
 1. **Room rate calculation** (`modLogic.bas`): daily pricing, partial-day handling
 2. **Concurrency**: replace Access file-locking with SQLite WAL + transactions
 3. **Reports**: Crystal Reports (P2smon.dll) → React-to-PDF + HTML print views
+
+## Knowledge Management Process
+
+Before starting a new task, review existing rules and hypotheses for this domain.
+
+Apply rules by default. Check if any hypothesis can be tested with today's work.
+
+At the end of each task, extract insights.
+Store them in domain folders, e.g.:
+
+/knowledge/pricing/
+  knowledge.md (facts and patterns)
+  hypotheses.md (need more data)
+  rules.md (confirmed — apply by default)
+
+Maintain a /knowledge/INDEX.md that routes to each domain folder.
+
+If the files and/or folders do not exist, create them.
+
+When a hypothesis gets confirmed 5+ times, promote it to a rule.
+
+When a rule gets contradicted by new data, demote it back to a hypothesis.

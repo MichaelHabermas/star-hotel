@@ -1,6 +1,8 @@
-# PR
+# PRE-SEARCH
 
 This Pre-Search audit has been conducted based on the repository reconnaissance of the `pyhoon/star-hotel-vb6` source and the architectural mandates of the StarHotel modernization spec. This document fulfills the **2-hour mandatory reconnaissance** window before project initialization.
+
+**Traceability (Epic E0):** Open gates **T4**, **T5**, and **T2** are resolved in [DECISIONS.md](./DECISIONS.md). Legacy forms → planned React routes are listed in [ROUTE-MAP.md](./ROUTE-MAP.md). Together with §4 below, this satisfies the PRE-SEARCH checklist for project initialization.
 
 ---
 
@@ -60,14 +62,17 @@ The "Star Hotel" legacy app utilizes specific logic that must be precisely porte
 * **[COMPLETED]** Map database relations (Guest -> Reservation -> Room).
 * **[COMPLETED]** Audit `P2smon.dll` dependency (Crystal Reports Data Driver identified).
 * **[COMPLETED]** Define Vite/React 19 entry points.
+* **[COMPLETED]** Legacy form/module inventory linked to planned React routes: [ROUTE-MAP.md](./ROUTE-MAP.md).
 
-## **Collaborative Check-in: Clarifications Needed**
+### Resolved questions (superseded by decisions)
 
-To move into the "Initialization" phase, please clarify:
+The former “clarifications needed” items are **closed**:
 
-1. **Report Complexity**: Does the application require complex grouping (e.g., Monthly Revenue by Room Type), or are basic receipt prints sufficient?
-2. **Environment**: Will this be deployed on a shared local network drive (common for VB6/Access), or will it be standalone per machine?
-3. **Data Integrity**: Should we perform a "clean slate" install first, or is a one-time migration of the existing `StarHotel.mdb` data mandatory for Day 1?
+| Topic | Resolution |
+| :--- | :--- |
+| Report complexity (receipt vs grouped financials) | [DECISIONS.md](./DECISIONS.md) (section **T5**) |
+| Data integrity / clean slate vs `.mdb` import | [DECISIONS.md](./DECISIONS.md) (section **T4**) |
+| Deployment topology (network vs standalone) | **Deferred to E10 / README** — Electron + local SQLite targets **standalone per machine** for the course MVP; shared network installs are a non-goal unless stakeholders reopen. |
 
 [VB6 Hotel Management System Project Review](https://www.youtube.com/watch?v=xOVBzq_BQXM)
 This video provides a visual overview of a typical VB6 Hotel Management system's UI and features, which aligns with the project structure and forms identified in the `pyhoon/star-hotel-vb6` repository.

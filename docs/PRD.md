@@ -2,7 +2,7 @@
 
 **Authority & conflict rule:** [VB6-Hotel-App-Modernization-Project-specs.md](./VB6-Hotel-App-Modernization-Project-specs.md) wins over [StarHotel-Modernization-Design.md](./StarHotel-Modernization-Design.md) when they differ (e.g., observability deadline, required breadth/deliverables). Design doc **B+A** still governs *sequencing*: MVP gate first, then performance budget + polish.
 
-**Open gates (from [TODOS.md](./TODOS.md)):** T4 (clean install vs `.mdb` import), T5 (report scope), T2 (workflow priority) must be decided before freezing schema, report sprint, and UI ordering respectively. Until decided, downstream epics carry explicit “blocked until decision” DoD items.
+**Resolved gates:** T4, T5, and T2 are recorded in [DECISIONS.md](./DECISIONS.md). Deferred items T1, T3, T6–T8 remain in [TODOS.md](./TODOS.md).
 
 ---
 
@@ -189,7 +189,7 @@ Use Cursor **Task** subagents (or equivalent) with **narrow prompts** and **read
 
 Do not check an epic until its **Epic DoD** is satisfied (all child user stories checked).
 
-- [ ] **E0** — Pre-search, decisions, traceability
+- [x] **E0** — Pre-search, decisions, traceability
 - [ ] **E1** — Repository scaffold & developer experience
 - [ ] **E1.5** — Visual design exploration & A/B (dev-only)
 - [ ] **E2** — Data layer (SQLite, migrations, WAL)
@@ -214,19 +214,19 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** T4/T5/T2 recorded in-repo (e.g., `docs/DECISIONS.md` or spec addendum); PRE-SEARCH checklist marked complete; legacy form/module inventory linked to React route map.
 
-- [ ] **US0.1 — Lock migration fork (T4)**  
+- [x] **US0.1 — Lock migration fork (T4)**  
   - **Feature F0.1.1:** Document clean install vs one-time `.mdb` import.  
-    - [ ] **T0.1.1.1:** Summarize impact on migrations, seeds, and verification suite (T3).  
+    - [x] **T0.1.1.1:** Summarize impact on migrations, seeds, and verification suite (T3).  
     - **DoD:** Written decision + rationale; unblock schema freeze tasks in E2.
 
-- [ ] **US0.2 — Report scope contract (T5)**  
+- [x] **US0.2 — Report scope contract (T5)**  
   - **Feature F0.2.1:** Define minimum report parity for final submission.  
-    - [ ] **T0.2.1.1:** Choose receipt/HTML vs grouped financials vs phased list.  
+    - [x] **T0.2.1.1:** Choose receipt/HTML vs grouped financials vs phased list.  
     - **DoD:** Signed scope bullet list referenced by E9.
 
-- [ ] **US0.3 — Workflow priority (T2)**  
+- [x] **US0.3 — Workflow priority (T2)**  
   - **Feature F0.3.1:** Rank modules for post-MVP expansion.  
-    - [ ] **T0.3.1.1:** Ordered backlog: e.g., front desk vs night audit vs reports.  
+    - [x] **T0.3.1.1:** Ordered backlog: e.g., front desk vs night audit vs reports.  
     - **DoD:** Epic E8 user story order reflects this ranking.
 
 ---
@@ -417,7 +417,9 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** Spec “five core functional modules” mapped to shadcn patterns (Input/Label, Data table, Select, DatePicker, Dialog); parity matrix updated; **T1** state matrix doc (loading/empty/error/partial) completed per [TODOS.md](./TODOS.md); hero polish on **one** workflow per design B+A without sacrificing E6/E7 gates.
 
-Minimum module mapping (adjust labels to legacy forms):
+**Implementation order (per T2):** Build priority follows [DECISIONS.md](./DECISIONS.md) (section **T2**): **US8.5** → **US8.3** → **US8.4** → **US8.2** → **US8.1** → **US8.6** (T1 doc may run in parallel once routes exist). **Epic E9** (reports) follows E8 breadth per dependency graph.
+
+Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay stable—use the order above for sequencing:
 
 - [ ] **US8.1 — Auth / session (`tbl_user`, Argon2)**  
   - **Feature F8.1.1:** Login flow; role surfaced for future authorization.  
@@ -461,7 +463,7 @@ Minimum module mapping (adjust labels to legacy forms):
 
 - [ ] **US9.3 — Grouped / financial reports (optional per T5)**  
   - **Feature F9.3.1:** Only if T5 includes; else mark N/A.  
-    - **DoD:** Explicit reference to T5 decision.
+    - **DoD:** Explicit reference to [DECISIONS.md](./DECISIONS.md) section **T5** (grouped financials are out of minimum scope unless stretch time is allocated).
 
 ---
 
@@ -507,7 +509,7 @@ Minimum module mapping (adjust labels to legacy forms):
 | Submission list | Same, §Submission Requirements |
 | Sequencing B+A | [StarHotel-Modernization-Design.md](./StarHotel-Modernization-Design.md) |
 | Legacy schema & logic | [PRE-SEARCH.md](./PRE-SEARCH.md) |
-| Deferred decisions T1–T8 | [TODOS.md](./TODOS.md) |
+| Deferred items (T1, T3, T6–T8); resolved T2/T4/T5 | [TODOS.md](./TODOS.md) + [DECISIONS.md](./DECISIONS.md) |
 | Visual A/B & locked tokens (E1.5) | [DECISIONS.md](./DECISIONS.md) or [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md) (create when epic runs) |
 | Stack & commands | [CLAUDE.md](../CLAUDE.md) |
 
