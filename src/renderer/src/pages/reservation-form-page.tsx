@@ -44,7 +44,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
 
   const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate })
   const { catalog, setDeleteErr } = editor
-  const { guests, rooms, loading: refsLoading } = catalog
+  const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog
 
   if (mode === 'edit' && !editIdValid) {
     return (
@@ -105,7 +105,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
 
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="font-ui text-lg">{title}</CardTitle>
           <CardDescription id={`${formId}-hint`}>{description}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,9 +116,31 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
             noValidate
             aria-describedby={`${formId}-hint`}
           >
+            {refsErr ? (
+              <div
+                className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+                role="alert"
+              >
+                <p className="text-destructive text-sm">Could not load guests or rooms: {refsErr}</p>
+                <Button type="button" variant="outline" size="sm" onClick={() => void reloadCatalog()}>
+                  Retry
+                </Button>
+              </div>
+            ) : null}
             {refsLoading ? (
               <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
                 Loading guests and rooms…
+              </p>
+            ) : null}
+
+            {!refsLoading && !refsErr && guests.length === 0 ? (
+              <p className="text-muted-foreground text-sm" role="status">
+                No guests in the database. Seed or create guests before adding a reservation.
+              </p>
+            ) : null}
+            {!refsLoading && !refsErr && rooms.length === 0 ? (
+              <p className="text-muted-foreground text-sm" role="status">
+                No rooms in the database. Seed or create rooms before adding a reservation.
               </p>
             ) : null}
 
@@ -209,7 +231,16 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
             ) : null}
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={editor.submitting || refsLoading}>
+              <Button
+                type="submit"
+                disabled={
+                  editor.submitting ||
+                  refsLoading ||
+                  Boolean(refsErr) ||
+                  guests.length === 0 ||
+                  rooms.length === 0
+                }
+              >
                 {editor.submitting ? 'Saving…' : mode === 'create' ? 'Create reservation' : 'Save changes'}
               </Button>
               <Button type="button" variant="outline" asChild disabled={editor.submitting}>

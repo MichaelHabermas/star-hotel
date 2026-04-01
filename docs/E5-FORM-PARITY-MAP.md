@@ -28,6 +28,10 @@ Traceability for **Epic E5 / US5.1 / T5.1.1.1**: links the chosen MVP slice (res
 | `CheckOutDate` | Check-out date | `checkOutDate` (ISO `YYYY-MM-DD`) |
 | `TotalAmount` | Current total (read-only on edit) | Computed server-side on create/update; shown from `ReservationResponse.totalAmount` |
 
+## List performance (US5.2 / T5.2.1.1)
+
+**T5.2.1.1 (pagination / virtualization):** Deferred as **N/A** for the current MVP dataset. Seeded reservations remain a small fixed set, so a single TanStack Table view without pagination keeps the DOM light and interactions within the PRD’s ≤100 ms perceived transition goal. Revisit client-side pagination or row virtualization if seed counts grow past roughly **200 rows** on the list screen or if profiling shows layout cost.
+
 ## Screenshots
 
 Optional for evaluators: capture list + create + edit after a successful CRUD cycle in `pnpm dev`; store under `docs/assets/` if the course requires image evidence (not required for this map).

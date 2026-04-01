@@ -43,7 +43,8 @@ const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'U
 
 export function ReservationsListPage(): JSX.Element {
   const starHotel = useStarHotelApp()
-  const { guests, rooms, loading: refsLoading, error: refsErr } = useGuestRoomCatalog(starHotel)
+  const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } =
+    useGuestRoomCatalog(starHotel)
   const { list, reload } = useReservationsList(starHotel)
   const [deleteTarget, setDeleteTarget] = useState<ReservationResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -145,7 +146,7 @@ export function ReservationsListPage(): JSX.Element {
     <div className="mx-auto max-w-5xl p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Reservations</h1>
+          <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Reservations</h1>
           <p className="text-muted-foreground text-sm">
             Create and manage stays — front-desk MVP (Epic E5).
           </p>
@@ -156,9 +157,15 @@ export function ReservationsListPage(): JSX.Element {
       </div>
 
       {refsErr ? (
-        <p className="text-destructive mb-4 text-sm" role="alert">
-          Could not load guest or room lists: {refsErr}
-        </p>
+        <div
+          className="mb-4 flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          role="alert"
+        >
+          <p className="text-destructive text-sm">Could not load guest or room lists: {refsErr}</p>
+          <Button type="button" variant="outline" size="sm" onClick={() => void reloadCatalog()}>
+            Retry catalog
+          </Button>
+        </div>
       ) : null}
 
       <Card>
@@ -175,9 +182,12 @@ export function ReservationsListPage(): JSX.Element {
             </p>
           ) : null}
           {list.kind === 'err' ? (
-            <p className="text-destructive text-sm" role="alert">
-              {list.message}
-            </p>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" role="alert">
+              <p className="text-destructive text-sm">{list.message}</p>
+              <Button type="button" variant="outline" size="sm" onClick={() => void reload()}>
+                Retry
+              </Button>
+            </div>
           ) : null}
           {list.kind === 'ok' && list.rows.length === 0 ? (
             <p className="text-muted-foreground text-sm" role="status">

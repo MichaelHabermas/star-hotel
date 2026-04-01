@@ -26,7 +26,7 @@ export function HomePage(): JSX.Element {
       <div className="flex items-center gap-2">
         <Hotel className="size-8 text-primary" aria-hidden />
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Star Hotel</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Star Hotel</h1>
           <p className="text-muted-foreground text-sm">
             Desktop shell — open{' '}
             <Link to="/reservations" className="text-primary font-medium underline-offset-4 hover:underline">

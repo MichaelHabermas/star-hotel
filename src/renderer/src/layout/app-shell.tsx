@@ -17,11 +17,13 @@ function navClass({ isActive }: { isActive: boolean }): string {
 
 export function AppShell(): JSX.Element {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3">
-          <span className="font-semibold tracking-tight">Star Hotel</span>
-          <nav className="flex gap-1" aria-label="Primary">
+    <div className="bg-background flex min-h-screen flex-col">
+      <header className="bg-card border-border shadow-xs border-b">
+        <div className="mx-auto flex max-w-5xl items-center gap-8 px-4 py-3 md:px-6">
+          <span className="font-display text-foreground text-lg font-semibold tracking-tight">
+            Star Hotel
+          </span>
+          <nav className="font-ui flex flex-1 gap-1" aria-label="Primary">
             <NavLink to="/" end className={navClass}>
               Home
             </NavLink>

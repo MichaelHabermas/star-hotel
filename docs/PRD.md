@@ -203,7 +203,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [x] **E2** — Data layer (SQLite, migrations, WAL)
 - [x] **E3** — Backend API (Express in main)
 - [x] **E4** — IPC contract (preload / contextBridge)
-- [ ] **E5** — MVP form + full CRUD path
+- [x] **E5** — MVP form + full CRUD path
 - [ ] **E6** — Testing & quality gates
 
 **MVP milestone (marked here on the timeline):** When **E3**, **E4**, **E5**, and **E6** are all checked, you are at the **single** MVP checkpoint—**complete**, **demo-able**, and **shipable** mean the same thing ([§1 — MVP milestone](#mvp-milestone-one-bar-complete--demo-able--shipable)). Anything below this line is **after** MVP.
@@ -362,14 +362,14 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** ≥1 legacy form recreated in React + Tailwind v4; **complete CRUD** from UI through IPC to SQLite; loading / empty / error states (per design B); keyboard-focus basics for shadcn controls.
 
-- [ ] **US5.1 — Form parity**  
+- [x] **US5.1 — Form parity**  
   - **Feature F5.1.1:** Chosen form (e.g., Guest, Room, or Reservation per T2) matches legacy fields and labels.  
-    - [ ] **T5.1.1.1:** Screenshot or mapping table in `docs/` linking `.frm` → components.  
+    - [x] **T5.1.1.1:** Screenshot or mapping table in `docs/` linking `.frm` → components.  
     - **DoD:** Evaluator can perform create, read, update, delete without developer assistance.
 
-- [ ] **US5.2 — List/detail or grid**  
+- [x] **US5.2 — List/detail or grid**  
   - **Feature F5.2.1:** Table pattern (TanStack Table + shadcn) for dense data if applicable.  
-    - [ ] **T5.2.1.1:** Pagination or virtualization if row count risks DOM perf.  
+    - [x] **T5.2.1.1:** Pagination or virtualization if row count risks DOM perf.  
     - **DoD:** Interaction remains responsive (align with ≤100 ms view transition goal).
 
 ---
