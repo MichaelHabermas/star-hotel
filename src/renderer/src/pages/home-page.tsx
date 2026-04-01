@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Hotel } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import {
@@ -26,7 +27,13 @@ export function HomePage(): JSX.Element {
         <Hotel className="size-8 text-primary" aria-hidden />
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Star Hotel</h1>
-          <p className="text-muted-foreground text-sm">Desktop shell — Epic E1 scaffold</p>
+          <p className="text-muted-foreground text-sm">
+            Desktop shell — open{' '}
+            <Link to="/reservations" className="text-primary font-medium underline-offset-4 hover:underline">
+              Reservations
+            </Link>{' '}
+            for Epic E5 CRUD.
+          </p>
         </div>
       </div>
 

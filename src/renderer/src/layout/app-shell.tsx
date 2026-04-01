@@ -25,6 +25,9 @@ export function AppShell(): JSX.Element {
             <NavLink to="/" end className={navClass}>
               Home
             </NavLink>
+            <NavLink to="/reservations" className={navClass}>
+              Reservations
+            </NavLink>
             {isDevRoutesEnabled
               ? devRouteDefinitions.map(({ path, label }) => (
                   <NavLink key={path} to={path} className={navClass}>

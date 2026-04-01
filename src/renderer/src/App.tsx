@@ -4,6 +4,8 @@ import { AppShell } from '@renderer/layout/app-shell'
 import { createStarHotelApp } from '@renderer/lib/star-hotel-app'
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider'
 import { HomePage } from '@renderer/pages/home-page'
+import { ReservationFormPage } from '@renderer/pages/reservation-form-page'
+import { ReservationsListPage } from '@renderer/pages/reservations-list-page'
 import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
 import { DEFAULT_API_PORT } from '@shared/constants'
 import { buildApiBaseUrl } from '@shared/embedded-api-config'
@@ -47,6 +49,9 @@ export function App(): JSX.Element {
         <Routes>
           <Route element={<AppShell />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/reservations" element={<ReservationsListPage />} />
+            <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
+            <Route path="/reservations/:reservationId" element={<ReservationFormPage mode="edit" />} />
             {isDevRoutesEnabled
               ? devRouteDefinitions.map(({ path, Page }) => (
                   <Route key={path} path={path} element={<Page />} />
