@@ -39,16 +39,28 @@ export function HomePage(): JSX.Element {
           <p className="text-muted-foreground text-sm">
             API base: <span className="font-mono">{starHotel.getEnvironment().apiBaseUrl}</span>
           </p>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={async () => {
-              await starHotel.ping()
-              console.info('[starHotelApp] ping ok')
-            }}
-          >
-            Test API health
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={async () => {
+                await starHotel.pingEmbeddedApi()
+                console.info('[starHotelApp] embedded API health ok')
+              }}
+            >
+              Test API health
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                await starHotel.pingIpc()
+                console.info('[starHotelApp] IPC ping ok')
+              }}
+            >
+              Test IPC
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

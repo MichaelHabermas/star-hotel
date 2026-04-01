@@ -1,31 +1,65 @@
 import { describe, expect, it, vi } from 'vitest'
+import { IPC_CHANNELS } from '@shared/ipc/channels'
+import type { StarHotelPreloadAPI } from '@shared/preload-contract'
 import { createStarHotelApp } from './star-hotel-app'
 
+function mockPreload(
+  overrides: Partial<Pick<StarHotelPreloadAPI, 'invoke'>> = {},
+): StarHotelPreloadAPI {
+  return {
+    platform: 'test',
+    apiBaseUrl: 'http://127.0.0.1:45123',
+    invoke: overrides.invoke ?? vi.fn(async () => ({ ok: true as const })),
+  }
+}
+
 describe('createStarHotelApp', () => {
-  it('ping succeeds when /health returns ok', async () => {
+  it('pingEmbeddedApi succeeds when /health returns ok', async () => {
     const fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ ok: true }),
     })
     const app = createStarHotelApp({
       fetch,
-      starHotel: {
-        platform: 'test',
-        apiBaseUrl: 'http://127.0.0.1:45123',
-      },
+      starHotel: mockPreload(),
     })
-    await expect(app.ping()).resolves.toEqual({ ok: true })
+    await expect(app.pingEmbeddedApi()).resolves.toEqual({ ok: true })
     expect(fetch).toHaveBeenCalledWith('http://127.0.0.1:45123/health')
   })
 
-  it('ping throws when response is not ok', async () => {
+  it('pingEmbeddedApi throws when response is not ok', async () => {
     const app = createStarHotelApp({
       fetch: vi.fn().mockResolvedValue({ ok: false, status: 500 }),
-      starHotel: {
-        platform: 'test',
-        apiBaseUrl: 'http://127.0.0.1:45123',
-      },
+      starHotel: mockPreload(),
     })
-    await expect(app.ping()).rejects.toThrow(/health check failed/)
+    await expect(app.pingEmbeddedApi()).rejects.toThrow(/health check failed/)
+  })
+
+  it('invoke delegates to preload bridge', async () => {
+    const invoke = vi.fn().mockResolvedValue({ ok: true })
+    const app = createStarHotelApp({
+      fetch: vi.fn(),
+      starHotel: mockPreload({ invoke }),
+    })
+    await expect(app.invoke(IPC_CHANNELS.ping)).resolves.toEqual({ ok: true })
+    expect(invoke).toHaveBeenCalledWith(IPC_CHANNELS.ping, undefined)
+  })
+
+  it('pingIpc resolves when IPC returns ok', async () => {
+    const app = createStarHotelApp({
+      fetch: vi.fn(),
+      starHotel: mockPreload(),
+    })
+    await expect(app.pingIpc()).resolves.toEqual({ ok: true })
+  })
+
+  it('pingIpc throws when IPC response is invalid', async () => {
+    const app = createStarHotelApp({
+      fetch: vi.fn(),
+      starHotel: mockPreload({
+        invoke: vi.fn().mockResolvedValue({ ok: false }),
+      }),
+    })
+    await expect(app.pingIpc()).rejects.toThrow(/IPC ping response invalid/)
   })
 })
