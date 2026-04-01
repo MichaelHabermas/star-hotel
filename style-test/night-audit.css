@@ -18,9 +18,9 @@ body {
   --info: #79a8ff;
   --shadow-lg: 0 30px 70px rgba(0, 0, 0, 0.44);
   --shadow-sm: 0 10px 26px rgba(0, 0, 0, 0.3);
-  --font-display: "Fraunces", serif;
-  --font-body: "Inter", sans-serif;
-  --font-ui: "Plus Jakarta Sans", sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-ui: 'Plus Jakarta Sans', sans-serif;
 }
 
 body {

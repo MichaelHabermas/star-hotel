@@ -17,9 +17,9 @@ body {
   --info: #2463d7;
   --shadow-lg: 0 24px 52px rgba(25, 48, 77, 0.12);
   --shadow-sm: 0 12px 22px rgba(25, 48, 77, 0.07);
-  --font-display: "Fraunces", serif;
-  --font-body: "Inter", sans-serif;
-  --font-ui: "Manrope", sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-ui: 'Manrope', sans-serif;
 }
 
 .app-shell {

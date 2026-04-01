@@ -24,19 +24,19 @@
 
 ## 2. User Experience & Functionality
 
-**User personas**
+### **User personas**
 
 - Front-desk staff: fast check-in/out, room status, guest lookup.
 - Night audit / back office: reports and reconciliation (scope per T5).
 - Evaluator (hotel-tech hiring partner): speed, coherence, architectural credibility.
 
-**Non-goals (protect timeline)**
+### **Non-goals (protect timeline)**
 
 - Public guest-facing web booking portal (spec appendix).
 - Substituting Tauri/NW.js or non-mandated stack.
 - Claiming parity for behaviors neither tested nor explicitly scoped (T5, T4).
 
-**User stories & acceptance criteria** are folded under **Epics** below (checkbox format).
+### **User stories & acceptance criteria** are folded under **Epics** below (checkbox format).
 
 ---
 
@@ -48,7 +48,7 @@
 
 ## 4. Technical Specifications
 
-**Architecture overview**
+### **Architecture overview**
 
 ```mermaid
 flowchart TB
@@ -78,7 +78,7 @@ flowchart TB
   EX --> OBS
 ```
 
-**End-to-end data flow (CRUD)**
+### **End-to-end data flow (CRUD)**
 
 ```mermaid
 sequenceDiagram
@@ -97,11 +97,11 @@ sequenceDiagram
   P-->>R: typed_result
 ```
 
-**Integration points:** Internal REST only (no cloud API required for MVP). Post-MVP: Sentry DSN, PostHog key (env-gated; see T7 in [TODOS.md](./TODOS.md)).
+### **Integration points:** Internal REST only (no cloud API required for MVP). Post-MVP: Sentry DSN, PostHog key (env-gated; see T7 in [TODOS.md](./TODOS.md)).
 
-**Security & privacy:** `contextIsolation: true`, `nodeIntegration: false`; parameterized queries; Zod at HTTP boundary; Argon2 for `tbl_user` passwords ([PRE-SEARCH.md](./PRE-SEARCH.md)); structured logging with PII redaction policy before telemetry (T7).
+### **Security & privacy:** `contextIsolation: true`, `nodeIntegration: false`; parameterized queries; Zod at HTTP boundary; Argon2 for `tbl_user` passwords ([PRE-SEARCH.md](./PRE-SEARCH.md)); structured logging with PII redaction policy before telemetry (T7).
 
-**Engineering principles (non-negotiable for implementation)**
+### **Engineering principles (non-negotiable for implementation)**
 
 - **SOLID:** UI components single-purpose; services/controllers for orchestration; repository or query modules abstract persistence; strategy-friendly pricing/report adapters as scope grows.
 - **Modular design:** `packages` or `src/` layers: `domain` (pure logic), `server` (Express, DB), `shared` (Zod schemas/types), `renderer` (UI only).
@@ -111,7 +111,7 @@ sequenceDiagram
 
 ## 5. Risks & Roadmap
 
-**Phased rollout (course checkpoints)**
+### **Phased rollout (course checkpoints)**
 
 - **Phase 0 — Pre-search (2h):** Legacy map complete ([PRE-SEARCH.md](./PRE-SEARCH.md)); decisions logged for T4/T5/T2.
 - **Phase 1 — MVP (~24h):** Spine: scaffold; optional time-boxed visual exploration / A/B (Epic E1.5) before locking design tokens; DB, Express, IPC, one form, CRUD, tests, lint.
@@ -122,7 +122,7 @@ sequenceDiagram
 
 ---
 
-## Epic dependency & parallelism
+### **Epic dependency & parallelism**
 
 ```mermaid
 flowchart LR
@@ -155,7 +155,7 @@ flowchart LR
   E9 --> E10
 ```
 
-**Parallelism (after E1 is green):**
+### **Parallelism (after E1 is green):**
 
 - **E2 (Data)** and **E4 (IPC contract stubs)** can proceed in parallel once repo layout and TS strict baseline exist—coordinate on **shared Zod types**.
 - **E1.5 (design A/B)** may run **concurrently** with **E2** and **E4**; coordinate only if shared files (e.g. global CSS tokens) cause merge churn—prefer token experiments in a dev-only route or isolated files until a decision is written.
@@ -165,7 +165,7 @@ flowchart LR
 
 ---
 
-## Subagent / complementary roles during build
+### **Subagent / complementary roles during build**
 
 Use Cursor **Task** subagents (or equivalent) with **narrow prompts** and **readonly** where appropriate:
 
@@ -190,7 +190,7 @@ Use Cursor **Task** subagents (or equivalent) with **narrow prompts** and **read
 Do not check an epic until its **Epic DoD** is satisfied (all child user stories checked).
 
 - [x] **E0** — Pre-search, decisions, traceability
-- [ ] **E1** — Repository scaffold & developer experience
+- [x] **E1** — Repository scaffold & developer experience
 - [ ] **E1.5** — Visual design exploration & A/B (dev-only)
 - [ ] **E2** — Data layer (SQLite, migrations, WAL)
 - [ ] **E3** — Backend API (Express in main)
@@ -235,22 +235,22 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm test`, `pnpm lint`, `pnpm format` exist and are documented in README; strict TS; Electron + Vite stable; Tailwind v4 + shadcn baseline; React **global error boundary** (spec MVP).
 
-- [ ] **US1.1 — Electron + Vite + TS strict baseline**  
+- [x] **US1.1 — Electron + Vite + TS strict baseline**  
   - **Feature F1.1.1:** Project scaffold (course: create-electron-vite-style).  
-    - [ ] **T1.1.1.1:** pnpm workspace / single package layout per team choice.  
-    - [ ] **T1.1.1.2:** ESLint + Prettier configs; CI-ready scripts.  
+    - [x] **T1.1.1.1:** pnpm workspace / single package layout per team choice.  
+    - [x] **T1.1.1.2:** ESLint + Prettier configs; CI-ready scripts.  
     - **DoD:** Clean lint/format; app launches blank shell; cold-start measured and recorded (target ≤2000 ms or gap documented with remediation plan).
 
-- [ ] **US1.2 — Tailwind v4 + shadcn/ui**  
+- [x] **US1.2 — Tailwind v4 + shadcn/ui**  
   - **Feature F1.2.1:** CSS-first Tailwind v4 per spec.  
-    - [ ] **T1.2.1.1:** shadcn init compatible with React 19 + Tailwind v4.  
-    - [ ] **T1.2.1.2:** Design tokens / layout shell for future forms.  
+    - [x] **T1.2.1.1:** shadcn init compatible with React 19 + Tailwind v4.  
+    - [x] **T1.2.1.2:** Design tokens / layout shell for future forms.  
     - **DoD:** Demo view in renderer proves utilities + ≥1 shadcn primitive under Electron; no Rollup errors on CSS pipeline.
 
-- [ ] **US1.3 — Global error boundary**  
+- [x] **US1.3 — Global error boundary**  
   - **Feature F1.3.1:** React error boundary (spec MVP).  
-    - [ ] **T1.3.1.1:** Boundary wraps routed content; fallback UI is accessible and non-crashing.  
-    - [ ] **T1.3.1.2:** Dev-only throw route or test proves boundary catches render errors.  
+    - [x] **T1.3.1.1:** Boundary wraps routed content; fallback UI is accessible and non-crashing.  
+    - [x] **T1.3.1.2:** Dev-only throw route or test proves boundary catches render errors.  
     - **DoD:** Documented behavior; manual or automated proof attached to PR notes.
 
 ---

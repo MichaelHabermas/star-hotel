@@ -1,6 +1,6 @@
 # Star Hotel
 
-Modernized desktop replacement for the legacy VB6 + Microsoft Access hotel reservation system. **Epic E1** (scaffold) is implemented: Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
+Modernized desktop replacement for the legacy VB6 + Microsoft Access hotel reservation system. **Epic E1** (scaffold) is complete in [docs/PRD.md](docs/PRD.md): Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
 
 Authoritative requirements: [docs/PRD.md](docs/PRD.md).
 
@@ -24,6 +24,8 @@ Authoritative requirements: [docs/PRD.md](docs/PRD.md).
 | `pnpm typecheck`    | `tsc --noEmit` for main/preload + renderer |
 
 Single test file: `pnpm test -- src/renderer/src/lib/utils.test.ts`
+
+CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typecheck`, `test`, and `build` — see [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 ## Project layout (modular boundaries)
 
