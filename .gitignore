@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # Local machine-specific settings
 .claude/settings.local.json
+
+# Cursor IDE: hook state (session metrics; changes every run)
+.cursor/hooks/state/
