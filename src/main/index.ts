@@ -3,6 +3,7 @@ import { app } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildApiBaseUrl, resolveApiPort } from '@shared/embedded-api-config'
+import { startStarHotelMain } from './bootstrap'
 import { startEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers } from './ipc-handlers'
 import { registerActivateHandler, registerWindowAllClosed } from './lifecycle'
@@ -35,26 +36,15 @@ function mainWindowParams() {
   } as const
 }
 
-registerWindowAllClosed()
-
-app.whenReady().then(async () => {
-  const readyMs = Date.now() - appStartMs
-  console.log(`[star-hotel] app.whenReady() + ${readyMs}ms from process start (see docs/PERF.md)`)
-
-  try {
-    await ensureEmbeddedApiServer()
-    console.log(`[star-hotel] API ${apiBaseUrl} (see docs/PERF.md)`)
-  } catch (err) {
-    console.error('[star-hotel] embedded API server failed to start', err)
-    app.quit()
-    return
-  }
-
-  registerIpcHandlers()
-
-  createMainWindow(mainWindowParams())
-
-  registerActivateHandler(() => {
-    createMainWindow(mainWindowParams())
-  })
+void startStarHotelMain({
+  app,
+  appStartMs,
+  apiBaseUrl,
+  ensureEmbeddedApiServer,
+  registerIpcHandlers,
+  registerWindowAllClosed,
+  registerActivateHandler,
+  createMainWindow,
+  mainWindowParams,
+  logger: console,
 })
