@@ -6,6 +6,8 @@ export type MainWindowDeps = {
   readonly scriptDir: string
   readonly isDev: boolean
   readonly rendererUrl?: string
+  /** Must match the embedded API listen URL (passed to preload via `additionalArguments`). */
+  readonly apiBaseUrl: string
 }
 
 export function createMainWindow(deps: MainWindowDeps): BrowserWindow {
@@ -18,6 +20,7 @@ export function createMainWindow(deps: MainWindowDeps): BrowserWindow {
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
+      additionalArguments: [`--star-hotel-api-base=${deps.apiBaseUrl}`],
     },
   })
 
