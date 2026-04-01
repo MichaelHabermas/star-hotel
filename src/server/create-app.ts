@@ -1,11 +1,11 @@
 import express, { type ErrorRequestHandler } from 'express'
 import { mapErrorToHttp } from './http/json-error'
 import { noopPersistencePort, type PersistencePort } from './ports/persistence'
-import { isSqlitePersistencePort } from './persistence/sqlite-persistence'
-import { createReservationRouter } from './reservations/reservation-router'
 
 export type CreateServerAppOptions = {
   persistence?: PersistencePort
+  /** Mount `/api/*` routes (composition root). Omitted when only `/health` is needed. */
+  registerApiRoutes?: (app: express.Express) => void
 }
 
 /** Express app for the in-main API (no listen — main owns the HTTP server). */
@@ -21,9 +21,7 @@ export function createServerApp(options: CreateServerAppOptions = {}): express.E
     res.status(200).json({ ok: true })
   })
 
-  if (isSqlitePersistencePort(persistence)) {
-    app.use('/api/reservations', createReservationRouter(persistence))
-  }
+  options.registerApiRoutes?.(app)
 
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (res.headersSent) {

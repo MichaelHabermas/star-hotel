@@ -1,10 +1,11 @@
-import { IPC_CHANNELS, type IpcChannel } from '@shared/ipc/channels'
+import type { IpcChannel } from '@shared/ipc/channels'
+import { invokeIpcPing } from '@shared/ipc/typed-invoke'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
 
 /** Renderer port: preload bridge + embedded API (dependency inversion — avoid `window` in features). */
 export type StarHotelApp = {
   getEnvironment(): Pick<StarHotelPreloadAPI, 'platform' | 'apiBaseUrl'>
-  /** Typed IPC to main; domain data stays on Express (see `IPC_CHANNELS`). */
+  /** Typed IPC to main; domain data stays on Express (see channel registry in `ipc/channels`). */
   invoke(channel: IpcChannel, payload?: unknown): Promise<unknown>
   /** Embedded Express API is up (HTTP GET `/health`). */
   pingEmbeddedApi(): Promise<{ ok: true }>
@@ -38,16 +39,7 @@ export function createStarHotelApp(deps: {
       return { ok: true as const }
     },
     async pingIpc() {
-      const result = await deps.starHotel.invoke(IPC_CHANNELS.ping)
-      if (
-        typeof result !== 'object' ||
-        result === null ||
-        !('ok' in result) ||
-        (result as { ok: unknown }).ok !== true
-      ) {
-        throw new Error('IPC ping response invalid')
-      }
-      return { ok: true as const }
+      return invokeIpcPing(deps.starHotel)
     },
   }
 }

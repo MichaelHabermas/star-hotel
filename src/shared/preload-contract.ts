@@ -10,7 +10,10 @@ export const starHotelPreloadBridgeSchema = z.object({
 
 export type StarHotelPreloadBridge = z.infer<typeof starHotelPreloadBridgeSchema>
 
-/** Full preload API: bridge data + non-JSON `invoke` (contextBridge can expose functions). */
+/**
+ * Full preload API: bridge data + non-JSON `invoke` (contextBridge can expose functions).
+ * Use typed helpers in `ipc/typed-invoke.ts` for channel results (Zod-validated).
+ */
 export type StarHotelPreloadAPI = StarHotelPreloadBridge & {
   readonly invoke: (channel: IpcChannel, payload?: unknown) => Promise<unknown>
 }

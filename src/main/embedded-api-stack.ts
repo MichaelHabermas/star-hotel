@@ -2,10 +2,20 @@ import type http from 'node:http'
 import type { App } from 'electron'
 import { buildApiBaseUrl, resolveApiPortFromEnv } from '@shared/embedded-api-config'
 import { resolveDatabaseFilePath } from '../server/db/database-path'
-import { createSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
+import { createSqlitePersistencePort as defaultCreateSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
 import type { PersistencePort } from '../server/ports/persistence'
-import { startEmbeddedApiServer } from './http-server'
+import { registerSqliteReservationRoutes } from '../server/reservations/register-sqlite-reservation-routes'
+import { startEmbeddedApiServer as defaultStartEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers as registerIpcHandlersImpl } from './ipc-handlers'
+
+export type CreateEmbeddedApiStackOptions = {
+  readonly getUserDataPath: () => string
+  readonly env: NodeJS.ProcessEnv
+  /** Defaults to production SQLite adapter; inject for tests. */
+  readonly createSqlitePersistencePort?: typeof defaultCreateSqlitePersistencePort
+  /** Defaults to real HTTP listener; inject to avoid binding ports in tests. */
+  readonly startEmbeddedApiServer?: typeof defaultStartEmbeddedApiServer
+}
 
 export type EmbeddedApiStack = {
   readonly apiPort: number
@@ -18,12 +28,12 @@ export type EmbeddedApiStack = {
 /**
  * Wires embedded Express + SQLite + IPC for the main process. Injected env and userData path keep this testable.
  */
-export function createEmbeddedApiStack(options: {
-  readonly getUserDataPath: () => string
-  readonly env: NodeJS.ProcessEnv
-}): EmbeddedApiStack {
+export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): EmbeddedApiStack {
   const apiPort = resolveApiPortFromEnv(options.env)
   const apiBaseUrl = buildApiBaseUrl(apiPort)
+  const createSqlitePersistencePort =
+    options.createSqlitePersistencePort ?? defaultCreateSqlitePersistencePort
+  const startEmbeddedApiServer = options.startEmbeddedApiServer ?? defaultStartEmbeddedApiServer
 
   let persistence: PersistencePort | null = null
   let embeddedApiServerPromise: Promise<http.Server> | null = null
@@ -32,22 +42,25 @@ export function createEmbeddedApiStack(options: {
   function ensureEmbeddedApiServer(): Promise<http.Server> {
     if (!embeddedApiServerPromise) {
       const dbFilePath = resolveDatabaseFilePath(options.getUserDataPath())
-      persistence = createSqlitePersistencePort({ dbFilePath })
+      const sqlite = createSqlitePersistencePort({ dbFilePath })
+      persistence = sqlite
       embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
-        persistence,
+        persistence: sqlite,
+        registerApiRoutes: (app) => {
+          registerSqliteReservationRoutes(app, sqlite)
+        },
       })
     }
     return embeddedApiServerPromise
   }
 
   function registerIpcHandlers(): void {
+    if (!persistence) {
+      throw new Error('[star-hotel] IPC registered before embedded API started')
+    }
+    const activePersistence = persistence
     registerIpcHandlersImpl({
-      getPersistence: () => {
-        if (!persistence) {
-          throw new Error('[star-hotel] IPC registered before embedded API started')
-        }
-        return persistence
-      },
+      getPersistence: () => activePersistence,
     })
   }
 

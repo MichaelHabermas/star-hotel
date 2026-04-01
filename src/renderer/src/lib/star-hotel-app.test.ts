@@ -1,3 +1,4 @@
+import { ZodError } from 'zod'
 import { describe, expect, it, vi } from 'vitest'
 import { IPC_CHANNELS } from '@shared/ipc/channels'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
@@ -53,13 +54,13 @@ describe('createStarHotelApp', () => {
     await expect(app.pingIpc()).resolves.toEqual({ ok: true })
   })
 
-  it('pingIpc throws when IPC response is invalid', async () => {
+  it('pingIpc throws when IPC response fails Zod validation', async () => {
     const app = createStarHotelApp({
       fetch: vi.fn(),
       starHotel: mockPreload({
         invoke: vi.fn().mockResolvedValue({ ok: false }),
       }),
     })
-    await expect(app.pingIpc()).rejects.toThrow(/IPC ping response invalid/)
+    await expect(app.pingIpc()).rejects.toThrow(ZodError)
   })
 })

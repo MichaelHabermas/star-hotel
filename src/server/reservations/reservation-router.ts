@@ -18,30 +18,37 @@ function asyncHandler(
   }
 }
 
-function serviceFor(persistence: SqlitePersistencePort): ReservationService {
-  const db = persistence.getDatabase()
-  return new ReservationService(new ReservationRepository(db))
-}
-
 export function createReservationRouter(persistence: SqlitePersistencePort): Router {
   const router = Router()
+  let reservationService: ReservationService | null = null
 
   router.use(async (req, res, next) => {
     try {
       await persistence.isReady()
+      if (!reservationService) {
+        reservationService = new ReservationService(
+          new ReservationRepository(persistence.getDatabase()),
+        )
+      }
       next()
     } catch (err) {
       next(err)
     }
   })
 
+  function getService(): ReservationService {
+    if (!reservationService) {
+      throw new Error('[star-hotel] reservation service used before persistence ready')
+    }
+    return reservationService
+  }
+
   router.get(
     '/',
     asyncHandler(async (req, res, next) => {
       try {
         const q = reservationListQuerySchema.parse(req.query)
-        const svc = serviceFor(persistence)
-        res.status(200).json(svc.list(q))
+        res.status(200).json(getService().list(q))
       } catch (err) {
         next(err)
       }
@@ -53,8 +60,7 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
-        const svc = serviceFor(persistence)
-        res.status(200).json(svc.get(id))
+        res.status(200).json(getService().get(id))
       } catch (err) {
         next(err)
       }
@@ -66,8 +72,7 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const body = reservationCreateBodySchema.parse(req.body)
-        const svc = serviceFor(persistence)
-        res.status(201).json(svc.create(body))
+        res.status(201).json(getService().create(body))
       } catch (err) {
         next(err)
       }
@@ -80,8 +85,7 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
         const body = reservationUpdateBodySchema.parse(req.body)
-        const svc = serviceFor(persistence)
-        res.status(200).json(svc.update(id, body))
+        res.status(200).json(getService().update(id, body))
       } catch (err) {
         next(err)
       }
@@ -93,8 +97,7 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
-        const svc = serviceFor(persistence)
-        svc.delete(id)
+        getService().delete(id)
         res.status(204).send()
       } catch (err) {
         next(err)

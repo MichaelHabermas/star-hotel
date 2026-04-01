@@ -12,7 +12,8 @@ import {
   ReservationNotFoundError,
   RoomNotFoundError,
 } from './reservation-errors'
-import { type ReservationRow, ReservationRepository } from './reservation-repository'
+import type { ReservationRepositoryPort } from './reservation-repository-port'
+import type { ReservationRow } from './reservation-repository'
 
 function rowToResponse(row: ReservationRow): ReservationResponse {
   return {
@@ -26,7 +27,7 @@ function rowToResponse(row: ReservationRow): ReservationResponse {
 }
 
 export class ReservationService {
-  constructor(private readonly repo: ReservationRepository) {}
+  constructor(private readonly repo: ReservationRepositoryPort) {}
 
   list(query: ReservationListQuery): ReservationResponse[] {
     return this.repo.list(query).map(rowToResponse)

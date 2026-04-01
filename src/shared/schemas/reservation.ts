@@ -54,11 +54,13 @@ export const reservationListQuerySchema = z
 
 export type ReservationListQuery = z.infer<typeof reservationListQuerySchema>
 
-export type ReservationResponse = {
-  id: number
-  roomId: number
-  guestId: number
-  checkInDate: string
-  checkOutDate: string
-  totalAmount: number
-}
+export const reservationResponseSchema = z.object({
+  id: z.number(),
+  roomId: z.number(),
+  guestId: z.number(),
+  checkInDate: isoDateStringSchema,
+  checkOutDate: isoDateStringSchema,
+  totalAmount: z.number(),
+})
+
+export type ReservationResponse = z.infer<typeof reservationResponseSchema>

@@ -1,5 +1,6 @@
 import type DatabaseType from 'better-sqlite3'
 import type { ReservationListQuery } from '@shared/schemas/reservation'
+import type { ReservationRepositoryPort } from './reservation-repository-port'
 
 type SqliteDatabase = InstanceType<typeof DatabaseType>
 
@@ -20,7 +21,7 @@ export type ReservationWrite = {
   totalAmount: number
 }
 
-export class ReservationRepository {
+export class ReservationRepository implements ReservationRepositoryPort {
   constructor(private readonly db: SqliteDatabase) {}
 
   list(query: ReservationListQuery): ReservationRow[] {

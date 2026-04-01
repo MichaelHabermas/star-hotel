@@ -5,6 +5,7 @@ import {
   createSqlitePersistencePort,
   type SqlitePersistencePort,
 } from './persistence/sqlite-persistence'
+import { registerSqliteReservationRoutes } from './reservations/register-sqlite-reservation-routes'
 
 type SqliteDb = ReturnType<SqlitePersistencePort['getDatabase']>
 
@@ -30,7 +31,12 @@ describe('createServerApp — reservations API', () => {
     await persistence.isReady()
     const { roomId, guestId } = seedRoomAndGuest(persistence.getDatabase())
 
-    const app = createServerApp({ persistence })
+    const app = createServerApp({
+      persistence,
+      registerApiRoutes: (expressApp) => {
+        registerSqliteReservationRoutes(expressApp, persistence)
+      },
+    })
 
     const createRes = await request(app)
       .post('/api/reservations')
