@@ -26,10 +26,9 @@ export function normalizeEmbeddedApiBaseUrl(baseUrl: string): string {
   return baseUrl.replace(/\/$/, '')
 }
 
-export async function readEmbeddedApiErrorBody(
-  res: Response,
-): Promise<EmbeddedApiErrorBody | undefined> {
-  const text = await res.text()
+function parseEmbeddedApiErrorBodyFromText(
+  text: string,
+): EmbeddedApiErrorBody | undefined {
   if (text === '') {
     return undefined
   }
@@ -42,17 +41,30 @@ export async function readEmbeddedApiErrorBody(
   }
 }
 
+export async function readEmbeddedApiErrorBody(
+  res: Response,
+): Promise<EmbeddedApiErrorBody | undefined> {
+  const text = await res.text()
+  return parseEmbeddedApiErrorBodyFromText(text)
+}
+
 export async function parseEmbeddedJsonOk<T>(
   res: Response,
   schema: z.ZodType<T>,
 ): Promise<T> {
-  const json: unknown = await res.json()
+  const text = await res.text()
   if (!res.ok) {
-    const parsed = embeddedApiErrorBodySchema.safeParse(json)
-    if (parsed.success) {
-      throw new EmbeddedApiHttpError(res.status, parsed.data)
+    const errBody = parseEmbeddedApiErrorBodyFromText(text)
+    if (errBody) {
+      throw new EmbeddedApiHttpError(res.status, errBody)
     }
     throw new Error(`HTTP ${res.status}`)
+  }
+  let json: unknown
+  try {
+    json = JSON.parse(text)
+  } catch {
+    throw new Error(`Invalid JSON response (HTTP ${res.status})`)
   }
   return schema.parse(json)
 }

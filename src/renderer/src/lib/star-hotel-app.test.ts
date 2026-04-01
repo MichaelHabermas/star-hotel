@@ -66,10 +66,7 @@ describe('createStarHotelApp', () => {
   })
 
   it('api.reservations.list uses embedded base URL', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [],
-    })
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }))
     const app = createStarHotelApp({
       fetch: fetchMock,
       starHotel: mockPreload(),
