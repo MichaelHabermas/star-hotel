@@ -10,6 +10,7 @@ const sharedAliases = {
 
 /** Tests that run in Node (no DOM, no renderer setup file). */
 const nodeTestGlobs = [
+  'src/domain/**/*.{test,spec}.{ts,tsx}',
   'src/server/**/*.{test,spec}.{ts,tsx}',
   'src/shared/**/*.{test,spec}.{ts,tsx}',
   'src/main/**/*.{test,spec}.{ts,tsx}',

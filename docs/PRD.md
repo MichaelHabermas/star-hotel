@@ -20,6 +20,10 @@
 - **Performance (spec targets):** Cold start ≤2000 ms; critical DB ops ≤50 ms (local WAL); IPC round-trip ≤15 ms (dev-measured harness); primary view transition ≤100 ms perceived; memory discipline toward ≤300 MB under normal use (document methodology).
 - **Quality bar:** No raw SQL or DB access from React; Zod on all external inputs; schema-level FK/UNIQUE/NOT NULL where applicable; parity claims backed by tests or an explicit written gap list.
 
+### MVP milestone: one bar (complete = demo-able = shipable)
+
+**Note for the team:** For the **MVP gate**, **MVP complete**, **demo-able**, and **shipable** are the **same milestone**—one Definition of Done, not three staggered checkpoints. Do not treat “MVP done” as true while a separate “demo prep” or “ship prep” track is still open; the checklist above is satisfied only when the build is ready to show an evaluator and acceptable as the completed MVP slice. **On the epic timeline (see §5 and the roll-up between E6 and E7),** that moment is **only when Epics E3, E4, E5, and E6 are all complete** (with **E0–E2**, **E1**, and **E1.5** already done per the dependency graph). Phases after MVP (broader UI, observability, reports, **E10** packaging and course submission) add scope **beyond** MVP; they do not split “MVP” into partial demo vs partial ship states.
+
 ---
 
 ## 2. User Experience & Functionality
@@ -114,7 +118,7 @@ sequenceDiagram
 ### **Phased rollout (course checkpoints)**
 
 - **Phase 0 — Pre-search (2h):** Legacy map complete ([PRE-SEARCH.md](./PRE-SEARCH.md)); decisions logged for T4/T5/T2.
-- **Phase 1 — MVP (~24h):** Spine: scaffold; optional time-boxed visual exploration / A/B (Epic E1.5) before locking design tokens; DB, Express, IPC, one form, CRUD, tests, lint.
+- **Phase 1 — MVP (~24h):** Spine: scaffold; optional time-boxed visual exploration / A/B (Epic E1.5) before locking design tokens; DB, Express, IPC, one form, CRUD, tests, lint. **MVP milestone on the epic graph:** completion of **E3 + E4 + E5 + E6** (prerequisites **E0–E2**, **E1**, **E1.5**)—see §5 *MVP milestone on the epic timeline*.
 - **Phase 2 — Early submission (~day 4):** Broaden UI; Sentry + PostHog; structured logging; performance budget instrumentation.
 - **Phase 3 — Final (~day 7):** Parity gaps closed per scope; reports per T5; packaging; submission artifacts.
 
@@ -154,6 +158,10 @@ flowchart LR
   E8 --> E10
   E9 --> E10
 ```
+
+### **MVP milestone on the epic timeline**
+
+**Marked point:** The **MVP gate** (where **complete = demo-able = shipable**, per §1) occurs **once Epics E3, E4, E5, and E6 are all done**—not when E5 alone is done, and not split across later epics. On the diagram above, that is **after E6** on the spine **E3/E4 → E5 → E6**, with **E0–E2**, **E1**, and **E1.5** feeding in as shown. **E7–E10** are **post-MVP** on this PRD (early submission, parity breadth, reports, packaging).
 
 ### **Parallelism (after E1 is green):**
 
@@ -197,6 +205,9 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [ ] **E4** — IPC contract (preload / contextBridge)
 - [ ] **E5** — MVP form + full CRUD path
 - [ ] **E6** — Testing & quality gates
+
+**MVP milestone (marked here on the timeline):** When **E3**, **E4**, **E5**, and **E6** are all checked, you are at the **single** MVP checkpoint—**complete**, **demo-able**, and **shipable** mean the same thing ([§1 — MVP milestone](#mvp-milestone-one-bar-complete--demo-able--shipable)). Anything below this line is **after** MVP.
+
 - [ ] **E7** — Performance budget & observability
 - [ ] **E8** — Full parity UI (module breadth per spec)
 - [ ] **E9** — Reports (scope per T5)

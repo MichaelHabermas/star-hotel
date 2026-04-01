@@ -14,4 +14,9 @@ describe('createSqlitePersistencePort', () => {
     await expect(p.close()).resolves.toBeUndefined()
     await expect(p.close()).resolves.toBeUndefined()
   })
+
+  it('getDatabase throws before isReady', () => {
+    const p = createSqlitePersistencePort({ dbFilePath: ':memory:' })
+    expect(() => p.getDatabase()).toThrow(/before isReady/)
+  })
 })

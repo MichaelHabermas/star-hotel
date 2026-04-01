@@ -8,11 +8,21 @@ export type SqlitePersistenceOptions = {
 
 type SqliteDatabase = InstanceType<typeof Database>
 
+export type SqlitePersistencePort = PersistencePort & {
+  getDatabase(): SqliteDatabase
+}
+
+export function isSqlitePersistencePort(p: PersistencePort): p is SqlitePersistencePort {
+  return typeof (p as SqlitePersistencePort).getDatabase === 'function'
+}
+
 /**
  * Opens SQLite in the main process, enables WAL + foreign keys, runs migrations.
  * Single shared connection for the embedded API lifetime.
  */
-export function createSqlitePersistencePort(options: SqlitePersistenceOptions): PersistencePort {
+export function createSqlitePersistencePort(
+  options: SqlitePersistenceOptions,
+): SqlitePersistencePort {
   let db: SqliteDatabase | null = null
 
   return {
@@ -33,6 +43,12 @@ export function createSqlitePersistencePort(options: SqlitePersistenceOptions): 
       const toClose = db
       db = null
       toClose.close()
+    },
+    getDatabase() {
+      if (!db) {
+        throw new Error('[star-hotel] getDatabase() called before isReady() completed')
+      }
+      return db
     },
   }
 }

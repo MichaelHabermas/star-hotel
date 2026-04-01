@@ -42,6 +42,19 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
+## Embedded Express API (Epic E3)
+
+The main process runs an HTTP server on **loopback only** (`127.0.0.1`), not on the LAN.
+
+| Topic                   | Detail                                                                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default port**        | `45123` — see [`src/shared/constants.ts`](src/shared/constants.ts).                                                                                                                                                     |
+| **Override**            | Set **`STAR_HOTEL_PORT`** to an integer in `1`–`65535`. Invalid or missing values fall back to the default ([`resolveApiPortFromEnv`](src/shared/embedded-api-config.ts)).                                              |
+| **Renderer base URL**   | Preload/renderer may receive `--star-hotel-api-base=http://127.0.0.1:<port>`; otherwise the port env + [`buildApiBaseUrl`](src/shared/embedded-api-config.ts) apply.                                                    |
+| **Port already in use** | `listen` fails with **`EADDRINUSE`**. The app does **not** auto-pick another port; free the port or change `STAR_HOTEL_PORT`.                                                                                           |
+| **Health**              | `GET /health` returns `{ "ok": true }` after SQLite migrations complete.                                                                                                                                                |
+| **Reservations (MVP)**  | `GET/POST /api/reservations`, `GET/PATCH/DELETE /api/reservations/:id` — Zod-validated JSON; totals follow [`src/domain/reservation-pricing.ts`](src/domain/reservation-pricing.ts) (legacy `DateDiff` × nightly rate). |
+
 ## SQLite database (Epic E2)
 
 - **Location:** The app opens `database.sqlite` under Electron **`userData`** (see [`resolveDatabaseFilePath`](src/server/db/database-path.ts)). Standalone install per machine; shared network DB paths are deferred (see [docs/DECISIONS.md](docs/DECISIONS.md) T4).

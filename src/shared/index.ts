@@ -8,6 +8,7 @@ export {
   STAR_HOTEL_PORT_ENV,
 } from './embedded-api-config'
 export { IPC_CHANNELS, type IpcChannel } from './ipc/channels'
+export * from './schemas/reservation'
 export {
   starHotelPreloadBridgeSchema,
   type StarHotelPreloadAPI,
