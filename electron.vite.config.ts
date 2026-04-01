@@ -15,6 +15,14 @@ export default defineConfig({
   preload: {
     plugins: [externalizeDepsPlugin()],
     resolve: { alias: { ...sharedAlias } },
+    build: {
+      rollupOptions: {
+        output: {
+          format: 'cjs',
+          entryFileNames: 'index.js',
+        },
+      },
+    },
   },
   renderer: {
     root: resolve(__dirname, 'src/renderer'),

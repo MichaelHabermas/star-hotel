@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Star Hotel Style Test — Night Audit</title>
+    <link rel="stylesheet" href="./common.css" />
+    <link rel="stylesheet" href="./night-audit.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">SH</div>
+          <div class="brand-copy">
+            <h1>Star Hotel</h1>
+            <p>Reservations / Check-In • Night Audit</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="status-chip success">Audit closed</span>
+          <span class="status-chip warning">1 folio needs review</span>
+          <a class="ghost-button" href="./index.html">Back to concepts</a>
+          <a class="solid-button" href="#">Resume check-in</a>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="rail">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Overnight board</h2>
+                <p>Higher contrast for low-light shifts and long sessions.</p>
+              </div>
+              <span class="eyebrow">11:48 PM</span>
+            </div>
+
+            <div class="mini-metrics">
+              <div class="mini-metric">
+                <strong>4</strong>
+                <span>Late arrivals</span>
+              </div>
+              <div class="mini-metric">
+                <strong>2</strong>
+                <span>Audit holds</span>
+              </div>
+              <div class="mini-metric">
+                <strong>91%</strong>
+                <span>Occupancy</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Assignable rooms</h2>
+                <p>Dark mode stress test for status contrast and hierarchy.</p>
+              </div>
+            </div>
+
+            <div class="room-list">
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Room 808</strong>
+                  <span class="pill available">Ready</span>
+                </div>
+                <p>High-floor king • Quiet wing • Audit-safe assignment</p>
+                <div class="room-meta">
+                  <span class="pill available">Available</span>
+                  <span class="pill">King</span>
+                  <span class="pill">$249 / night</span>
+                </div>
+              </article>
+
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Room 455</strong>
+                  <span class="pill dirty">Inspect</span>
+                </div>
+                <p>Turn complete, minibar variance needs acknowledgment</p>
+                <div class="room-meta">
+                  <span class="pill dirty">Pending inspect</span>
+                  <span class="pill">Queen</span>
+                  <span class="pill">Supervisor signoff</span>
+                </div>
+              </article>
+
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Suite 901</strong>
+                  <span class="pill vip">Priority</span>
+                </div>
+                <p>CEO arrival held with direct-to-room check-in privileges</p>
+                <div class="room-meta">
+                  <span class="pill available">Available</span>
+                  <span class="pill vip">Escort required</span>
+                  <span class="pill">Key packet sealed</span>
+                </div>
+              </article>
+            </div>
+          </section>
+        </aside>
+
+        <section class="main-column">
+          <div class="banner">
+            <div>
+              <strong>Error-recovery test</strong>
+              <p>
+                Corporate tax exemption failed validation. The clerk can still complete the room
+                assignment and save the folio in review state without losing guest input.
+              </p>
+            </div>
+            <span class="status-chip warning">Review required</span>
+          </div>
+
+          <div class="checkin-grid">
+            <section class="checkin-card">
+              <div class="panel-header">
+                <div>
+                  <h2>Late arrival form</h2>
+                  <p>Dark mode version of the same front-desk muscle-memory layout.</p>
+                </div>
+                <span class="eyebrow">Walk-in recovery</span>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label>Guest</label>
+                  <div class="input">Danielle Brooks</div>
+                </div>
+                <div class="field">
+                  <label>Arrival source</label>
+                  <div class="selector">
+                    <span>Phone booking</span>
+                    <span>1 hour ago</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Tonight</label>
+                  <div class="selector">
+                    <span>Apr 1, 2026</span>
+                    <span>Late arrival</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Departure</label>
+                  <div class="selector">
+                    <span>Apr 2, 2026</span>
+                    <span>1 night</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Assigned room</label>
+                  <div class="selector">
+                    <span>Room 808</span>
+                    <span>Quiet wing</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Payment method</label>
+                  <div class="selector">
+                    <span>Mastercard ending 0048</span>
+                    <span>Chip fallback</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="subsection">
+                <h3>Desk notes</h3>
+                <div class="textarea">
+                  Flight delay. Guest requested express checkout and emailed folio only. Tax exempt
+                  paperwork to be reverified by manager at 7:00 AM.
+                </div>
+              </div>
+            </section>
+
+            <section class="summary-card">
+              <div class="panel-header">
+                <div>
+                  <h2>Folio check</h2>
+                  <p>Designed to prove contrast and hierarchy under stress.</p>
+                </div>
+              </div>
+
+              <div class="rate-table">
+                <div class="table-head">
+                  <div>Charge</div>
+                  <div>Base</div>
+                  <div>Status</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Room night</div>
+                  <div class="table-cell">$249.00</div>
+                  <div class="table-cell">Ready</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Incidentals hold</div>
+                  <div class="table-cell">$150.00</div>
+                  <div class="table-cell">Authorized</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Tax exemption</div>
+                  <div class="table-cell">Pending</div>
+                  <div class="table-cell">Review</div>
+                </div>
+              </div>
+
+              <div class="summary-total">
+                <span>Tonight if tax clears</span>
+                <strong>$249.00</strong>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="timeline-card">
+            <div class="panel-header">
+              <div>
+                <h2>Recent actions</h2>
+                <p>Dark-mode activity cards for overnight monitoring.</p>
+              </div>
+            </div>
+            <div class="timeline-list">
+              <div class="timeline-item">
+                <time>11:22 PM</time>
+                <strong>Audit batch completed</strong>
+                <p>Daily room and tax postings locked without discrepancy.</p>
+              </div>
+              <div class="timeline-item">
+                <time>11:37 PM</time>
+                <strong>Card fallback accepted</strong>
+                <p>Reader timeout resolved after second chip attempt.</p>
+              </div>
+              <div class="timeline-item">
+                <time>11:43 PM</time>
+                <strong>Manager note attached</strong>
+                <p>Tax document review delegated to morning shift lead.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="activity-card">
+            <div class="panel-header">
+              <div>
+                <h2>Before completion</h2>
+                <p>High-contrast checklist with reduced glare.</p>
+              </div>
+            </div>
+
+            <div class="activity-list">
+              <div class="activity-item">
+                <strong>ID verified</strong>
+                <p>Name and photo match reservation record.</p>
+              </div>
+              <div class="activity-item">
+                <strong>Tax paperwork unresolved</strong>
+                <p>Save in review state and notify morning manager.</p>
+              </div>
+              <div class="activity-item">
+                <strong>Folio delivery set to email</strong>
+                <p>No print packet required for this guest.</p>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <a class="ghost-button" href="#">Save for review</a>
+              <a class="solid-button" href="#">Check in guest</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="screen-footer">
+        <span>Direction test: credible low-light mode for overnight operators, not just inverted light theme.</span>
+        <span>Core cues: deep navy panels, electric blue focus, amber service accents, explicit contrast.</span>
+      </footer>
+    </div>
+  </body>
+</html>

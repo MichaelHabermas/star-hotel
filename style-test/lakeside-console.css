@@ -1,0 +1,49 @@
+body {
+  --bg: #eff5fb;
+  --bg-accent: #dfe9f4;
+  --panel: rgba(255, 255, 255, 0.9);
+  --panel-strong: #ffffff;
+  --panel-muted: #edf3f8;
+  --line: rgba(36, 61, 88, 0.12);
+  --line-strong: rgba(36, 61, 88, 0.22);
+  --text: #142033;
+  --muted: #5d718b;
+  --primary: #1f4f88;
+  --primary-strong: #173b66;
+  --accent: #0f8a8d;
+  --success: #127b67;
+  --warning: #c8850c;
+  --danger: #cb4a3f;
+  --info: #2463d7;
+  --shadow-lg: 0 24px 52px rgba(25, 48, 77, 0.12);
+  --shadow-sm: 0 12px 22px rgba(25, 48, 77, 0.07);
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+  --font-ui: "Manrope", sans-serif;
+}
+
+.app-shell {
+  border-radius: 30px;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #1f4f88, #0f8a8d);
+}
+
+.topbar {
+  background:
+    linear-gradient(90deg, rgba(253, 255, 255, 0.96), rgba(236, 244, 250, 0.8)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), transparent);
+}
+
+.status-chip {
+  background: rgba(36, 99, 215, 0.12);
+}
+
+.status-chip.success {
+  background: rgba(18, 123, 103, 0.14);
+}
+
+.summary-total {
+  background: linear-gradient(135deg, rgba(31, 79, 136, 0.11), rgba(15, 138, 141, 0.12));
+}

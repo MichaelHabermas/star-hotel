@@ -1,0 +1,69 @@
+body {
+  color-scheme: dark;
+  --bg: #09111c;
+  --bg-accent: #101b2a;
+  --panel: rgba(11, 20, 33, 0.92);
+  --panel-strong: #0f1a2a;
+  --panel-muted: #111d31;
+  --line: rgba(153, 180, 212, 0.14);
+  --line-strong: rgba(153, 180, 212, 0.24);
+  --text: #edf4ff;
+  --muted: #91a7c2;
+  --primary: #6fa8ff;
+  --primary-strong: #3b7cff;
+  --accent: #d4a24a;
+  --success: #4cd29a;
+  --warning: #e2b35f;
+  --danger: #ff8073;
+  --info: #79a8ff;
+  --shadow-lg: 0 30px 70px rgba(0, 0, 0, 0.44);
+  --shadow-sm: 0 10px 26px rgba(0, 0, 0, 0.3);
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+  --font-ui: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(111, 168, 255, 0.18), transparent 22%),
+    radial-gradient(circle at top right, rgba(212, 162, 74, 0.12), transparent 18%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-accent) 100%);
+}
+
+.eyebrow,
+.ghost-button,
+.pill,
+.input,
+.textarea,
+.selector {
+  background: rgba(17, 29, 49, 0.9);
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #3b7cff, #d4a24a);
+}
+
+.topbar {
+  background: linear-gradient(180deg, rgba(12, 21, 35, 0.96), rgba(12, 21, 35, 0.8));
+}
+
+.status-chip {
+  background: rgba(111, 168, 255, 0.16);
+}
+
+.status-chip.warning {
+  background: rgba(226, 179, 95, 0.14);
+}
+
+.status-chip.success {
+  background: rgba(76, 210, 154, 0.16);
+}
+
+.banner {
+  background: rgba(226, 179, 95, 0.12);
+  border-color: rgba(226, 179, 95, 0.22);
+}
+
+.summary-total {
+  background: linear-gradient(135deg, rgba(59, 124, 255, 0.18), rgba(212, 162, 74, 0.16));
+}

@@ -1,0 +1,42 @@
+body {
+  --bg: #f6f1e8;
+  --bg-accent: #e8dfd0;
+  --panel: rgba(255, 252, 247, 0.9);
+  --panel-strong: #fffaf3;
+  --panel-muted: #efe6d8;
+  --line: rgba(48, 44, 39, 0.12);
+  --line-strong: rgba(48, 44, 39, 0.22);
+  --text: #1d2433;
+  --muted: #6e675b;
+  --primary: #213b63;
+  --primary-strong: #162947;
+  --accent: #a56a18;
+  --success: #2f7a57;
+  --warning: #aa7318;
+  --danger: #af4436;
+  --info: #315fb4;
+  --shadow-lg: 0 28px 60px rgba(40, 31, 16, 0.14);
+  --shadow-sm: 0 10px 26px rgba(40, 31, 16, 0.08);
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+  --font-ui: "Plus Jakarta Sans", sans-serif;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #1f3d66, #b27a25);
+}
+
+.topbar {
+  background:
+    linear-gradient(90deg, rgba(255, 251, 245, 0.96), rgba(248, 240, 227, 0.72)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), transparent);
+}
+
+.banner {
+  background: rgba(165, 106, 24, 0.12);
+  border-color: rgba(165, 106, 24, 0.24);
+}
+
+.summary-total {
+  background: linear-gradient(135deg, rgba(33, 59, 99, 0.12), rgba(165, 106, 24, 0.16));
+}

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Star Hotel Style Test — Lakeside Console</title>
+    <link rel="stylesheet" href="./common.css" />
+    <link rel="stylesheet" href="./lakeside-console.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">SH</div>
+          <div class="brand-copy">
+            <h1>Star Hotel</h1>
+            <p>Reservations / Check-In • Lakeside Console</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="status-chip success">11 rooms ready</span>
+          <span class="status-chip">Avg check-in 02:14</span>
+          <a class="ghost-button" href="./index.html">Back to concepts</a>
+          <a class="solid-button" href="#">Start check-in</a>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="rail">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Desk board</h2>
+                <p>A calmer operations feel with sharper scan lines.</p>
+              </div>
+              <span class="eyebrow">Morning shift</span>
+            </div>
+
+            <div class="mini-metrics">
+              <div class="mini-metric">
+                <strong>21</strong>
+                <span>Expected arrivals</span>
+              </div>
+              <div class="mini-metric">
+                <strong>07</strong>
+                <span>Before noon</span>
+              </div>
+              <div class="mini-metric">
+                <strong>04</strong>
+                <span>Waiting rooms</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Open rooms</h2>
+                <p>Less boutique, more workstation.</p>
+              </div>
+            </div>
+
+            <div class="room-list">
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Room 602</strong>
+                  <span class="pill available">Ready now</span>
+                </div>
+                <p>Corner king • High floor • Express housekeeping cleared</p>
+                <div class="room-meta">
+                  <span class="pill available">Available</span>
+                  <span class="pill">King</span>
+                  <span class="pill">ADA shower</span>
+                </div>
+              </article>
+
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Room 307</strong>
+                  <span class="pill dirty">Queue</span>
+                </div>
+                <p>Preparing for early arrival • Linen restock in progress</p>
+                <div class="room-meta">
+                  <span class="pill dirty">Dirty</span>
+                  <span class="pill">Double queen</span>
+                  <span class="pill">ETA 12 min</span>
+                </div>
+              </article>
+
+              <article class="room-card">
+                <div class="room-top">
+                  <strong>Room 510</strong>
+                  <span class="pill vip">Preferred</span>
+                </div>
+                <p>Quiet-side room tagged for loyalty elite upgrade</p>
+                <div class="room-meta">
+                  <span class="pill available">Available</span>
+                  <span class="pill">King</span>
+                  <span class="pill vip">Elite tier</span>
+                </div>
+              </article>
+            </div>
+          </section>
+        </aside>
+
+        <section class="main-column">
+          <div class="banner">
+            <div>
+              <strong>Partial state: rates available, room assignment pending</strong>
+              <p>
+                Housekeeping sync is still returning room 307. The desk can finish guest data,
+                card capture, and date edits before a room is finalized.
+              </p>
+            </div>
+            <span class="status-chip">Auto-refresh on</span>
+          </div>
+
+          <div class="checkin-grid">
+            <section class="checkin-card">
+              <div class="panel-header">
+                <div>
+                  <h2>Reservation workspace</h2>
+                  <p>Built to feel lighter and faster on older monitors.</p>
+                </div>
+                <span class="eyebrow">Ctrl + K guest search</span>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label>Guest</label>
+                  <div class="input">Marcus Alvarez</div>
+                </div>
+                <div class="field">
+                  <label>Loyalty tier</label>
+                  <div class="selector">
+                    <span>Star Circle Gold</span>
+                    <span>28 stays</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Arrival date</label>
+                  <div class="selector">
+                    <span>Apr 1, 2026</span>
+                    <span>Early check-in</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Departure date</label>
+                  <div class="selector">
+                    <span>Apr 3, 2026</span>
+                    <span>2 nights</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Requested room</label>
+                  <div class="selector">
+                    <span>Room 510</span>
+                    <span>Quiet side</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Payment</label>
+                  <div class="selector">
+                    <span>Visa ending 4421</span>
+                    <span>Chip verified</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="subsection">
+                <h3>Operational notes</h3>
+                <div class="textarea">
+                  Returning guest. Wants invoice split between room and parking. Requested a
+                  lower pillow profile and breakfast vouchers for two.
+                </div>
+              </div>
+            </section>
+
+            <section class="summary-card">
+              <div class="panel-header">
+                <div>
+                  <h2>Charge preview</h2>
+                  <p>Cleaner rows, less ornament, more confidence.</p>
+                </div>
+              </div>
+
+              <div class="rate-table">
+                <div class="table-head">
+                  <div>Line</div>
+                  <div>Base</div>
+                  <div>Total</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Night 1 • preferred rate</div>
+                  <div class="table-cell">$239.00</div>
+                  <div class="table-cell">$271.11</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Night 2 • preferred rate</div>
+                  <div class="table-cell">$239.00</div>
+                  <div class="table-cell">$271.11</div>
+                </div>
+                <div class="table-row">
+                  <div class="table-cell">Parking & city fee</div>
+                  <div class="table-cell">$24.00</div>
+                  <div class="table-cell">$31.45</div>
+                </div>
+              </div>
+
+              <div class="summary-total">
+                <span>Projected arrival balance</span>
+                <strong>$573.67</strong>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="timeline-card">
+            <div class="panel-header">
+              <div>
+                <h2>Today’s queue</h2>
+                <p>Actionable timing instead of ornamental cards.</p>
+              </div>
+            </div>
+            <div class="timeline-list">
+              <div class="timeline-item">
+                <time>07:04 AM</time>
+                <strong>Guest texted ETA</strong>
+                <p>Airport shuttle arrival moved forward by 25 minutes.</p>
+              </div>
+              <div class="timeline-item">
+                <time>07:06 AM</time>
+                <strong>Room 510 held</strong>
+                <p>Loyalty preference triggered a manual assignment hold.</p>
+              </div>
+              <div class="timeline-item">
+                <time>07:11 AM</time>
+                <strong>Breakfast package confirmed</strong>
+                <p>Two vouchers queued for print with registration card.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="activity-card">
+            <div class="panel-header">
+              <div>
+                <h2>Complete before keys</h2>
+                <p>A lighter checklist treatment for high-frequency work.</p>
+              </div>
+            </div>
+
+            <div class="activity-list">
+              <div class="activity-item">
+                <strong>ID scan captured</strong>
+                <p>Government photo ID verified against reservation record.</p>
+              </div>
+              <div class="activity-item">
+                <strong>Deposit hold ready</strong>
+                <p>$200 incidental authorization prepared for confirmation.</p>
+              </div>
+              <div class="activity-item">
+                <strong>Parking pass not yet issued</strong>
+                <p>Action stays visible until folio print is complete.</p>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <a class="ghost-button" href="#">Save draft</a>
+              <a class="solid-button" href="#">Confirm & issue keys</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="screen-footer">
+        <span>Direction test: calm utility with less luxury signaling and tighter scan rhythm.</span>
+        <span>Core cues: steel blues, soft teal accent, airy panels, operational typography.</span>
+      </footer>
+    </div>
+  </body>
+</html>

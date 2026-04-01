@@ -7,12 +7,14 @@ import { startStarHotelMain } from './bootstrap'
 import { startEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers } from './ipc-handlers'
 import { registerActivateHandler, registerWindowAllClosed } from './lifecycle'
+import { configureAppMenu } from './menu'
 import { createMainWindow } from './window'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const isDev = !app.isPackaged
 const appStartMs = Date.now()
+configureAppMenu(isDev)
 
 const apiPort = resolveApiPort(process.env)
 
@@ -27,13 +29,18 @@ function ensureEmbeddedApiServer(): Promise<http.Server> {
   return embeddedApiServerPromise
 }
 
-function mainWindowParams() {
+function mainWindowParams(): {
+  readonly scriptDir: string
+  readonly isDev: boolean
+  readonly rendererUrl: string | undefined
+  readonly apiBaseUrl: string
+} {
   return {
     scriptDir: __dirname,
     isDev,
     rendererUrl: process.env['ELECTRON_RENDERER_URL'],
     apiBaseUrl,
-  } as const
+  }
 }
 
 void startStarHotelMain({

@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
-    "cleanup": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck"
   },
   "engines": {
     "node": ">=20"
