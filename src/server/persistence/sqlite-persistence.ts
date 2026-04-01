@@ -26,5 +26,13 @@ export function createSqlitePersistencePort(options: SqlitePersistenceOptions): 
       runMigrations(database)
       db = database
     },
+    async close() {
+      if (!db) {
+        return
+      }
+      const toClose = db
+      db = null
+      toClose.close()
+    },
   }
 }

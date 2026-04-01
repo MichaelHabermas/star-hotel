@@ -6,16 +6,18 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build",
-    "preview": "electron-vite preview",
-    "test": "vitest run",
+    "dev": "electron-rebuild -f -w better-sqlite3 && electron-vite dev",
+    "build": "electron-rebuild -f -w better-sqlite3 && electron-vite build",
+    "preview": "electron-rebuild -f -w better-sqlite3 && electron-vite preview",
+    "test": "pnpm rebuild better-sqlite3 && vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
-    "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck"
+    "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3"
   },
   "engines": {
     "node": ">=20"
@@ -42,6 +44,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@eslint/js": "^9.21.0",
     "@tailwindcss/vite": "^4.0.17",
     "@testing-library/jest-dom": "^6.9.1",

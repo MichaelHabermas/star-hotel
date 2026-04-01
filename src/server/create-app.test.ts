@@ -16,6 +16,9 @@ describe('createServerApp', () => {
       async isReady() {
         ready = true
       },
+      async close() {
+        /* test */
+      },
     }
     const app = createServerApp({ persistence })
     await request(app).get('/health').expect(200)

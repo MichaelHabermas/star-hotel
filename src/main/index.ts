@@ -1,13 +1,8 @@
-import type http from 'node:http'
 import { app } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildApiBaseUrl, resolveApiPort } from '@shared/embedded-api-config'
-import { resolveDatabaseFilePath } from '../server/db/database-path'
-import { createSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
+import { createEmbeddedApiStack } from './embedded-api-stack'
 import { startStarHotelMain } from './bootstrap'
-import { startEmbeddedApiServer } from './http-server'
-import { registerIpcHandlers } from './ipc-handlers'
 import { registerActivateHandler, registerWindowAllClosed } from './lifecycle'
 import { configureAppMenu } from './menu'
 import { createMainWindow } from './window'
@@ -18,21 +13,12 @@ const isDev = !app.isPackaged
 const appStartMs = Date.now()
 configureAppMenu(isDev)
 
-const apiPort = resolveApiPort(process.env)
+const stack = createEmbeddedApiStack({
+  getUserDataPath: () => app.getPath('userData'),
+  env: process.env,
+})
 
-const apiBaseUrl = buildApiBaseUrl(apiPort)
-
-let embeddedApiServerPromise: Promise<http.Server> | null = null
-
-function ensureEmbeddedApiServer(): Promise<http.Server> {
-  if (!embeddedApiServerPromise) {
-    const dbFilePath = resolveDatabaseFilePath(app.getPath('userData'))
-    embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
-      persistence: createSqlitePersistencePort({ dbFilePath }),
-    })
-  }
-  return embeddedApiServerPromise
-}
+stack.registerShutdownHandlers(app)
 
 function mainWindowParams(): {
   readonly scriptDir: string
@@ -44,16 +30,16 @@ function mainWindowParams(): {
     scriptDir: __dirname,
     isDev,
     rendererUrl: process.env['ELECTRON_RENDERER_URL'],
-    apiBaseUrl,
+    apiBaseUrl: stack.apiBaseUrl,
   }
 }
 
 void startStarHotelMain({
   app,
   appStartMs,
-  apiBaseUrl,
-  ensureEmbeddedApiServer,
-  registerIpcHandlers,
+  apiBaseUrl: stack.apiBaseUrl,
+  ensureEmbeddedApiServer: stack.ensureEmbeddedApiServer,
+  registerIpcHandlers: stack.registerIpcHandlers,
   registerWindowAllClosed,
   registerActivateHandler,
   createMainWindow,

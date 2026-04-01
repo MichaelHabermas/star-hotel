@@ -5,10 +5,15 @@
 export type PersistencePort = {
   /** Resolve when the backing store is safe to read (future: migrations done). */
   isReady(): Promise<void>
+  /** Idempotent: safe to call multiple times. */
+  close(): Promise<void>
 }
 
 export const noopPersistencePort: PersistencePort = {
   async isReady() {
     /* SQLite adapter will open the DB and run migrations here. */
+  },
+  async close() {
+    /* no-op */
   },
 }

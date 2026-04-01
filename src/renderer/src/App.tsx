@@ -5,6 +5,8 @@ import { createStarHotelApp } from '@renderer/lib/star-hotel-app'
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider'
 import { HomePage } from '@renderer/pages/home-page'
 import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
+import { DEFAULT_API_PORT } from '@shared/constants'
+import { buildApiBaseUrl } from '@shared/embedded-api-config'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
 
 const BRIDGE_MISSING_ERROR =
@@ -12,7 +14,7 @@ const BRIDGE_MISSING_ERROR =
 
 const FALLBACK_STAR_HOTEL_BRIDGE: StarHotelPreloadAPI = {
   platform: 'unknown',
-  apiBaseUrl: 'http://127.0.0.1:0',
+  apiBaseUrl: buildApiBaseUrl(DEFAULT_API_PORT),
   invoke: async (): Promise<never> => {
     throw new Error('Preload bridge unavailable')
   },
