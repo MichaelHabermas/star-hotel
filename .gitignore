@@ -39,6 +39,8 @@ build/Release
 
 # Dependency directories
 node_modules/
+# Project-local pnpm store (store-dir); not source — reproducible from lockfile
+.pnpm-store/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
@@ -141,6 +143,12 @@ vite.config.ts.timestamp-*
 # macOS Finder metadata
 .DS_Store
 **/.DS_Store
+
+# JetBrains IDEs
+.idea/
+
+# electron-builder packaged apps (if added later)
+release/
 
 # Local machine-specific settings
 .claude/settings.local.json
