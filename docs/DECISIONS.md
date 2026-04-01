@@ -1,8 +1,38 @@
 # Architecture & product decisions (StarHotel)
 
-Canonical decisions for open gates **T4**, **T5**, and **T2**. Other docs should link here instead of duplicating rationale.
+Canonical decisions for **E1.5 (visual design)** and gates **T4**, **T5**, and **T2**. Other docs should link here instead of duplicating rationale.
 
-**Related:** [PRE-SEARCH.md](./PRE-SEARCH.md), [ROUTE-MAP.md](./ROUTE-MAP.md), [TODOS.md](./TODOS.md), [PRD.md](./PRD.md).
+**Related:** [PRE-SEARCH.md](./PRE-SEARCH.md), [ROUTE-MAP.md](./ROUTE-MAP.md), [TODOS.md](./TODOS.md), [PRD.md](./PRD.md), [STYLE-GUIDE.md](./STYLE-GUIDE.md), [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md).
+
+---
+
+## E1.5 Visual design and style lab scope
+
+| Field | Value |
+|--------|--------|
+| **Status** | Accepted |
+| **Date** | 2026-04-01 |
+
+### Context
+
+[PRD](./PRD.md) Epic E1.5 originally described an optional **in-app** design lab (React + Tailwind + shadcn under Electron). That would duplicate maintenance with the static exploration already captured in-repo.
+
+### Decision
+
+1. **Canonical visual system:** [STYLE-GUIDE.md](./STYLE-GUIDE.md) — **Lakeside Console** (light mode default), **Night Audit** (dark mode). Token mapping (colors, typography, spacing, density) and UI rules for implementation live there.
+2. **Static style lab:** [style-test/](../style-test/) — plain HTML/CSS prototypes (`index.html`, `lakeside-console.html`, `night-audit.html`) for side-by-side comparison in a browser. **Not** bundled into the Electron production app; no IPC or Express surface.
+3. **No in-app dev lab:** We are **not** shipping a `/dev/design-lab` React route. Rationale: scope and ROI; the STYLE-GUIDE plus `style-test/` satisfy exploration and lock for E5+.
+4. **Index:** [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md) points here and to the guide and prototypes.
+
+### Rejected options
+
+- Additional distinct visual “C” directions beyond the two locked in STYLE-GUIDE (unless product explicitly expands scope).
+- In-app Electron/Vite design lab for A/B (per above).
+
+### Consequences
+
+- UI work in E5+ follows **STYLE-GUIDE.md**; apply tokens to the shared shell as screens land (E5/E8), not a separate fake lab route.
+- [README.md](../README.md) documents how to open `style-test/` for reviewers.
 
 ---
 

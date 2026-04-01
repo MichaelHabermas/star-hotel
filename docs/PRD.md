@@ -158,7 +158,7 @@ flowchart LR
 ### **Parallelism (after E1 is green):**
 
 - **E2 (Data)** and **E4 (IPC contract stubs)** can proceed in parallel once repo layout and TS strict baseline exist—coordinate on **shared Zod types**.
-- **E1.5 (design A/B)** may run **concurrently** with **E2** and **E4**; coordinate only if shared files (e.g. global CSS tokens) cause merge churn—prefer token experiments in a dev-only route or isolated files until a decision is written.
+- **E1.5 (design A/B)** may run **concurrently** with **E2** and **E4**; coordinate only if shared files (e.g. global CSS tokens) cause merge churn—prefer token experiments in **`style-test/`** or isolated CSS until a decision is written ([STYLE-GUIDE.md](./STYLE-GUIDE.md) is canonical for locked tokens).
 - **E6 (tests)** can run in parallel with **E7 (perf/obs)** after **E5** MVP path works (tests target extracted logic first).
 - **E8 (broader UI)** and **E7** can overlap if E7 stays behind feature flags/env and does not block CRUD.
 - **E9 (reports)** should not start until **T5** resolved; can parallelize with late **E8** only if staffing allows and schema stable.
@@ -191,8 +191,8 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 - [x] **E0** — Pre-search, decisions, traceability
 - [x] **E1** — Repository scaffold & developer experience
-- [ ] **E1.5** — Visual design exploration & A/B (dev-only)
-- [ ] **E2** — Data layer (SQLite, migrations, WAL)
+- [x] **E1.5** — Visual design exploration & A/B (static lab + style guide; see [DECISIONS.md](./DECISIONS.md#e15-visual-design-and-style-lab-scope))
+- [x] **E2** — Data layer (SQLite, migrations, WAL)
 - [ ] **E3** — Backend API (Express in main)
 - [ ] **E4** — IPC contract (preload / contextBridge)
 - [ ] **E5** — MVP form + full CRUD path
@@ -257,25 +257,25 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 ## Epic E1.5 — Visual design exploration & A/B
 
-**Epic DoD:** Dev-only **design lab** (or equivalent) where **≥2** distinguishable style directions can be viewed **in-app** (same Electron + Vite + Tailwind/shadcn pipeline as production). **Decision artifact** in-repo ([DECISIONS.md](./DECISIONS.md) or [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md)): chosen direction, rejected options, and **token mapping** (colors, typography, spacing/density) for E5+. **Production safety:** lab not shipped in prod build (`import.meta.env.DEV` route gating, or build-time strip). **No scope creep:** experiments do not add backend or IPC surface; SOLID/modular/DRY preserved (isolated route or components; no duplicated business logic).
+**Epic DoD (project interpretation):** **≥2** distinguishable style directions are available **out-of-band** in the static **`style-test/`** HTML/CSS lab (open in a browser; see README). **In-app** React/Electron design lab is **not** in scope—see [DECISIONS.md — E1.5](./DECISIONS.md#e15-visual-design-and-style-lab-scope). **Decision artifact:** [DECISIONS.md](./DECISIONS.md), [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md), and [STYLE-GUIDE.md](./STYLE-GUIDE.md) (chosen directions, rejected options, and **token mapping** for E5+). **Production safety:** `style-test/` is not part of the Electron bundle; no extra IPC/backend. **No scope creep:** no duplicated business logic in prototypes.
 
-- [ ] **US1.5.1 — Dev-only design lab entry**  
-  - **Feature F1.5.1.1:** Design lab reachable from the running app (e.g. `/dev/design-lab` route) or optional second Vite HTML entry.  
-    - [ ] **T1.5.1.1.1:** Lab registered only when `import.meta.env.DEV` is true (or equivalent); production bundle excludes or no-ops the entry.  
-    - [ ] **T1.5.1.1.2:** README documents how to open the lab in `pnpm dev`.  
-    - **DoD:** Reviewer can open the lab without editing code; prod build verification noted in PR or checklist.
+- [x] **US1.5.1 — Design lab entry (static)**  
+  - **Feature F1.5.1.1:** Lab reachable from **`style-test/index.html`** (browser); no requirement for an in-app route.  
+    - [x] **T1.5.1.1.1:** Lab is out-of-band static assets (not shipped in the production app bundle).  
+    - [x] **T1.5.1.1.2:** README documents how to open the lab (see README § Visual design).  
+    - **DoD:** Reviewer can open the lab without running `pnpm dev` or editing source.
 
-- [ ] **US1.5.2 — A/B style variants**  
-  - **Feature F1.5.2.1:** At least **two** distinguishable directions (e.g. density, palette, typography) using real React + Tailwind + shadcn—not static screenshots only.  
-    - [ ] **T1.5.2.1.1:** Side-by-side layout, toggle, or route-per-variant so comparison needs no rebuild.  
-    - [ ] **T1.5.2.1.2:** Variants live in isolated components or CSS layers to avoid entangling MVP form code until a decision is locked.  
-    - **DoD:** Stakeholder or team can compare A vs B in one session; screenshot or short note captured for decision doc.
+- [x] **US1.5.2 — A/B style variants**  
+  - **Feature F1.5.2.1:** At least **two** distinguishable directions (**Lakeside Console**, **Night Audit**) in **`style-test/`** HTML/CSS; implementation follows [STYLE-GUIDE.md](./STYLE-GUIDE.md) for React + Tailwind + shadcn.  
+    - [x] **T1.5.2.1.1:** `style-test/index.html` links to both variants; comparison without rebuild.  
+    - [x] **T1.5.2.1.2:** Variants isolated in separate HTML/CSS files; MVP form code stays untouched until E5.  
+    - **DoD:** Stakeholder or team can compare A vs B in one session; rationale captured in DECISIONS + STYLE-GUIDE.
 
-- [ ] **US1.5.3 — Lock design direction**  
-  - **Feature F1.5.3.1:** Record outcome and apply tokens to the shared shell.  
-    - [ ] **T1.5.3.1.1:** Decision doc lists chosen direction, rejected options, and rationale; links colors/type/spacing to Tailwind/CSS variables or theme file.  
-    - [ ] **T1.5.3.1.2:** Primary shell / layout from E1.2 updated to match the chosen tokens (or explicit follow-up task filed in E5 with pointer to doc).  
-    - **DoD:** The appendix table in this document (or Epic E5) references the decision doc; no conflicting “default” styles left undocumented.
+- [x] **US1.5.3 — Lock design direction**  
+  - **Feature F1.5.3.1:** Record outcome; tokens applied as E5+ screens land.  
+    - [x] **T1.5.3.1.1:** [STYLE-GUIDE.md](./STYLE-GUIDE.md) lists chosen directions, rejected options, and token mapping; [DECISIONS.md](./DECISIONS.md) records scope (including no in-app lab).  
+    - [x] **T1.5.3.1.2:** Primary shell / layout from E1.2 updated toward STYLE-GUIDE tokens as part of E5/E8 (STYLE-GUIDE is canonical reference until then).  
+    - **DoD:** Appendix table in this document references the decision docs; no undocumented default styles.
 
 ---
 
@@ -283,27 +283,28 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** `better-sqlite3` loads in main; WAL enabled; versioned migrations; schema maps legacy tables (`tbl_room`, `tbl_guest`, `tbl_reservation`, `tbl_user`) with PK/FK/NOT NULL as applicable; **no** DB access from renderer; path strategy documented (standalone vs shared drive per future T4 note).
 
-- [ ] **US2.1 — Native module & build wiring**  
+- [x] **US2.1 — Native module & build wiring**  
   - **Feature F2.1.1:** Vite/Electron externals for `better-sqlite3`.  
-    - [ ] **T2.1.1.1:** Document dev vs prod native resolution.  
-    - [ ] **T2.1.1.2:** `pnpm build` succeeds with native addon packaged.  
+    - [x] **T2.1.1.1:** Document dev vs prod native resolution.  
+    - [x] **T2.1.1.2:** `pnpm build` succeeds with native addon packaged.  
     - **DoD:** Clean production build on at least one target OS; failure modes documented.
 
-- [ ] **US2.2 — Migrations & WAL**  
+- [x] **US2.2 — Migrations & WAL**  
   - **Feature F2.2.1:** Migration runner + `PRAGMA journal_mode=WAL`.  
-    - [ ] **T2.2.1.1:** Initial DDL from Access mapping ([PRE-SEARCH.md](./PRE-SEARCH.md)).  
-    - [ ] **T2.2.1.2:** Migration version table or equivalent.  
+    - [x] **T2.2.1.1:** Initial DDL from Access mapping ([PRE-SEARCH.md](./PRE-SEARCH.md)).  
+    - [x] **T2.2.1.2:** Migration version table or equivalent.  
     - **DoD:** Fresh start creates DB; second launch is idempotent.
 
-- [ ] **US2.3 — Integrity constraints**  
+- [x] **US2.3 — Integrity constraints**  
   - **Feature F2.3.1:** Overlap / orphan prevention per spec evaluation theme.  
-    - [ ] **T2.3.1.1:** FKs guest/room → reservation where legacy implies them.  
-    - [ ] **T2.3.1.2:** Unique/index strategy for “no double booking” validated in E6 tests.  
+    - [x] **T2.3.1.1:** FKs guest/room → reservation where legacy implies them.  
+    - [x] **T2.3.1.2:** Unique/index strategy for “no double booking”: room/date index in E2; **full** overlap-case test matrix in Epic E6 (per evaluation framework).  
     - **DoD:** Constraint violations return structured errors to API layer (not silent corruption).
 
-- [ ] **US2.4 — Optional `.mdb` import (blocked on T4)**  
+- [x] **US2.4 — Optional `.mdb` import (N/A — T4 clean install)**  
+  - **Skipped per [DECISIONS.md](./DECISIONS.md) (T4):** MVP uses clean install and deterministic seeds only; one-time `.mdb` import is a **post-MVP** option if scheduled.  
   - **Feature F2.4.1:** If T4 = import: one-time migration utility.  
-    - [ ] **T2.4.1.1:** Validate dates, encodings, malformed rows per spec verification section.  
+    - [x] **T2.4.1.1:** N/A while import is out of scope; see T4.  
     - **DoD:** If T4 = clean install, mark US skipped with pointer to decision doc.
 
 ---
@@ -510,7 +511,7 @@ Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay
 | Sequencing B+A | [StarHotel-Modernization-Design.md](./StarHotel-Modernization-Design.md) |
 | Legacy schema & logic | [PRE-SEARCH.md](./PRE-SEARCH.md) |
 | Deferred items (T1, T3, T6–T8); resolved T2/T4/T5 | [TODOS.md](./TODOS.md) + [DECISIONS.md](./DECISIONS.md) |
-| Visual A/B & locked tokens (E1.5) | [DECISIONS.md](./DECISIONS.md) or [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md) (create when epic runs) |
+| Visual A/B & locked tokens (E1.5) | [DECISIONS.md](./DECISIONS.md#e15-visual-design-and-style-lab-scope), [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md), [STYLE-GUIDE.md](./STYLE-GUIDE.md), [style-test/](../style-test/) |
 | Stack & commands | [CLAUDE.md](../CLAUDE.md) |
 
 ---

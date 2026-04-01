@@ -81,14 +81,16 @@ All authoritative specs live in `docs/`:
 - `docs/VB6-Hotel-App-Modernization-Project-specs.md` — requirements, checkpoint gates, evaluation rubric
 - `docs/PRE-SEARCH.md` — legacy schema map, VB6 forms → React component mapping, logic extraction
 - `docs/StarHotel-Modernization-Design.md` — pointer to sequencing (B+A); canonical detail in `DESIGN-DOC.md`
-- `docs/DECISIONS.md` — **T4, T5, T2** (Epic E0); canonical product/architecture gates
+- `docs/DECISIONS.md` — **E1.5** (visual design scope), **T4, T5, T2** (Epic E0); canonical product/architecture gates
+- `docs/STYLE-GUIDE.md` — locked UI directions (Lakeside Console / Night Audit) and tokens for implementation
+- `docs/DESIGN-DIRECTION.md` — short index to E1.5 decisions and style guide
 - `docs/ROUTE-MAP.md` — legacy forms/modules → planned React routes
 - `docs/AUTOPLAN-Full-Review.md` — CEO/Design/Eng review consensus, failure modes
 - `docs/TODOS.md` — deferred items (T1, T3, T6–T8); T2/T4/T5 resolved in `DECISIONS.md`
 
 ## Resolved gates (Epic E0)
 
-**T4, T5, T2** are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md). Remaining deferrals: **T1, T3, T6–T8** in [`docs/TODOS.md`](docs/TODOS.md).
+**E1.5** (static style lab + [STYLE-GUIDE.md](docs/STYLE-GUIDE.md), no in-app lab) and **T4, T5, T2** are recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md). Remaining deferrals: **T1, T3, T6–T8** in [`docs/TODOS.md`](docs/TODOS.md).
 
 ## Business Logic to Port
 

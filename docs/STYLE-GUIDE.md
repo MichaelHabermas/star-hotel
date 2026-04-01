@@ -2,6 +2,8 @@
 
 This guide is the source of truth for AI agents building UI for Star Hotel.
 
+**Epic E1.5:** Locked directions and scope (including no in-app design lab) are recorded in [DECISIONS.md](./DECISIONS.md#e15-visual-design-and-style-lab-scope); static A/B prototypes live under [style-test/](../style-test/).
+
 It is based on the selected style directions from the design lab:
 
 - `Lakeside Console` for light mode

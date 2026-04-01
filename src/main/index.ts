@@ -3,6 +3,8 @@ import { app } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildApiBaseUrl, resolveApiPort } from '@shared/embedded-api-config'
+import { resolveDatabaseFilePath } from '../server/db/database-path'
+import { createSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
 import { startStarHotelMain } from './bootstrap'
 import { startEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers } from './ipc-handlers'
@@ -24,7 +26,10 @@ let embeddedApiServerPromise: Promise<http.Server> | null = null
 
 function ensureEmbeddedApiServer(): Promise<http.Server> {
   if (!embeddedApiServerPromise) {
-    embeddedApiServerPromise = startEmbeddedApiServer(apiPort)
+    const dbFilePath = resolveDatabaseFilePath(app.getPath('userData'))
+    embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
+      persistence: createSqlitePersistencePort({ dbFilePath }),
+    })
   }
   return embeddedApiServerPromise
 }

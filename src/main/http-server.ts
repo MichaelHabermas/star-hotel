@@ -1,12 +1,20 @@
 import http from 'node:http'
 import { createServerApp } from '../server/create-app'
+import type { PersistencePort } from '../server/ports/persistence'
+
+export type StartEmbeddedApiServerOptions = {
+  readonly persistence?: PersistencePort
+}
 
 /**
  * Binds the embedded API on 127.0.0.1. Call during `app.whenReady()` before creating windows
  * so the renderer can reach `/health` immediately.
  */
-export function startEmbeddedApiServer(port: number): Promise<http.Server> {
-  const expressApp = createServerApp()
+export function startEmbeddedApiServer(
+  port: number,
+  options: StartEmbeddedApiServerOptions = {},
+): Promise<http.Server> {
+  const expressApp = createServerApp({ persistence: options.persistence })
   const server = http.createServer(expressApp)
 
   return new Promise((resolve, reject) => {

@@ -1,5 +1,7 @@
-# Server (Epic E3)
+# Server (Epics E2–E3)
 
-Express will run in the Electron **main** process here. This folder is reserved so the `server` layer stays separate from `renderer/` (UI) and `shared/` (Zod types and DTOs).
+Express runs in the Electron **main** process. The `server` layer stays separate from `renderer/` (UI) and `shared/` (Zod types and DTOs).
 
-No runtime code in Epic E1.
+**Epic E2:** SQLite via `better-sqlite3` (`src/server/db/`), migrations, `PersistencePort` + [`sqlite-persistence.ts`](persistence/sqlite-persistence.ts). Constraint mapping: [`db-errors.ts`](db/db-errors.ts).
+
+**Epic E3:** REST routes and domain services (in progress).

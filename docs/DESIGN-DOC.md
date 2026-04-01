@@ -112,3 +112,4 @@ From `PRE-SEARCH.md` and the spec—resolve explicitly:
 
 - `docs/PRE-SEARCH.md` — legacy folder map, schema sketch, control mapping, clarifying questions.
 - `docs/VB6-Hotel-App-Modernization-Project-specs.md` — authoritative stack, gates, deliverables, and evaluation framework.
+- `docs/DESIGN-DIRECTION.md`, `docs/STYLE-GUIDE.md`, `docs/DECISIONS.md` (E1.5) — locked visual directions and tokens (Epic E1.5); `style-test/` for static A/B prototypes.

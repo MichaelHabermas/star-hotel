@@ -1,6 +1,6 @@
 # Agent Building Rules
 
-Use this alongside [STYLE-GUIDE.md](/Users/michaelhabermas/repos/star-hotel/style-test/STYLE-GUIDE.md) when implementing UI.
+Use this alongside [STYLE-GUIDE.md](./STYLE-GUIDE.md) when implementing UI.
 
 ## Default Theme Choice
 
