@@ -8,9 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@renderer/components/ui/card'
-import { apiClient } from '@renderer/lib/api-client'
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
 
 export function HomePage(): JSX.Element {
+  const starHotel = useStarHotelApp()
+
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6 p-6">
       <div className="flex items-center gap-2">
@@ -32,17 +34,20 @@ export function HomePage(): JSX.Element {
         <CardContent className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm">
             Preload bridge (read-only):{' '}
-            <span className="font-mono">{window.starHotel.platform}</span>
+            <span className="font-mono">{starHotel.getEnvironment().platform}</span>
+          </p>
+          <p className="text-muted-foreground text-sm">
+            API base: <span className="font-mono">{starHotel.getEnvironment().apiBaseUrl}</span>
           </p>
           <Button
             type="button"
             variant="secondary"
             onClick={async () => {
-              await apiClient.ping()
-              console.info('[apiClient] ping ok (stub until E4)')
+              await starHotel.ping()
+              console.info('[starHotelApp] ping ok')
             }}
           >
-            Test API stub
+            Test API health
           </Button>
         </CardContent>
       </Card>
