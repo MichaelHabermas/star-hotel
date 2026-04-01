@@ -7,7 +7,12 @@ import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-ro
 function navClass({ isActive }: { isActive: boolean }): string {
   const base = 'rounded-md px-3 py-2 text-sm font-medium transition-colors'
 
-  return cn(base, isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground')
+  return cn(
+    base,
+    isActive
+      ? 'bg-secondary text-secondary-foreground'
+      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+  )
 }
 
 export function AppShell(): JSX.Element {
