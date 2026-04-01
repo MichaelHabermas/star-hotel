@@ -123,3 +123,24 @@ Spec rubric rewards coherent breadth; build order should follow **front-desk val
 ### Link to PRD
 
 Implementation order is reflected under **Epic E8** in [PRD.md](./PRD.md) (“Implementation order (per T2)”).
+
+---
+
+## Embedded API config and IPC vs HTTP (renderer boundary)
+
+| Field | Value |
+|--------|--------|
+| **Status** | Accepted |
+| **Date** | 2026-03-31 |
+
+### Decision
+
+- **Embedded API URL:** `resolveApiPort` and `buildApiBaseUrl` in [`src/shared/embedded-api-config.ts`](../src/shared/embedded-api-config.ts) are the single source for default port (`STAR_HOTEL_PORT` override) and loopback base URL. Main and preload both use these helpers so defaults cannot drift.
+- **HTTP (Express):** Hotel domain data and CRUD live on the embedded API; **`GET /health`** is the canonical check that the Express app is up.
+- **IPC:** Used for Electron/native seams only (see [`IPC_CHANNELS`](../src/shared/ipc/channels.ts)), not as the primary domain transport.
+- **Renderer contract:** [`StarHotelApp`](../src/renderer/src/lib/star-hotel-app.ts) (`createStarHotelApp`) is the facade; feature code uses `pingEmbeddedApi`, `pingIpc`, and `invoke` instead of calling `window.starHotel` ad hoc.
+
+### Consequences
+
+- Preload still reads `--star-hotel-api-base=` from the renderer process; when the flag is absent, the fallback uses the same shared URL builder as main.
+- Express persistence is composed behind [`PersistencePort`](../src/server/ports/persistence.ts); future SQLite wiring injects a real implementation at `createServerApp` composition time.
