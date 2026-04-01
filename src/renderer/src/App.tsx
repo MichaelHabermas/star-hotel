@@ -16,7 +16,9 @@ const FALLBACK_STAR_HOTEL_BRIDGE: StarHotelPreloadAPI = {
   platform: 'unknown',
   apiBaseUrl: buildApiBaseUrl(DEFAULT_API_PORT),
   invoke: async (): Promise<never> => {
-    throw new Error('Preload bridge unavailable')
+    throw new Error(
+      'Preload bridge unavailable: open the app with Electron (pnpm dev), not the Vite URL alone.',
+    )
   },
 }
 

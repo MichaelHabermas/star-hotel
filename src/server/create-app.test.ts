@@ -10,6 +10,25 @@ describe('createServerApp', () => {
     expect(res.body).toEqual({ ok: true })
   })
 
+  it('GET /health includes CORS for localhost Origin (browser + Vite dev)', async () => {
+    const app = createServerApp()
+    const res = await request(app)
+      .get('/health')
+      .set('Origin', 'http://localhost:5173')
+      .expect(200)
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5173')
+    expect(res.body).toEqual({ ok: true })
+  })
+
+  it('OPTIONS /health preflight succeeds for localhost Origin', async () => {
+    const app = createServerApp()
+    await request(app)
+      .options('/health')
+      .set('Origin', 'http://localhost:5173')
+      .set('Access-Control-Request-Method', 'GET')
+      .expect(204)
+  })
+
   it('awaits persistence isReady before responding', async () => {
     let ready = false
     const persistence: PersistencePort = {

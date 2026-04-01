@@ -39,13 +39,23 @@ export function HomePage(): JSX.Element {
           <p className="text-muted-foreground text-sm">
             API base: <span className="font-mono">{starHotel.getEnvironment().apiBaseUrl}</span>
           </p>
+          {starHotel.getEnvironment().platform === 'unknown' ? (
+            <p className="text-muted-foreground text-xs">
+              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>). API
+              health still works if the embedded server is running.
+            </p>
+          ) : null}
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               variant="secondary"
               onClick={async () => {
-                await starHotel.pingEmbeddedApi()
-                console.info('[starHotelApp] embedded API health ok')
+                try {
+                  await starHotel.pingEmbeddedApi()
+                  console.info('[starHotelApp] embedded API health ok')
+                } catch (err) {
+                  console.warn('[starHotelApp] embedded API health failed', err)
+                }
               }}
             >
               Test API health
@@ -54,8 +64,12 @@ export function HomePage(): JSX.Element {
               type="button"
               variant="outline"
               onClick={async () => {
-                await starHotel.pingIpc()
-                console.info('[starHotelApp] IPC ping ok')
+                try {
+                  await starHotel.pingIpc()
+                  console.info('[starHotelApp] IPC ping ok')
+                } catch (err) {
+                  console.warn('[starHotelApp] IPC ping failed', err)
+                }
               }}
             >
               Test IPC
