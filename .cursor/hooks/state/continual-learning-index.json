@@ -2,56 +2,108 @@
   "version": 1,
   "transcripts": {
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/1fe6c951-fc65-4575-84f4-c5c3e6b96ea7/1fe6c951-fc65-4575-84f4-c5c3e6b96ea7.jsonl": {
-      "mtimeMs": 1775003583191,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775003583192,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/298ab13c-2bd3-48ac-9f48-f9fc67780589/298ab13c-2bd3-48ac-9f48-f9fc67780589.jsonl": {
-      "mtimeMs": 1775007082027,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775007159023,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/298ab13c-2bd3-48ac-9f48-f9fc67780589/subagents/4bb71ca4-d99f-4b72-a823-13c28877ff2c.jsonl": {
-      "mtimeMs": 1775007097480,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775007142395,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/2b7a2e50-d307-4aeb-b07b-79442ddd8d8b/2b7a2e50-d307-4aeb-b07b-79442ddd8d8b.jsonl": {
-      "mtimeMs": 1775005081765,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775005081766,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/2b7a2e50-d307-4aeb-b07b-79442ddd8d8b/subagents/1e301e92-574b-485f-b1b6-c3d5cd1f8fad.jsonl": {
-      "mtimeMs": 1775005052389,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775005052390,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/2b7a2e50-d307-4aeb-b07b-79442ddd8d8b/subagents/d61f7b09-0d6c-44f4-b5d0-c1f141d1423a.jsonl": {
-      "mtimeMs": 1775005002033,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775005002034,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/40199b52-b9de-45cc-84e0-86f7420a5981/40199b52-b9de-45cc-84e0-86f7420a5981.jsonl": {
-      "mtimeMs": 1775000211080,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775000211081,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/4050e57e-6ef0-4567-93b4-c321a7e065ac/4050e57e-6ef0-4567-93b4-c321a7e065ac.jsonl": {
+      "mtimeMs": 1775054557669,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/4050e57e-6ef0-4567-93b4-c321a7e065ac/subagents/1168889d-3c22-47f0-ad2f-45d2266bc64c.jsonl": {
+      "mtimeMs": 1775054545645,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/4e6ebe0e-afec-48c4-92ce-85e6192cbcfa/4e6ebe0e-afec-48c4-92ce-85e6192cbcfa.jsonl": {
       "mtimeMs": 1775002804615,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/4e8026b1-c76b-4492-a5f2-f7c16a152dc8/4e8026b1-c76b-4492-a5f2-f7c16a152dc8.jsonl": {
       "mtimeMs": 1775001067250,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/75f8f87f-5ff8-4fe1-8d69-b5dde2bce533/75f8f87f-5ff8-4fe1-8d69-b5dde2bce533.jsonl": {
-      "mtimeMs": 1775004138023,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1775004138024,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/8cab0266-ee74-447c-8f2f-44f3b9b35e61/8cab0266-ee74-447c-8f2f-44f3b9b35e61.jsonl": {
+      "mtimeMs": 1775061760343,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/8cab0266-ee74-447c-8f2f-44f3b9b35e61/subagents/d6e0d99f-28d9-4299-8cfe-ac6ae260f6a3.jsonl": {
+      "mtimeMs": 1775061772428,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/9ae45bed-0999-4897-a91b-3c593ece769c/9ae45bed-0999-4897-a91b-3c593ece769c.jsonl": {
+      "mtimeMs": 1775055199566,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/a643d9f0-6d14-4c94-ad74-9530e9f7e409/a643d9f0-6d14-4c94-ad74-9530e9f7e409.jsonl": {
-      "mtimeMs": 1774996541032,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1774996541033,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/a7476fa2-3411-4331-bf6c-df241cb1ab85/a7476fa2-3411-4331-bf6c-df241cb1ab85.jsonl": {
+      "mtimeMs": 1775058360088,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/b0367d5c-cb67-4dec-a397-4790761e3ca9/b0367d5c-cb67-4dec-a397-4790761e3ca9.jsonl": {
-      "mtimeMs": 1774999442957,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1774999442958,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     },
     "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/b0367d5c-cb67-4dec-a397-4790761e3ca9/subagents/335703f8-507b-49f5-86f7-164fd23ee437.jsonl": {
-      "mtimeMs": 1774999366770,
-      "lastProcessedAt": "2026-04-01T01:32:04.000Z"
+      "mtimeMs": 1774999366771,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/bbc30b99-ea1a-4251-a7e8-086d07998474/bbc30b99-ea1a-4251-a7e8-086d07998474.jsonl": {
+      "mtimeMs": 1775007717458,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/bbc30b99-ea1a-4251-a7e8-086d07998474/subagents/91fc06cc-805e-4b4f-9209-9c4483bffc35.jsonl": {
+      "mtimeMs": 1775007213127,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/bbc30b99-ea1a-4251-a7e8-086d07998474/subagents/a746dd1f-8e80-4bb7-a269-4ee80e5559a5.jsonl": {
+      "mtimeMs": 1775007366292,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/c42c43ea-b54e-4eed-ac70-021b97e43c6a/c42c43ea-b54e-4eed-ac70-021b97e43c6a.jsonl": {
+      "mtimeMs": 1775054165218,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/c42c43ea-b54e-4eed-ac70-021b97e43c6a/subagents/066fe8dd-7ba1-4a09-be1b-b3625a05d3eb.jsonl": {
+      "mtimeMs": 1775053030278,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/eeb95ab2-5447-4641-9c1c-4ae94eab0367/eeb95ab2-5447-4641-9c1c-4ae94eab0367.jsonl": {
+      "mtimeMs": 1775008332507,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
+    },
+    "/Users/michaelhabermas/.cursor/projects/Users-michaelhabermas-repos-star-hotel/agent-transcripts/eeb95ab2-5447-4641-9c1c-4ae94eab0367/subagents/7f9f1e0a-f81a-468d-9199-1968bf33ca71.jsonl": {
+      "mtimeMs": 1775007866600,
+      "lastProcessedAt": "2026-04-01T16:43:09.879Z"
     }
   }
 }
