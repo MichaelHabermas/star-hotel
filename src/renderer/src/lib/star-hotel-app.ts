@@ -1,15 +1,15 @@
-import type { StarHotelPreloadAPI } from '@shared/preload-contract'
+import type { StarHotelPreloadBridge } from '@shared/preload-contract'
 
 /** Renderer port for app data: preload bridge + embedded API (Dependency Inversion). */
 export type StarHotelApp = {
-  getEnvironment(): Pick<StarHotelPreloadAPI, 'platform' | 'apiBaseUrl'>
+  getEnvironment(): Pick<StarHotelPreloadBridge, 'platform' | 'apiBaseUrl'>
   /** Verifies the embedded Express API responds on `/health`. */
   ping(): Promise<{ ok: true }>
 }
 
 export function createStarHotelApp(deps: {
   fetch: typeof fetch
-  starHotel: StarHotelPreloadAPI
+  starHotel: StarHotelPreloadBridge
 }): StarHotelApp {
   return {
     getEnvironment() {

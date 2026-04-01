@@ -4,6 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DEFAULT_API_PORT } from '@shared/constants'
 import { startEmbeddedApiServer } from './http-server'
+import { registerIpcHandlers } from './ipc-handlers'
 import { registerActivateHandler, registerWindowAllClosed } from './lifecycle'
 import { createMainWindow } from './window'
 
@@ -48,6 +49,8 @@ app.whenReady().then(async () => {
     app.quit()
     return
   }
+
+  registerIpcHandlers()
 
   createMainWindow(mainWindowParams())
 
