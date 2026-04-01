@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { runMigrations } from '../db/run-migrations'
+import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
 import type { PersistencePort } from '../ports/persistence'
 
 export type SqlitePersistenceOptions = {
@@ -8,12 +9,11 @@ export type SqlitePersistenceOptions = {
 
 type SqliteDatabase = InstanceType<typeof Database>
 
-export type SqlitePersistencePort = PersistencePort & {
-  getDatabase(): SqliteDatabase
-}
+/** @alias Production SQLite implementation of {@link HotelSqlitePersistencePort}. */
+export type SqlitePersistencePort = HotelSqlitePersistencePort
 
-export function isSqlitePersistencePort(p: PersistencePort): p is SqlitePersistencePort {
-  return typeof (p as SqlitePersistencePort).getDatabase === 'function'
+export function isSqlitePersistencePort(p: PersistencePort): p is HotelSqlitePersistencePort {
+  return typeof (p as HotelSqlitePersistencePort).getDatabase === 'function'
 }
 
 /**

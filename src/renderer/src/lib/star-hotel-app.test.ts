@@ -1,5 +1,6 @@
 import { ZodError } from 'zod'
 import { describe, expect, it, vi } from 'vitest'
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths'
 import { IPC_CHANNELS } from '@shared/ipc/channels'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
 import { createStarHotelApp } from './star-hotel-app'
@@ -25,7 +26,7 @@ describe('createStarHotelApp', () => {
       starHotel: mockPreload(),
     })
     await expect(app.pingEmbeddedApi()).resolves.toEqual({ ok: true })
-    expect(fetch).toHaveBeenCalledWith('http://127.0.0.1:45123/health')
+    expect(fetch).toHaveBeenCalledWith(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.health}`)
   })
 
   it('pingEmbeddedApi throws when response is not ok', async () => {
@@ -75,7 +76,7 @@ describe('createStarHotelApp', () => {
     })
     expect(app.api.reservations).toBeDefined()
     await app.api.reservations.list({})
-    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:45123/api/reservations')
+    expect(fetchMock).toHaveBeenCalledWith(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`)
   })
 
   it('formatEmbeddedApiUserMessage delegates to shared helper', () => {

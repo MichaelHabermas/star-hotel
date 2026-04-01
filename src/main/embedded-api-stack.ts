@@ -4,9 +4,7 @@ import { buildApiBaseUrl, resolveApiPortFromEnv } from '@shared/embedded-api-con
 import { resolveDatabaseFilePath } from '../server/db/database-path'
 import { createSqlitePersistencePort as defaultCreateSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
 import type { PersistencePort } from '../server/ports/persistence'
-import { registerSqliteGuestRoutes } from '../server/guests/register-sqlite-guest-routes'
-import { registerSqliteRoomRoutes } from '../server/rooms/register-sqlite-room-routes'
-import { registerSqliteReservationRoutes } from '../server/reservations/register-sqlite-reservation-routes'
+import { registerMvpSqliteApiRoutes } from '../server/register-mvp-sqlite-api-routes'
 import { startEmbeddedApiServer as defaultStartEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers as registerIpcHandlersImpl } from './ipc-handlers'
 
@@ -49,9 +47,7 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
       embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
         persistence: sqlite,
         registerApiRoutes: (app) => {
-          registerSqliteGuestRoutes(app, sqlite)
-          registerSqliteRoomRoutes(app, sqlite)
-          registerSqliteReservationRoutes(app, sqlite)
+          registerMvpSqliteApiRoutes(app, sqlite)
         },
       })
     }

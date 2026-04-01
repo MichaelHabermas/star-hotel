@@ -1,6 +1,9 @@
 /**
  * OpenAPI 3 description of the loopback embedded API (see README — default port 45123).
  * Served at GET /api/openapi.json; Swagger UI at GET /api/docs.
+ *
+ * **`paths` keys** must match `EMBEDDED_OPENAPI_DOCUMENTED_PATHS` in `@shared/api/embedded-api-paths`
+ * (see `openapi-documented-paths.test.ts`).
  */
 export const starHotelOpenApiDocument: Record<string, unknown> = {
   openapi: '3.0.3',

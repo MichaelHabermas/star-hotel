@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { EMBEDDED_API_PATHS } from './embedded-api-paths'
 import {
   normalizeEmbeddedApiBaseUrl,
   parseEmbeddedJsonOk,
@@ -50,18 +51,18 @@ export function createReservationsHttpClient(deps: {
   return {
     async list(query) {
       const qs = listQueryString(query)
-      const res = await fetchFn(`${base}/api/reservations${qs}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservations}${qs}`)
       return parseEmbeddedJsonOk(res, z.array(reservationResponseSchema))
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}/api/reservations/${id}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`)
       return parseEmbeddedJsonOk(res, reservationResponseSchema)
     },
 
     async create(body) {
       const payload = reservationCreateBodySchema.parse(body)
-      const res = await fetchFn(`${base}/api/reservations`, {
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservations}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -71,7 +72,7 @@ export function createReservationsHttpClient(deps: {
 
     async update(id, body) {
       const payload = reservationUpdateBodySchema.parse(body)
-      const res = await fetchFn(`${base}/api/reservations/${id}`, {
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -80,7 +81,7 @@ export function createReservationsHttpClient(deps: {
     },
 
     async delete(id) {
-      const res = await fetchFn(`${base}/api/reservations/${id}`, { method: 'DELETE' })
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`, { method: 'DELETE' })
       if (res.status === 204) {
         return
       }

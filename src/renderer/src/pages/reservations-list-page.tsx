@@ -5,7 +5,7 @@ import {
   type ColumnDef,
 } from '@tanstack/react-table'
 import type { JSX } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@renderer/components/ui/button'
 import {
@@ -24,16 +24,12 @@ import {
   DialogTitle,
 } from '@renderer/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@renderer/components/ui/table'
+import { useGuestRoomCatalog } from '@renderer/features/reservations/use-guest-room-catalog'
+import { useReservationsList } from '@renderer/features/reservations/use-reservations-list'
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
 import type { GuestResponse } from '@shared/schemas/guest'
 import type { ReservationResponse } from '@shared/schemas/reservation'
 import type { RoomResponse } from '@shared/schemas/room'
-
-type ListState =
-  | { kind: 'idle' }
-  | { kind: 'loading' }
-  | { kind: 'ok'; rows: ReservationResponse[] }
-  | { kind: 'err'; message: string }
 
 function guestLabel(g: GuestResponse): string {
   return g.name
@@ -47,60 +43,14 @@ const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'U
 
 export function ReservationsListPage(): JSX.Element {
   const starHotel = useStarHotelApp()
-  const [list, setList] = useState<ListState>({ kind: 'idle' })
-  const [guests, setGuests] = useState<GuestResponse[]>([])
-  const [rooms, setRooms] = useState<RoomResponse[]>([])
-  const [refsLoading, setRefsLoading] = useState(true)
-  const [refsErr, setRefsErr] = useState<string | null>(null)
+  const { guests, rooms, loading: refsLoading, error: refsErr } = useGuestRoomCatalog(starHotel)
+  const { list, reload } = useReservationsList(starHotel)
   const [deleteTarget, setDeleteTarget] = useState<ReservationResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteErr, setDeleteErr] = useState<string | null>(null)
 
   const guestById = useMemo(() => new Map(guests.map((g) => [g.id, g])), [guests])
   const roomById = useMemo(() => new Map(rooms.map((r) => [r.id, r])), [rooms])
-
-  const loadReservations = useCallback(async () => {
-    setList({ kind: 'loading' })
-    try {
-      const rows = await starHotel.api.reservations.list({})
-      setList({ kind: 'ok', rows })
-    } catch (err) {
-      setList({ kind: 'err', message: starHotel.formatEmbeddedApiUserMessage(err) })
-    }
-  }, [starHotel])
-
-  useEffect(() => {
-    void loadReservations()
-  }, [loadReservations])
-
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      setRefsLoading(true)
-      setRefsErr(null)
-      try {
-        const [g, r] = await Promise.all([
-          starHotel.api.guests.list({}),
-          starHotel.api.rooms.list({}),
-        ])
-        if (!cancelled) {
-          setGuests(g)
-          setRooms(r)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setRefsErr(starHotel.formatEmbeddedApiUserMessage(err))
-        }
-      } finally {
-        if (!cancelled) {
-          setRefsLoading(false)
-        }
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [starHotel])
 
   const columns = useMemo<ColumnDef<ReservationResponse>[]>(
     () => [
@@ -183,7 +133,7 @@ export function ReservationsListPage(): JSX.Element {
     try {
       await starHotel.api.reservations.delete(deleteTarget.id)
       setDeleteTarget(null)
-      await loadReservations()
+      await reload()
     } catch (err) {
       setDeleteErr(starHotel.formatEmbeddedApiUserMessage(err))
     } finally {

@@ -1,3 +1,4 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths'
 import express, { type ErrorRequestHandler, type NextFunction, type Request, type Response } from 'express'
 import { mapErrorToHttp } from './http/json-error'
 import { registerOpenApiRoutes } from './openapi/register-openapi-routes'
@@ -54,7 +55,7 @@ export function createServerApp(options: CreateServerAppOptions = {}): express.E
   app.use(allowLocalhostBrowserCors)
   app.use(express.json({ limit: '1mb' }))
 
-  app.get('/health', async (_req, res) => {
+  app.get(EMBEDDED_API_PATHS.health, async (_req, res) => {
     await persistence.isReady()
     res.status(200).json({ ok: true })
   })

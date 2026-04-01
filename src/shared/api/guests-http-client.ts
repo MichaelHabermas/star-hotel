@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { EMBEDDED_API_PATHS } from './embedded-api-paths'
 import { normalizeEmbeddedApiBaseUrl, parseEmbeddedJsonOk } from './embedded-http'
 import {
   guestListQuerySchema,
@@ -27,12 +28,12 @@ export function createGuestsHttpClient(deps: {
   return {
     async list(query = {}) {
       const qs = listQueryString(query)
-      const res = await fetchFn(`${base}/api/guests${qs}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.guests}${qs}`)
       return parseEmbeddedJsonOk(res, z.array(guestResponseSchema))
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}/api/guests/${id}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.guestById(id)}`)
       return parseEmbeddedJsonOk(res, guestResponseSchema)
     },
   }

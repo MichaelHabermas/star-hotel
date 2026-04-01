@@ -1,7 +1,7 @@
 import { roomIdParamsSchema, roomListQuerySchema } from '@shared/schemas/room'
 import type { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
-import type { SqlitePersistencePort } from '../persistence/sqlite-persistence'
+import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
 import { RoomNotFoundError } from '../reservations/reservation-errors'
 import { RoomRepository } from './room-repository'
 
@@ -22,7 +22,7 @@ function rowToJson(row: { RoomID: number; RoomType: string; Price: number; Statu
   }
 }
 
-export function createRoomRouter(persistence: SqlitePersistencePort): Router {
+export function createRoomRouter(persistence: HotelSqlitePersistencePort): Router {
   const router = Router()
 
   router.use(async (req, res, next) => {

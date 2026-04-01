@@ -1,3 +1,4 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths'
 import { createGuestsHttpClient, type GuestsHttpClient } from '@shared/api/guests-http-client'
 import { createReservationsHttpClient, type ReservationsHttpClient } from '@shared/api/reservations-http-client'
 import { createRoomsHttpClient, type RoomsHttpClient } from '@shared/api/rooms-http-client'
@@ -53,7 +54,7 @@ export function createStarHotelApp(deps: {
       return formatEmbeddedApiUserMessageShared(error)
     },
     async pingEmbeddedApi() {
-      const res = await deps.fetch(`${deps.starHotel.apiBaseUrl}/health`)
+      const res = await deps.fetch(`${deps.starHotel.apiBaseUrl}${EMBEDDED_API_PATHS.health}`)
       if (!res.ok) {
         throw new Error(`health check failed: HTTP ${res.status}`)
       }

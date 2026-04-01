@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { EMBEDDED_API_PATHS } from './embedded-api-paths'
 import { normalizeEmbeddedApiBaseUrl, parseEmbeddedJsonOk } from './embedded-http'
 import {
   roomListQuerySchema,
@@ -32,12 +33,12 @@ export function createRoomsHttpClient(deps: {
   return {
     async list(query = {}) {
       const qs = listQueryString(query)
-      const res = await fetchFn(`${base}/api/rooms${qs}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.rooms}${qs}`)
       return parseEmbeddedJsonOk(res, z.array(roomResponseSchema))
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}/api/rooms/${id}`)
+      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.roomById(id)}`)
       return parseEmbeddedJsonOk(res, roomResponseSchema)
     },
   }

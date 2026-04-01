@@ -6,7 +6,7 @@ import {
 } from '@shared/schemas/reservation'
 import type { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
-import type { SqlitePersistencePort } from '../persistence/sqlite-persistence'
+import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
 import { ReservationRepository } from './reservation-repository'
 import { ReservationService } from './reservation-service'
 
@@ -18,37 +18,36 @@ function asyncHandler(
   }
 }
 
-export function createReservationRouter(persistence: SqlitePersistencePort): Router {
+export function createReservationRouter(persistence: HotelSqlitePersistencePort): Router {
   const router = Router()
-  let reservationService: ReservationService | null = null
 
-  router.use(async (req, res, next) => {
+  let serviceInit: Promise<ReservationService> | null = null
+  function getReservationService(): Promise<ReservationService> {
+    if (!serviceInit) {
+      serviceInit = (async () => {
+        await persistence.isReady()
+        return new ReservationService(new ReservationRepository(persistence.getDatabase()))
+      })()
+    }
+    return serviceInit
+  }
+
+  router.use(async (_req, _res, next) => {
     try {
-      await persistence.isReady()
-      if (!reservationService) {
-        reservationService = new ReservationService(
-          new ReservationRepository(persistence.getDatabase()),
-        )
-      }
+      await getReservationService()
       next()
     } catch (err) {
       next(err)
     }
   })
 
-  function getService(): ReservationService {
-    if (!reservationService) {
-      throw new Error('[star-hotel] reservation service used before persistence ready')
-    }
-    return reservationService
-  }
-
   router.get(
     '/',
     asyncHandler(async (req, res, next) => {
       try {
         const q = reservationListQuerySchema.parse(req.query)
-        res.status(200).json(getService().list(q))
+        const svc = await getReservationService()
+        res.status(200).json(svc.list(q))
       } catch (err) {
         next(err)
       }
@@ -60,7 +59,8 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
-        res.status(200).json(getService().get(id))
+        const svc = await getReservationService()
+        res.status(200).json(svc.get(id))
       } catch (err) {
         next(err)
       }
@@ -72,7 +72,8 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const body = reservationCreateBodySchema.parse(req.body)
-        res.status(201).json(getService().create(body))
+        const svc = await getReservationService()
+        res.status(201).json(svc.create(body))
       } catch (err) {
         next(err)
       }
@@ -85,7 +86,8 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
         const body = reservationUpdateBodySchema.parse(req.body)
-        res.status(200).json(getService().update(id, body))
+        const svc = await getReservationService()
+        res.status(200).json(svc.update(id, body))
       } catch (err) {
         next(err)
       }
@@ -97,7 +99,8 @@ export function createReservationRouter(persistence: SqlitePersistencePort): Rou
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
-        getService().delete(id)
+        const svc = await getReservationService()
+        svc.delete(id)
         res.status(204).send()
       } catch (err) {
         next(err)

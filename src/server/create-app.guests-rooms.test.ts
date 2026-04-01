@@ -1,3 +1,4 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths'
 import request from 'supertest'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createServerApp } from './create-app'
@@ -5,9 +6,7 @@ import {
   createSqlitePersistencePort,
   type SqlitePersistencePort,
 } from './persistence/sqlite-persistence'
-import { registerSqliteGuestRoutes } from './guests/register-sqlite-guest-routes'
-import { registerSqliteRoomRoutes } from './rooms/register-sqlite-room-routes'
-import { registerSqliteReservationRoutes } from './reservations/register-sqlite-reservation-routes'
+import { registerMvpSqliteApiRoutes } from './register-mvp-sqlite-api-routes'
 
 type SqliteDb = ReturnType<SqlitePersistencePort['getDatabase']>
 
@@ -27,9 +26,7 @@ function createTestApp(persistence: SqlitePersistencePort) {
   return createServerApp({
     persistence,
     registerApiRoutes: (expressApp) => {
-      registerSqliteGuestRoutes(expressApp, persistence)
-      registerSqliteRoomRoutes(expressApp, persistence)
-      registerSqliteReservationRoutes(expressApp, persistence)
+      registerMvpSqliteApiRoutes(expressApp, persistence)
     },
   })
 }
@@ -48,7 +45,7 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
 
     const app = createTestApp(persistence)
 
-    const openApiRes = await request(app).get('/api/openapi.json').expect(200)
+    const openApiRes = await request(app).get(EMBEDDED_API_PATHS.openapiJson).expect(200)
     expect(openApiRes.body).toMatchObject({ openapi: '3.0.3', info: { title: 'Star Hotel embedded API' } })
 
     const guestsRes = await request(app).get('/api/guests').expect(200)

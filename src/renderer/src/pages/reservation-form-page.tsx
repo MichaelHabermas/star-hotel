@@ -1,5 +1,5 @@
-import type { FormEvent, JSX } from 'react'
-import { useCallback, useEffect, useId, useState } from 'react'
+import type { JSX } from 'react'
+import { useId } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@renderer/components/ui/button'
 import {
@@ -20,10 +20,8 @@ import {
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select'
+import { useReservationEditor } from '@renderer/features/reservations/use-reservation-editor'
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
-import { reservationCreateBodySchema, reservationUpdateBodySchema } from '@shared/schemas/reservation'
-import type { GuestResponse } from '@shared/schemas/guest'
-import type { RoomResponse } from '@shared/schemas/room'
 
 type ReservationFormPageProps = {
   readonly mode: 'create' | 'edit'
@@ -44,162 +42,9 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
   const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN
   const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0
 
-  const [guests, setGuests] = useState<GuestResponse[]>([])
-  const [rooms, setRooms] = useState<RoomResponse[]>([])
-  const [refsLoading, setRefsLoading] = useState(true)
-
-  const [guestId, setGuestId] = useState<string>('')
-  const [roomId, setRoomId] = useState<string>('')
-  const [checkInDate, setCheckInDate] = useState('')
-  const [checkOutDate, setCheckOutDate] = useState('')
-  const [totalAmount, setTotalAmount] = useState<number | null>(null)
-
-  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
-  const [loadErr, setLoadErr] = useState<string | null>(null)
-
-  const [submitErr, setSubmitErr] = useState<string | null>(null)
-  const [fieldErr, setFieldErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [deleteErr, setDeleteErr] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      setRefsLoading(true)
-      try {
-        const [g, r] = await Promise.all([
-          starHotel.api.guests.list({}),
-          starHotel.api.rooms.list({}),
-        ])
-        if (!cancelled) {
-          setGuests(g)
-          setRooms(r)
-        }
-      } finally {
-        if (!cancelled) {
-          setRefsLoading(false)
-        }
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [starHotel])
-
-  const loadReservation = useCallback(async () => {
-    if (!editIdValid) {
-      return
-    }
-    setLoadState('loading')
-    setLoadErr(null)
-    try {
-      const res = await starHotel.api.reservations.get(editId)
-      setGuestId(String(res.guestId))
-      setRoomId(String(res.roomId))
-      setCheckInDate(res.checkInDate)
-      setCheckOutDate(res.checkOutDate)
-      setTotalAmount(res.totalAmount)
-      setLoadState('ok')
-    } catch (err) {
-      setLoadState('err')
-      setLoadErr(starHotel.formatEmbeddedApiUserMessage(err))
-    }
-  }, [editIdValid, editId, starHotel])
-
-  useEffect(() => {
-    if (mode === 'edit') {
-      void loadReservation()
-    } else {
-      setLoadState('ok')
-      setLoadErr(null)
-    }
-  }, [mode, loadReservation])
-
-  async function onSubmit(e: FormEvent): Promise<void> {
-    e.preventDefault()
-    setSubmitErr(null)
-    setFieldErr(null)
-
-    if (mode === 'create') {
-      const parsed = reservationCreateBodySchema.safeParse({
-        roomId,
-        guestId,
-        checkInDate,
-        checkOutDate,
-      })
-      if (!parsed.success) {
-        const first = parsed.error.issues[0]
-        setFieldErr(first?.message ?? 'Invalid input')
-        return
-      }
-      setSubmitting(true)
-      try {
-        await starHotel.api.reservations.create(parsed.data)
-        navigate('/reservations')
-      } catch (err) {
-        setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
-      } finally {
-        setSubmitting(false)
-      }
-      return
-    }
-
-    if (!editIdValid) {
-      return
-    }
-
-    const body: Record<string, unknown> = {}
-    if (roomId !== '') {
-      body.roomId = roomId
-    }
-    if (guestId !== '') {
-      body.guestId = guestId
-    }
-    if (checkInDate !== '') {
-      body.checkInDate = checkInDate
-    }
-    if (checkOutDate !== '') {
-      body.checkOutDate = checkOutDate
-    }
-
-    const parsed = reservationUpdateBodySchema.safeParse(body)
-    if (!parsed.success) {
-      const first = parsed.error.issues[0]
-      setFieldErr(first?.message ?? 'Invalid input')
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      const updated = await starHotel.api.reservations.update(editId, parsed.data)
-      setTotalAmount(updated.totalAmount)
-      navigate('/reservations')
-    } catch (err) {
-      setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  async function confirmDelete(): Promise<void> {
-    if (!editIdValid) {
-      return
-    }
-    setDeleting(true)
-    setDeleteErr(null)
-    try {
-      await starHotel.api.reservations.delete(editId)
-      setDeleteOpen(false)
-      navigate('/reservations')
-    } catch (err) {
-      setDeleteErr(starHotel.formatEmbeddedApiUserMessage(err))
-    } finally {
-      setDeleting(false)
-    }
-  }
+  const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate })
+  const { catalog, setDeleteErr } = editor
+  const { guests, rooms, loading: refsLoading } = catalog
 
   if (mode === 'edit' && !editIdValid) {
     return (
@@ -214,7 +59,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
     )
   }
 
-  if (mode === 'edit' && (loadState === 'loading' || loadState === 'idle')) {
+  if (mode === 'edit' && (editor.loadState === 'loading' || editor.loadState === 'idle')) {
     return (
       <div className="mx-auto max-w-lg p-6">
         <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
@@ -224,14 +69,14 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
     )
   }
 
-  if (mode === 'edit' && loadState === 'err') {
+  if (mode === 'edit' && editor.loadState === 'err') {
     return (
-      <div className="mx-auto max-w-lg p-6 space-y-4">
+      <div className="mx-auto max-w-lg space-y-4 p-6">
         <p className="text-destructive text-sm" role="alert">
-          {loadErr}
+          {editor.loadErr}
         </p>
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={() => void loadReservation()}>
+          <Button type="button" variant="outline" onClick={() => void editor.loadReservation()}>
             Retry
           </Button>
           <Button type="button" variant="ghost" asChild>
@@ -266,7 +111,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
         <CardContent>
           <form
             id={formId}
-            onSubmit={(e) => void onSubmit(e)}
+            onSubmit={(e) => void editor.onSubmit(e)}
             className="space-y-6"
             noValidate
             aria-describedby={`${formId}-hint`}
@@ -280,8 +125,8 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
             <div className="space-y-2">
               <Label htmlFor={guestSelectId}>Guest</Label>
               <Select
-                value={guestId === '' ? undefined : guestId}
-                onValueChange={setGuestId}
+                value={editor.guestId === '' ? undefined : editor.guestId}
+                onValueChange={editor.setGuestId}
                 disabled={refsLoading || guests.length === 0}
                 required
               >
@@ -302,8 +147,8 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
             <div className="space-y-2">
               <Label htmlFor={roomSelectId}>Room</Label>
               <Select
-                value={roomId === '' ? undefined : roomId}
-                onValueChange={setRoomId}
+                value={editor.roomId === '' ? undefined : editor.roomId}
+                onValueChange={editor.setRoomId}
                 disabled={refsLoading || rooms.length === 0}
                 required
               >
@@ -326,8 +171,8 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                 <Input
                   id={checkInId}
                   type="date"
-                  value={checkInDate}
-                  onChange={(ev) => setCheckInDate(ev.target.value)}
+                  value={editor.checkInDate}
+                  onChange={(ev) => editor.setCheckInDate(ev.target.value)}
                   required
                   aria-required
                 />
@@ -337,36 +182,37 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                 <Input
                   id={checkOutId}
                   type="date"
-                  value={checkOutDate}
-                  onChange={(ev) => setCheckOutDate(ev.target.value)}
+                  value={editor.checkOutDate}
+                  onChange={(ev) => editor.setCheckOutDate(ev.target.value)}
                   required
                   aria-required
                 />
               </div>
             </div>
 
-            {mode === 'edit' && totalAmount !== null ? (
+            {mode === 'edit' && editor.totalAmount !== null ? (
               <p className="text-muted-foreground text-sm">
-                Current total: <span className="text-foreground font-medium">{money.format(totalAmount)}</span>
+                Current total:{' '}
+                <span className="text-foreground font-medium">{money.format(editor.totalAmount)}</span>
               </p>
             ) : null}
 
-            {fieldErr ? (
+            {editor.fieldErr ? (
               <p className="text-destructive text-sm" role="alert">
-                {fieldErr}
+                {editor.fieldErr}
               </p>
             ) : null}
-            {submitErr ? (
+            {editor.submitErr ? (
               <p className="text-destructive text-sm" role="alert" aria-live="assertive">
-                {submitErr}
+                {editor.submitErr}
               </p>
             ) : null}
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={submitting || refsLoading}>
-                {submitting ? 'Saving…' : mode === 'create' ? 'Create reservation' : 'Save changes'}
+              <Button type="submit" disabled={editor.submitting || refsLoading}>
+                {editor.submitting ? 'Saving…' : mode === 'create' ? 'Create reservation' : 'Save changes'}
               </Button>
-              <Button type="button" variant="outline" asChild disabled={submitting}>
+              <Button type="button" variant="outline" asChild disabled={editor.submitting}>
                 <Link to="/reservations">Cancel</Link>
               </Button>
               {mode === 'edit' ? (
@@ -374,10 +220,10 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                   type="button"
                   variant="destructive"
                   className="sm:ml-auto"
-                  disabled={submitting}
+                  disabled={editor.submitting}
                   onClick={() => {
                     setDeleteErr(null)
-                    setDeleteOpen(true)
+                    editor.setDeleteOpen(true)
                   }}
                 >
                   Delete
@@ -388,7 +234,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
         </CardContent>
       </Card>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <Dialog open={editor.deleteOpen} onOpenChange={editor.setDeleteOpen}>
         <DialogContent aria-describedby="delete-form-desc">
           <DialogHeader>
             <DialogTitle>Delete this reservation?</DialogTitle>
@@ -397,17 +243,27 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
               rules).
             </DialogDescription>
           </DialogHeader>
-          {deleteErr ? (
+          {editor.deleteErr ? (
             <p className="text-destructive text-sm" role="alert">
-              {deleteErr}
+              {editor.deleteErr}
             </p>
           ) : null}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => editor.setDeleteOpen(false)}
+              disabled={editor.deleting}
+            >
               Cancel
             </Button>
-            <Button type="button" variant="destructive" disabled={deleting} onClick={() => void confirmDelete()}>
-              {deleting ? 'Deleting…' : 'Delete'}
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={editor.deleting}
+              onClick={() => void editor.confirmDelete()}
+            >
+              {editor.deleting ? 'Deleting…' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
