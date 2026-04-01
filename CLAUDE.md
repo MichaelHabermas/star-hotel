@@ -23,16 +23,18 @@ Modernization of a legacy Visual Basic 6.0 + Microsoft Access hotel reservation 
 
 ## Commands
 
-> Commands are not yet implemented — app scaffolding has not started. Treat as the intended interface.
+Epic **E1** scaffold is in place (`electron-vite`, strict TypeScript, Tailwind v4 + shadcn baseline).
 
 ```bash
 pnpm install
 pnpm dev             # Start Electron + Vite in dev mode
-pnpm build           # Build for production
+pnpm build           # Build for production (output under out/)
+pnpm preview         # Preview production build
 pnpm test            # Run Vitest
-pnpm test -- --run src/path/to/file.test.ts  # Single test file
+pnpm test -- src/path/to/file.test.ts  # Single test file
 pnpm lint            # ESLint
 pnpm format          # Prettier
+pnpm typecheck       # tsc --noEmit (main/preload + renderer)
 ```
 
 ## Architecture
