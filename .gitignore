@@ -137,3 +137,10 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store
+
+# Local machine-specific settings
+.claude/settings.local.json
