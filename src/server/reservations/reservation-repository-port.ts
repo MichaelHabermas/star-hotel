@@ -18,4 +18,21 @@ export type ReservationRepositoryPort = {
   insert(row: ReservationWrite): number
   update(resId: number, row: ReservationWrite): void
   delete(resId: number): boolean
+  /**
+   * Overlap check and insert in one SQLite transaction (TOCTOU-safe on WAL).
+   * Implementations that are not SQLite should still perform check-then-write atomically where possible.
+   */
+  insertWithNoOverlap(
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): number
+  updateWithNoOverlap(
+    resId: number,
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): void
 }

@@ -1,5 +1,6 @@
 import type DatabaseType from 'better-sqlite3'
 import type { ReservationListQuery } from '@shared/schemas/reservation'
+import { ReservationConflictError } from './reservation-errors'
 import type { ReservationRepositoryPort } from './reservation-repository-port'
 
 type SqliteDatabase = InstanceType<typeof DatabaseType>
@@ -146,5 +147,36 @@ export class ReservationRepository implements ReservationRepositoryPort {
   delete(resId: number): boolean {
     const result = this.db.prepare('DELETE FROM tbl_reservation WHERE ResID = ?').run(resId)
     return result.changes > 0
+  }
+
+  insertWithNoOverlap(
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): number {
+    const run = this.db.transaction(() => {
+      if (this.findOverlappingReservation(roomId, checkIn, checkOut) !== undefined) {
+        throw new ReservationConflictError()
+      }
+      return this.insert(row)
+    })
+    return run()
+  }
+
+  updateWithNoOverlap(
+    resId: number,
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): void {
+    const run = this.db.transaction(() => {
+      if (this.findOverlappingReservation(roomId, checkIn, checkOut, resId) !== undefined) {
+        throw new ReservationConflictError()
+      }
+      this.update(resId, row)
+    })
+    run()
   }
 }

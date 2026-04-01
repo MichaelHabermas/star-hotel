@@ -1,5 +1,6 @@
 import express, { type ErrorRequestHandler, type NextFunction, type Request, type Response } from 'express'
 import { mapErrorToHttp } from './http/json-error'
+import { registerOpenApiRoutes } from './openapi/register-openapi-routes'
 import { noopPersistencePort, type PersistencePort } from './ports/persistence'
 
 /**
@@ -57,6 +58,8 @@ export function createServerApp(options: CreateServerAppOptions = {}): express.E
     await persistence.isReady()
     res.status(200).json({ ok: true })
   })
+
+  registerOpenApiRoutes(app)
 
   options.registerApiRoutes?.(app)
 

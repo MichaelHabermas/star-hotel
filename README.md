@@ -46,14 +46,20 @@ Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
 The main process runs an HTTP server on **loopback only** (`127.0.0.1`), not on the LAN.
 
+**PRD traceability matrix:** [docs/E3-BACKEND-API.md](docs/E3-BACKEND-API.md).
+
 | Topic                   | Detail                                                                                                                                                                                                                  |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Default port**        | `45123` — see [`src/shared/constants.ts`](src/shared/constants.ts).                                                                                                                                                     |
 | **Override**            | Set **`STAR_HOTEL_PORT`** to an integer in `1`–`65535`. Invalid or missing values fall back to the default ([`resolveApiPortFromEnv`](src/shared/embedded-api-config.ts)).                                              |
-| **Renderer base URL**   | Preload/renderer may receive `--star-hotel-api-base=http://127.0.0.1:<port>`; otherwise the port env + [`buildApiBaseUrl`](src/shared/embedded-api-config.ts) apply.                                                    |
+| **Renderer base URL**   | Preload/renderer may receive **`--star-hotel-api-base=http://127.0.0.1:<port>`** (see [`API_BASE_ARG_PREFIX`](src/shared/embedded-api-config.ts)); otherwise the port env + [`buildApiBaseUrl`](src/shared/embedded-api-config.ts) apply. |
 | **Port already in use** | `listen` fails with **`EADDRINUSE`**. The app does **not** auto-pick another port; free the port or change `STAR_HOTEL_PORT`.                                                                                           |
+| **Startup order**       | After Electron **`app.whenReady()`**, main calls [`ensureEmbeddedApiServer`](src/main/embedded-api-stack.ts) so `/health` and `/api/*` exist before the first window loads ([`bootstrap.ts`](src/main/bootstrap.ts)).   |
+| **Shutdown order**      | On **`before-quit`**, main closes the HTTP server (drain `server.close`) then calls [`persistence.close()`](src/main/embedded-api-stack.ts) so SQLite is not left busy while the port is still bound.                   |
 | **Health**              | `GET /health` returns `{ "ok": true }` after SQLite migrations complete.                                                                                                                                                |
+| **OpenAPI / Swagger**   | `GET /api/openapi.json` — machine-readable spec. **`GET /api/docs`** — Swagger UI (try requests against the embedded API on loopback only).                                                                             |
 | **Reservations (MVP)**  | `GET/POST /api/reservations`, `GET/PATCH/DELETE /api/reservations/:id` — Zod-validated JSON; totals follow [`src/domain/reservation-pricing.ts`](src/domain/reservation-pricing.ts) (legacy `DateDiff` × nightly rate). |
+| **Guests & rooms**      | Read-only `GET /api/guests`, `GET /api/guests/:id`, `GET /api/rooms`, `GET /api/rooms/:id` for MVP pickers (Zod on params/query).                                                                                        |
 
 ## SQLite database (Epic E2)
 

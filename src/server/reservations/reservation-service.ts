@@ -8,7 +8,6 @@ import type {
 import { mapSqliteConstraintError } from '../db/db-errors'
 import {
   GuestNotFoundError,
-  ReservationConflictError,
   ReservationNotFoundError,
   RoomNotFoundError,
 } from './reservation-errors'
@@ -64,16 +63,8 @@ export class ReservationService {
   create(body: ReservationCreateBody): ReservationResponse {
     this.assertGuest(body.guestId)
     const totalAmount = this.computeTotal(body.roomId, body.checkInDate, body.checkOutDate)
-    const overlap = this.repo.findOverlappingReservation(
-      body.roomId,
-      body.checkInDate,
-      body.checkOutDate,
-    )
-    if (overlap !== undefined) {
-      throw new ReservationConflictError()
-    }
     try {
-      const id = this.repo.insert({
+      const id = this.repo.insertWithNoOverlap(body.roomId, body.checkInDate, body.checkOutDate, {
         roomId: body.roomId,
         guestId: body.guestId,
         checkInDate: body.checkInDate,
@@ -108,13 +99,8 @@ export class ReservationService {
       ? this.computeTotal(roomId, checkInDate, checkOutDate)
       : existing.TotalAmount
 
-    const overlap = this.repo.findOverlappingReservation(roomId, checkInDate, checkOutDate, resId)
-    if (overlap !== undefined) {
-      throw new ReservationConflictError()
-    }
-
     try {
-      this.repo.update(resId, {
+      this.repo.updateWithNoOverlap(resId, roomId, checkInDate, checkOutDate, {
         roomId,
         guestId,
         checkInDate,

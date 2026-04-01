@@ -39,6 +39,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.0",
+    "swagger-ui-express": "^5.0.1",
     "tailwind-merge": "^3.0.2",
     "tw-animate-css": "^1.2.5",
     "zod": "^4.3.6"
@@ -55,6 +56,7 @@
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@types/supertest": "^7.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^34.3.0",
     "electron-vite": "^5.0.0",

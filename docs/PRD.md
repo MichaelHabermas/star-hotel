@@ -201,7 +201,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [x] **E1** — Repository scaffold & developer experience
 - [x] **E1.5** — Visual design exploration & A/B (static lab + style guide; see [DECISIONS.md](./DECISIONS.md#e15-visual-design-and-style-lab-scope))
 - [x] **E2** — Data layer (SQLite, migrations, WAL)
-- [ ] **E3** — Backend API (Express in main)
+- [x] **E3** — Backend API (Express in main)
 - [ ] **E4** — IPC contract (preload / contextBridge)
 - [ ] **E5** — MVP form + full CRUD path
 - [ ] **E6** — Testing & quality gates
@@ -324,20 +324,20 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** Express listens only on localhost (or loopback); REST handlers for MVP resource(s); **Zod** validates all request bodies/query params; parameterized SQL only; transactional mutations where multi-step; structured logging hook (winston/electron-log) stub or full per E7.
 
-- [ ] **US3.1 — Server bootstrap in main**  
+- [x] **US3.1 — Server bootstrap in main**  
   - **Feature F3.1.1:** Lifecycle tied to app ready/quit (no zombie servers).  
-    - [ ] **T3.1.1.1:** Port selection / conflict handling documented.  
+    - [x] **T3.1.1.1:** Port selection / conflict handling documented.  
     - **DoD:** Health endpoint or ping returns 200 from main process.
 
-- [ ] **US3.2 — MVP REST resources**  
+- [x] **US3.2 — MVP REST resources**  
   - **Feature F3.2.1:** CRUD routes for chosen MVP entity aligned with E5 form.  
-    - [ ] **T3.2.1.1:** List + get + create + update + delete (as scope requires).  
-    - [ ] **T3.2.1.2:** 4xx/5xx JSON error shape stable and logged.  
+    - [x] **T3.2.1.1:** List + get + create + update + delete (as scope requires).  
+    - [x] **T3.2.1.2:** 4xx/5xx JSON error shape stable and logged.  
     - **DoD:** Postman/curl or automated integration test from main-side.
 
-- [ ] **US3.3 — Domain services (SOLID)**  
+- [x] **US3.3 — Domain services (SOLID)**  
   - **Feature F3.3.1:** Extract pricing/totals from legacy `modLogic.bas` into testable pure functions called by services.  
-    - [ ] **T3.3.1.1:** No business rules duplicated in route handlers as copy-paste.  
+    - [x] **T3.3.1.1:** No business rules duplicated in route handlers as copy-paste.  
     - **DoD:** Service module unit-tested independently of HTTP (feeds E6).
 
 ---

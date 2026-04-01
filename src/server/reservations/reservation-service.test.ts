@@ -102,6 +102,31 @@ class InMemoryReservationRepository implements ReservationRepositoryPort {
   delete(resId: number): boolean {
     return this.rows.delete(resId)
   }
+
+  insertWithNoOverlap(
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): number {
+    if (this.findOverlappingReservation(roomId, checkIn, checkOut) !== undefined) {
+      throw new ReservationConflictError()
+    }
+    return this.insert(row)
+  }
+
+  updateWithNoOverlap(
+    resId: number,
+    roomId: number,
+    checkIn: string,
+    checkOut: string,
+    row: ReservationWrite,
+  ): void {
+    if (this.findOverlappingReservation(roomId, checkIn, checkOut, resId) !== undefined) {
+      throw new ReservationConflictError()
+    }
+    this.update(resId, row)
+  }
 }
 
 describe('ReservationService', () => {
