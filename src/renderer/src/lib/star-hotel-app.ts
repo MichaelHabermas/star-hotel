@@ -1,3 +1,7 @@
+import { createGuestsHttpClient, type GuestsHttpClient } from '@shared/api/guests-http-client'
+import { createReservationsHttpClient, type ReservationsHttpClient } from '@shared/api/reservations-http-client'
+import { createRoomsHttpClient, type RoomsHttpClient } from '@shared/api/rooms-http-client'
+import { formatEmbeddedApiUserMessage as formatEmbeddedApiUserMessageShared } from '@shared/api/embedded-http'
 import type { IpcChannel } from '@shared/ipc/channels'
 import { invokeIpcPing } from '@shared/ipc/typed-invoke'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
@@ -11,12 +15,29 @@ export type StarHotelApp = {
   pingEmbeddedApi(): Promise<{ ok: true }>
   /** Main process IPC bridge responds (native/Electron seam). */
   pingIpc(): Promise<{ ok: true }>
+  /** Typed HTTP clients for the embedded Express API (localhost); all domain reads/writes go here. */
+  readonly api: {
+    readonly reservations: ReservationsHttpClient
+    readonly guests: GuestsHttpClient
+    readonly rooms: RoomsHttpClient
+  }
+  /** Stable user-visible copy from API/network errors (E5+ UI patterns). */
+  formatEmbeddedApiUserMessage(error: unknown): string
 }
 
 export function createStarHotelApp(deps: {
   fetch: typeof fetch
   starHotel: StarHotelPreloadAPI
 }): StarHotelApp {
+  const baseUrl = deps.starHotel.apiBaseUrl
+  const fetchFn = deps.fetch
+
+  const api = {
+    reservations: createReservationsHttpClient({ baseUrl, fetch: fetchFn }),
+    guests: createGuestsHttpClient({ baseUrl, fetch: fetchFn }),
+    rooms: createRoomsHttpClient({ baseUrl, fetch: fetchFn }),
+  } as const
+
   return {
     getEnvironment() {
       return {
@@ -26,6 +47,10 @@ export function createStarHotelApp(deps: {
     },
     invoke(channel, payload) {
       return deps.starHotel.invoke(channel, payload)
+    },
+    api,
+    formatEmbeddedApiUserMessage(error: unknown) {
+      return formatEmbeddedApiUserMessageShared(error)
     },
     async pingEmbeddedApi() {
       const res = await deps.fetch(`${deps.starHotel.apiBaseUrl}/health`)

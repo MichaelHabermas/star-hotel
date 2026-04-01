@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+import { useState } from 'react'
 import { Hotel } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import {
@@ -12,6 +13,12 @@ import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
 
 export function HomePage(): JSX.Element {
   const starHotel = useStarHotelApp()
+  const [reservationSmoke, setReservationSmoke] = useState<
+    | { kind: 'idle' }
+    | { kind: 'loading' }
+    | { kind: 'ok'; count: number }
+    | { kind: 'err'; message: string }
+  >({ kind: 'idle' })
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6 p-6">
@@ -27,8 +34,8 @@ export function HomePage(): JSX.Element {
         <CardHeader>
           <CardTitle>Developer experience</CardTitle>
           <CardDescription>
-            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui baseline. Express and SQLite arrive
-            in later epics.
+            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui baseline. Embedded Express API is
+            reached only through <span className="font-mono">StarHotelApp.api</span> (Epic E4).
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
@@ -74,7 +81,36 @@ export function HomePage(): JSX.Element {
             >
               Test IPC
             </Button>
+            <Button
+              type="button"
+              variant="default"
+              disabled={reservationSmoke.kind === 'loading'}
+              onClick={async () => {
+                setReservationSmoke({ kind: 'loading' })
+                try {
+                  const rows = await starHotel.api.reservations.list({})
+                  setReservationSmoke({ kind: 'ok', count: rows.length })
+                } catch (err) {
+                  setReservationSmoke({
+                    kind: 'err',
+                    message: starHotel.formatEmbeddedApiUserMessage(err),
+                  })
+                }
+              }}
+            >
+              List reservations
+            </Button>
           </div>
+          {reservationSmoke.kind === 'ok' ? (
+            <p className="text-muted-foreground text-sm" role="status">
+              Reservations loaded: {reservationSmoke.count} row(s).
+            </p>
+          ) : null}
+          {reservationSmoke.kind === 'err' ? (
+            <p className="text-destructive text-sm" role="alert">
+              {reservationSmoke.message}
+            </p>
+          ) : null}
         </CardContent>
       </Card>
     </div>

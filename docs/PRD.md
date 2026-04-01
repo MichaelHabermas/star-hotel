@@ -202,7 +202,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [x] **E1.5** — Visual design exploration & A/B (static lab + style guide; see [DECISIONS.md](./DECISIONS.md#e15-visual-design-and-style-lab-scope))
 - [x] **E2** — Data layer (SQLite, migrations, WAL)
 - [x] **E3** — Backend API (Express in main)
-- [ ] **E4** — IPC contract (preload / contextBridge)
+- [x] **E4** — IPC contract (preload / contextBridge)
 - [ ] **E5** — MVP form + full CRUD path
 - [ ] **E6** — Testing & quality gates
 
@@ -346,14 +346,14 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** `preload` exposes **minimal** typed API; renderer has zero Node/fs/sqlite access; bridge calls Express via `fetch` or structured HTTP client; types shared from `shared` package/folder (DRY).
 
-- [ ] **US4.1 — Typed bridge surface**  
+- [x] **US4.1 — Typed bridge surface**  
   - **Feature F4.1.1:** One module defines allowed operations (e.g., `api.reservations.*`).  
-    - [ ] **T4.1.1.1:** No `eval`, no arbitrary paths, no shell.  
+    - [x] **T4.1.1.1:** No `eval`, no arbitrary paths, no shell.  
     - **DoD:** Static review checklist signed; optional security notes in architecture doc.
 
-- [ ] **US4.2 — Renderer API client**  
+- [x] **US4.2 — Renderer API client**  
   - **Feature F4.2.1:** Thin wrapper used by hooks/components.  
-    - [ ] **T4.2.1.1:** Maps HTTP errors to user-visible messages via UI patterns (E5/E8).  
+    - [x] **T4.2.1.1:** Maps HTTP errors to user-visible messages via UI patterns (E5/E8).  
     - **DoD:** All data fetching in MVP form goes through this client only.
 
 ---

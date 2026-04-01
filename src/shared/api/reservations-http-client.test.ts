@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ReservationsHttpError, createReservationsHttpClient } from './reservations-http-client'
+import { EmbeddedApiHttpError } from './embedded-http'
+import { createReservationsHttpClient } from './reservations-http-client'
 
 function jsonResponse(data: unknown, init?: ResponseInit): Response {
   return new Response(JSON.stringify(data), {
@@ -34,7 +35,7 @@ describe('createReservationsHttpClient', () => {
     expect(rows[0].totalAmount).toBe(200)
   })
 
-  it('throws ReservationsHttpError on API error JSON', async () => {
+  it('throws EmbeddedApiHttpError on API error JSON', async () => {
     const fetchMock = vi.fn(async () =>
       jsonResponse(
         { error: { code: 'NOT_FOUND', message: 'Reservation 9 not found' } },
@@ -48,15 +49,15 @@ describe('createReservationsHttpClient', () => {
     })
 
     await expect(client.get(9)).rejects.toMatchObject({
-      name: 'ReservationsHttpError',
+      name: 'EmbeddedApiHttpError',
       status: 404,
     })
 
     try {
       await client.get(9)
     } catch (e) {
-      expect(e).toBeInstanceOf(ReservationsHttpError)
-      if (e instanceof ReservationsHttpError) {
+      expect(e).toBeInstanceOf(EmbeddedApiHttpError)
+      if (e instanceof EmbeddedApiHttpError) {
         expect(e.body.error.code).toBe('NOT_FOUND')
       }
     }

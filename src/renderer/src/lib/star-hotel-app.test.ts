@@ -63,4 +63,26 @@ describe('createStarHotelApp', () => {
     })
     await expect(app.pingIpc()).rejects.toThrow(ZodError)
   })
+
+  it('api.reservations.list uses embedded base URL', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    })
+    const app = createStarHotelApp({
+      fetch: fetchMock,
+      starHotel: mockPreload(),
+    })
+    expect(app.api.reservations).toBeDefined()
+    await app.api.reservations.list({})
+    expect(fetchMock).toHaveBeenCalledWith('http://127.0.0.1:45123/api/reservations')
+  })
+
+  it('formatEmbeddedApiUserMessage delegates to shared helper', () => {
+    const app = createStarHotelApp({
+      fetch: vi.fn(),
+      starHotel: mockPreload(),
+    })
+    expect(app.formatEmbeddedApiUserMessage(new Error('x'))).toBe('x')
+  })
 })
