@@ -1,4 +1,8 @@
-/** Typed preload bridge; extend in E4. Values stay JSON-serializable. */
-export type StarHotelPreloadAPI = {
-  readonly platform: string
-}
+import { z } from 'zod'
+
+/** JSON-serializable surface exposed on `window.starHotel` (preload bridge). */
+export const starHotelPreloadBridgeSchema = z.object({
+  platform: z.string(),
+})
+
+export type StarHotelPreloadAPI = z.infer<typeof starHotelPreloadBridgeSchema>

@@ -1,8 +1,8 @@
 import { contextBridge } from 'electron'
-import type { StarHotelPreloadAPI } from '@shared/preload-contract'
+import { starHotelPreloadBridgeSchema } from '@shared/preload-contract'
 
-const api: StarHotelPreloadAPI = {
+const api = starHotelPreloadBridgeSchema.parse({
   platform: process.platform,
-}
+})
 
 contextBridge.exposeInMainWorld('starHotel', api)

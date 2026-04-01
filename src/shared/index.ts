@@ -1,1 +1,4 @@
-export type { StarHotelPreloadAPI } from './preload-contract'
+export {
+  starHotelPreloadBridgeSchema,
+  type StarHotelPreloadAPI,
+} from './preload-contract'
