@@ -98,24 +98,51 @@ All authoritative specs live in `docs/`:
 2. **Concurrency**: replace Access file-locking with SQLite WAL + transactions
 3. **Reports**: Crystal Reports (P2smon.dll) → React-to-PDF + HTML print views
 
-## Knowledge Management Process
+## Knowledge management (repo-local, portable)
 
-Before starting a new task, review existing rules and hypotheses for this domain.
+This section is **repository-agnostic**: copy it into any project’s `CLAUDE.md` (or `AGENTS.md`). It does not assume a product name or stack beyond a repo root.
 
-Apply rules by default. Check if any hypothesis can be tested with today's work.
+**Scope.** All paths are relative to the **repository root**. Maintain a `knowledge/` directory here — not a global path on disk, and not outside the repo.
 
-At the end of each task, extract insights.
-Store them in domain folders, e.g.:
+**Relationship to `docs/`.** Authoritative product specs, PRDs, ADRs, and course requirements stay in `docs/` (or your project’s usual docs tree). Use `knowledge/` for **recurring engineering facts**, **validated rules**, and **testable hypotheses**, grouped by **domain** (e.g. `workspace`, `pricing`, `auth`). If `docs/` does not exist in a repo, still use `knowledge/` for the same purpose alongside whatever docs you have.
 
-/knowledge/pricing/
-  knowledge.md (facts and patterns)
-  hypotheses.md (need more data)
-  rules.md (confirmed — apply by default)
+**Directory contract:**
 
-Maintain a /knowledge/INDEX.md that routes to each domain folder.
+```text
+knowledge/
+  INDEX.md                 # lists domains; create if missing
+  <domain>/
+    knowledge.md           # facts and patterns
+    hypotheses.md          # needs validation
+    rules.md               # confirmed — apply by default
+```
 
-If the files and/or folders do not exist, create them.
+**Bootstrap (first use — run if anything is missing):**
 
-When a hypothesis gets confirmed 5+ times, promote it to a rule.
+1. Create `knowledge/` at the repo root.
+2. Create `knowledge/INDEX.md` listing each domain with a one-line description and a relative link to `<domain>/`.
+3. Choose a domain folder name (lowercase, hyphenated if needed, e.g. `workspace`, `api-clients`).
+4. In that folder, create `knowledge.md`, `hypotheses.md`, and `rules.md` (empty or with a one-line purpose at the top).
+5. Add the domain to `INDEX.md`.
 
-When a rule gets contradicted by new data, demote it back to a hypothesis.
+**Workflow.** Before starting a task: skim `rules.md` and relevant `hypotheses.md` for the active domain. Apply `rules.md` by default; use work in this session to confirm or refute open hypotheses. After the task: append concise insights to `knowledge.md`, update `hypotheses.md`, or promote/demote content in `rules.md` as appropriate. When a hypothesis has been confirmed **five or more** times under real use, promote it to `rules.md`. When a rule is contradicted by new evidence, remove or rewrite it and record the correction in `knowledge.md` or move it back to `hypotheses.md`.
+
+**Optional integrations** (do not create these files solely for knowledge — only patch if they already exist):
+
+- **If `AGENTS.md` exists**, add this bullet under **Learned Workspace Facts** (or the closest equivalent heading) (if it doesn't exist, create it):
+
+  ```markdown
+  - Learned engineering patterns and cross-cutting facts live in `knowledge/` (see `knowledge/INDEX.md`). Authoritative product specs and decisions stay in `docs/`.
+  ```
+
+- **If `README.md` exists** and it already has a **Documentation**, **Contributing**, or **Project layout** section where repo folders are listed, add **one** of the following (whichever fits):
+
+  ```markdown
+  - Learned patterns (agent-maintained): [knowledge/INDEX.md](knowledge/INDEX.md).
+  ```
+
+  Or a row in a layout table:
+
+  ```markdown
+  | `knowledge/` | Learned patterns and rules (see INDEX.md) |
+  ```

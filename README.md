@@ -38,6 +38,7 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 | `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there |
 | `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                |
 | `docs/`         | PRD, decisions, STYLE-GUIDE, DESIGN-DIRECTION                        |
+| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))          |
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
