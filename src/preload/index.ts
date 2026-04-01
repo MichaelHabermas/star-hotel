@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { DEFAULT_API_PORT } from '@shared/constants'
+import { buildApiBaseUrl, resolveApiPort } from '@shared/embedded-api-config'
 import { IPC_CHANNELS, type IpcChannel } from '@shared/ipc/channels'
 import { starHotelPreloadBridgeSchema, type StarHotelPreloadAPI } from '@shared/preload-contract'
 
@@ -12,7 +12,7 @@ function readApiBaseUrlFromRendererArgv(): string {
   if (hit) {
     return hit.slice(API_BASE_ARG_PREFIX.length)
   }
-  return `http://127.0.0.1:${DEFAULT_API_PORT}`
+  return buildApiBaseUrl(resolveApiPort(process.env))
 }
 
 const bridge = starHotelPreloadBridgeSchema.parse({
