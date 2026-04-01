@@ -114,7 +114,7 @@ sequenceDiagram
 **Phased rollout (course checkpoints)**
 
 - **Phase 0 — Pre-search (2h):** Legacy map complete ([PRE-SEARCH.md](./PRE-SEARCH.md)); decisions logged for T4/T5/T2.
-- **Phase 1 — MVP (~24h):** Spine: scaffold, DB, Express, IPC, one form, CRUD, tests, lint.
+- **Phase 1 — MVP (~24h):** Spine: scaffold; optional time-boxed visual exploration / A/B (Epic E1.5) before locking design tokens; DB, Express, IPC, one form, CRUD, tests, lint.
 - **Phase 2 — Early submission (~day 4):** Broaden UI; Sentry + PostHog; structured logging; performance budget instrumentation.
 - **Phase 3 — Final (~day 7):** Parity gaps closed per scope; reports per T5; packaging; submission artifacts.
 
@@ -128,6 +128,7 @@ sequenceDiagram
 flowchart LR
   E0[E0_PreSearch_Decisions]
   E1[E1_Scaffold_Tooling]
+  E1_5[E1_5_Design_AB]
   E2[E2_Data_Layer]
   E3[E3_Backend_API]
   E4[E4_IPC_Contract]
@@ -140,6 +141,8 @@ flowchart LR
   E0 --> E1
   E1 --> E2
   E1 --> E4
+  E1 --> E1_5
+  E1_5 --> E5
   E2 --> E3
   E3 --> E5
   E4 --> E5
@@ -155,6 +158,7 @@ flowchart LR
 **Parallelism (after E1 is green):**
 
 - **E2 (Data)** and **E4 (IPC contract stubs)** can proceed in parallel once repo layout and TS strict baseline exist—coordinate on **shared Zod types**.
+- **E1.5 (design A/B)** may run **concurrently** with **E2** and **E4**; coordinate only if shared files (e.g. global CSS tokens) cause merge churn—prefer token experiments in a dev-only route or isolated files until a decision is written.
 - **E6 (tests)** can run in parallel with **E7 (perf/obs)** after **E5** MVP path works (tests target extracted logic first).
 - **E8 (broader UI)** and **E7** can overlap if E7 stays behind feature flags/env and does not block CRUD.
 - **E9 (reports)** should not start until **T5** resolved; can parallelize with late **E8** only if staffing allows and schema stable.
@@ -169,6 +173,7 @@ Use Cursor **Task** subagents (or equivalent) with **narrow prompts** and **read
 |-------|----------------------|------------------|
 | Discovery / parity | Map legacy forms, schema, edge cases | `explore` (quick/medium) |
 | Scaffold & native modules | Shell, Vite externals, pnpm scripts | `shell` / `generalPurpose` |
+| Visual / A-B exploration | Design lab routes, token variants, side-by-side comparisons | `generalPurpose` (use **frontend-design** skill when implementing UI) |
 | Architecture guardrails | IPC security, layering, transaction boundaries | `generalPurpose` (eng review checklist) |
 | Implementation spikes | Vertical slice delivery | `generalPurpose` |
 | Test gap analysis | Vitest coverage, parity cases | `generalPurpose` + `explore` |
@@ -186,6 +191,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 - [ ] **E0** — Pre-search, decisions, traceability
 - [ ] **E1** — Repository scaffold & developer experience
+- [ ] **E1.5** — Visual design exploration & A/B (dev-only)
 - [ ] **E2** — Data layer (SQLite, migrations, WAL)
 - [ ] **E3** — Backend API (Express in main)
 - [ ] **E4** — IPC contract (preload / contextBridge)
@@ -246,6 +252,30 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
     - [ ] **T1.3.1.1:** Boundary wraps routed content; fallback UI is accessible and non-crashing.  
     - [ ] **T1.3.1.2:** Dev-only throw route or test proves boundary catches render errors.  
     - **DoD:** Documented behavior; manual or automated proof attached to PR notes.
+
+---
+
+## Epic E1.5 — Visual design exploration & A/B
+
+**Epic DoD:** Dev-only **design lab** (or equivalent) where **≥2** distinguishable style directions can be viewed **in-app** (same Electron + Vite + Tailwind/shadcn pipeline as production). **Decision artifact** in-repo ([DECISIONS.md](./DECISIONS.md) or [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md)): chosen direction, rejected options, and **token mapping** (colors, typography, spacing/density) for E5+. **Production safety:** lab not shipped in prod build (`import.meta.env.DEV` route gating, or build-time strip). **No scope creep:** experiments do not add backend or IPC surface; SOLID/modular/DRY preserved (isolated route or components; no duplicated business logic).
+
+- [ ] **US1.5.1 — Dev-only design lab entry**  
+  - **Feature F1.5.1.1:** Design lab reachable from the running app (e.g. `/dev/design-lab` route) or optional second Vite HTML entry.  
+    - [ ] **T1.5.1.1.1:** Lab registered only when `import.meta.env.DEV` is true (or equivalent); production bundle excludes or no-ops the entry.  
+    - [ ] **T1.5.1.1.2:** README documents how to open the lab in `pnpm dev`.  
+    - **DoD:** Reviewer can open the lab without editing code; prod build verification noted in PR or checklist.
+
+- [ ] **US1.5.2 — A/B style variants**  
+  - **Feature F1.5.2.1:** At least **two** distinguishable directions (e.g. density, palette, typography) using real React + Tailwind + shadcn—not static screenshots only.  
+    - [ ] **T1.5.2.1.1:** Side-by-side layout, toggle, or route-per-variant so comparison needs no rebuild.  
+    - [ ] **T1.5.2.1.2:** Variants live in isolated components or CSS layers to avoid entangling MVP form code until a decision is locked.  
+    - **DoD:** Stakeholder or team can compare A vs B in one session; screenshot or short note captured for decision doc.
+
+- [ ] **US1.5.3 — Lock design direction**  
+  - **Feature F1.5.3.1:** Record outcome and apply tokens to the shared shell.  
+    - [ ] **T1.5.3.1.1:** Decision doc lists chosen direction, rejected options, and rationale; links colors/type/spacing to Tailwind/CSS variables or theme file.  
+    - [ ] **T1.5.3.1.2:** Primary shell / layout from E1.2 updated to match the chosen tokens (or explicit follow-up task filed in E5 with pointer to doc).  
+    - **DoD:** The appendix table in this document (or Epic E5) references the decision doc; no conflicting “default” styles left undocumented.
 
 ---
 
@@ -478,6 +508,7 @@ Minimum module mapping (adjust labels to legacy forms):
 | Sequencing B+A | [StarHotel-Modernization-Design.md](./StarHotel-Modernization-Design.md) |
 | Legacy schema & logic | [PRE-SEARCH.md](./PRE-SEARCH.md) |
 | Deferred decisions T1–T8 | [TODOS.md](./TODOS.md) |
+| Visual A/B & locked tokens (E1.5) | [DECISIONS.md](./DECISIONS.md) or [DESIGN-DIRECTION.md](./DESIGN-DIRECTION.md) (create when epic runs) |
 | Stack & commands | [CLAUDE.md](../CLAUDE.md) |
 
 ---
