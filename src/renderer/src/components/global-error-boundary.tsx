@@ -1,33 +1,33 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 type Props = {
-  readonly children: ReactNode
-}
+  readonly children: ReactNode;
+};
 
 type State = {
-  readonly error: Error | null
-}
+  readonly error: Error | null;
+};
 
 export class GlobalErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
-    this.state = { error: null }
+    super(props);
+    this.state = { error: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { error }
+    return { error };
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('[GlobalErrorBoundary]', error, info.componentStack)
+    console.error('[GlobalErrorBoundary]', error, info.componentStack);
   }
 
   private handleReload = (): void => {
-    this.setState({ error: null })
-    window.location.hash = '#/'
-    window.location.reload()
-  }
+    this.setState({ error: null });
+    window.location.hash = '#/';
+    window.location.reload();
+  };
 
   override render(): ReactNode {
     if (this.state.error) {
@@ -47,8 +47,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             Reload app
           </Button>
         </div>
-      )
+      );
     }
-    return this.props.children
+    return this.props.children;
   }
 }

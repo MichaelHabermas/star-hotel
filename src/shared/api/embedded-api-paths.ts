@@ -15,7 +15,7 @@ export const EMBEDDED_API_PATHS = {
   roomById: (id: number): string => `/api/rooms/${id}`,
   reservations: '/api/reservations',
   reservationById: (id: number): string => `/api/reservations/${id}`,
-} as const
+} as const;
 
 /** OpenAPI 3 `paths` keys (with `{id}` templates) — must match `starHotelOpenApiDocument.paths`. */
 export const EMBEDDED_OPENAPI_DOCUMENTED_PATHS = [
@@ -29,4 +29,4 @@ export const EMBEDDED_OPENAPI_DOCUMENTED_PATHS = [
   '/api/rooms/{id}',
   EMBEDDED_API_PATHS.reservations,
   '/api/reservations/{id}',
-] as const
+] as const;

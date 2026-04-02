@@ -1,24 +1,24 @@
-import type { JSX } from 'react'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Building2, CalendarRange, FileText, Hotel, Users } from 'lucide-react'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
-import { runPerfSmoke, type PerfSmokeResult } from '@renderer/lib/perf-measurements'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
-import { capturePostHogWorkflow } from '@renderer/telemetry/renderer-telemetry'
+} from '@renderer/components/ui/card';
+import { runPerfSmoke, type PerfSmokeResult } from '@renderer/lib/perf-measurements';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { capturePostHogWorkflow } from '@renderer/telemetry/renderer-telemetry';
+import { Building2, CalendarRange, FileText, Hotel, Users } from 'lucide-react';
+import type { JSX } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const hubCards: readonly {
-  readonly title: string
-  readonly description: string
-  readonly to: string | null
-  readonly icon: typeof Hotel
+  readonly title: string;
+  readonly description: string;
+  readonly to: string | null;
+  readonly icon: typeof Hotel;
 }[] = [
   {
     title: 'Reservations',
@@ -44,22 +44,22 @@ const hubCards: readonly {
     to: null,
     icon: FileText,
   },
-]
+];
 
 export function HomePage(): JSX.Element {
-  const starHotel = useStarHotelApp()
+  const starHotel = useStarHotelApp();
   const [perfSmoke, setPerfSmoke] = useState<
     | { kind: 'idle' }
     | { kind: 'loading' }
     | { kind: 'ok'; result: PerfSmokeResult }
     | { kind: 'err'; message: string }
-  >({ kind: 'idle' })
+  >({ kind: 'idle' });
   const [reservationSmoke, setReservationSmoke] = useState<
     | { kind: 'idle' }
     | { kind: 'loading' }
     | { kind: 'ok'; count: number }
     | { kind: 'err'; message: string }
-  >({ kind: 'idle' })
+  >({ kind: 'idle' });
 
   return (
     <div className="mx-auto max-w-5xl flex-col gap-8 p-4 md:p-6">
@@ -67,9 +67,12 @@ export function HomePage(): JSX.Element {
         <div className="flex items-center gap-3">
           <Hotel className="text-primary size-10 shrink-0" aria-hidden />
           <div>
-            <h1 className="font-display text-foreground text-2xl font-semibold tracking-tight">Operations hub</h1>
+            <h1 className="font-display text-foreground text-2xl font-semibold tracking-tight">
+              Operations hub
+            </h1>
             <p className="text-muted-foreground text-sm">
-              Front desk, inventory, and guests — same surface as the legacy main menu, rebuilt for speed.
+              Front desk, inventory, and guests — same surface as the legacy main menu, rebuilt for
+              speed.
             </p>
           </div>
         </div>
@@ -106,8 +109,8 @@ export function HomePage(): JSX.Element {
         <CardHeader>
           <CardTitle>Developer experience</CardTitle>
           <CardDescription>
-            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui. Embedded Express API is reached only through{' '}
-            <span className="font-mono">StarHotelApp.api</span> (Epic E4).
+            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui. Embedded Express API is reached
+            only through <span className="font-mono">StarHotelApp.api</span> (Epic E4).
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
@@ -120,8 +123,8 @@ export function HomePage(): JSX.Element {
           </p>
           {starHotel.getEnvironment().platform === 'unknown' ? (
             <p className="text-muted-foreground text-xs">
-              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>). API health
-              still works if the embedded server is running.
+              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>
+              ). API health still works if the embedded server is running.
             </p>
           ) : null}
           <div className="flex flex-wrap gap-2">
@@ -130,10 +133,10 @@ export function HomePage(): JSX.Element {
               variant="secondary"
               onClick={async () => {
                 try {
-                  await starHotel.pingEmbeddedApi()
-                  console.info('[starHotelApp] embedded API health ok')
+                  await starHotel.pingEmbeddedApi();
+                  console.info('[starHotelApp] embedded API health ok');
                 } catch (err) {
-                  console.warn('[starHotelApp] embedded API health failed', err)
+                  console.warn('[starHotelApp] embedded API health failed', err);
                 }
               }}
             >
@@ -144,10 +147,10 @@ export function HomePage(): JSX.Element {
               variant="outline"
               onClick={async () => {
                 try {
-                  await starHotel.pingIpc()
-                  console.info('[starHotelApp] IPC ping ok')
+                  await starHotel.pingIpc();
+                  console.info('[starHotelApp] IPC ping ok');
                 } catch (err) {
-                  console.warn('[starHotelApp] IPC ping failed', err)
+                  console.warn('[starHotelApp] IPC ping failed', err);
                 }
               }}
             >
@@ -158,15 +161,15 @@ export function HomePage(): JSX.Element {
               variant="secondary"
               disabled={perfSmoke.kind === 'loading'}
               onClick={async () => {
-                setPerfSmoke({ kind: 'loading' })
+                setPerfSmoke({ kind: 'loading' });
                 try {
-                  const result = await runPerfSmoke(starHotel)
-                  setPerfSmoke({ kind: 'ok', result })
+                  const result = await runPerfSmoke(starHotel);
+                  setPerfSmoke({ kind: 'ok', result });
                 } catch (err) {
                   setPerfSmoke({
                     kind: 'err',
                     message: err instanceof Error ? err.message : String(err),
-                  })
+                  });
                 }
               }}
             >
@@ -177,16 +180,16 @@ export function HomePage(): JSX.Element {
               variant="default"
               disabled={reservationSmoke.kind === 'loading'}
               onClick={async () => {
-                setReservationSmoke({ kind: 'loading' })
+                setReservationSmoke({ kind: 'loading' });
                 try {
-                  const rows = await starHotel.api.reservations.list({})
-                  setReservationSmoke({ kind: 'ok', count: rows.length })
-                  capturePostHogWorkflow('workflow_list_reservations', { count: rows.length })
+                  const rows = await starHotel.api.reservations.list({});
+                  setReservationSmoke({ kind: 'ok', count: rows.length });
+                  capturePostHogWorkflow('workflow_list_reservations', { count: rows.length });
                 } catch (err) {
                   setReservationSmoke({
                     kind: 'err',
                     message: starHotel.formatEmbeddedApiUserMessage(err),
-                  })
+                  });
                 }
               }}
             >
@@ -205,8 +208,9 @@ export function HomePage(): JSX.Element {
           ) : null}
           {perfSmoke.kind === 'ok' ? (
             <p className="text-muted-foreground text-xs font-mono" role="status">
-              Perf: HTTP health {perfSmoke.result.embeddedApiRttMs} ms · IPC {perfSmoke.result.ipcRttMs} ms · GET
-              /api/reservations {perfSmoke.result.reservationListMs} ms (see docs/PERF.md)
+              Perf: HTTP health {perfSmoke.result.embeddedApiRttMs} ms · IPC{' '}
+              {perfSmoke.result.ipcRttMs} ms · GET /api/reservations{' '}
+              {perfSmoke.result.reservationListMs} ms (see docs/PERF.md)
             </p>
           ) : null}
           {perfSmoke.kind === 'err' ? (
@@ -217,5 +221,5 @@ export function HomePage(): JSX.Element {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

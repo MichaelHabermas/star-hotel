@@ -4,10 +4,10 @@
  */
 export type PersistencePort = {
   /** Resolve when the backing store is safe to read (future: migrations done). */
-  isReady(): Promise<void>
+  isReady(): Promise<void>;
   /** Idempotent: safe to call multiple times. */
-  close(): Promise<void>
-}
+  close(): Promise<void>;
+};
 
 export const noopPersistencePort: PersistencePort = {
   async isReady() {
@@ -16,4 +16,4 @@ export const noopPersistencePort: PersistencePort = {
   async close() {
     /* no-op */
   },
-}
+};

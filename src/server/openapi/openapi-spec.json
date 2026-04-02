@@ -30,9 +30,7 @@
   "paths": {
     "/health": {
       "get": {
-        "tags": [
-          "health"
-        ],
+        "tags": ["health"],
         "summary": "Liveness after SQLite is ready",
         "responses": {
           "200": {
@@ -47,9 +45,7 @@
                       "example": true
                     }
                   },
-                  "required": [
-                    "ok"
-                  ]
+                  "required": ["ok"]
                 }
               }
             }
@@ -59,9 +55,7 @@
     },
     "/api/auth/login": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login (Argon2 password verification)",
         "requestBody": {
           "required": true,
@@ -69,10 +63,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "username",
-                  "password"
-                ],
+                "required": ["username", "password"],
                 "additionalProperties": false,
                 "properties": {
                   "username": {
@@ -93,21 +84,14 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "token",
-                    "user"
-                  ],
+                  "required": ["token", "user"],
                   "properties": {
                     "token": {
                       "type": "string"
                     },
                     "user": {
                       "type": "object",
-                      "required": [
-                        "id",
-                        "username",
-                        "role"
-                      ],
+                      "required": ["id", "username", "role"],
                       "properties": {
                         "id": {
                           "type": "integer"
@@ -133,9 +117,7 @@
     },
     "/api/auth/logout": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Logout (invalidate server session)",
         "responses": {
           "204": {
@@ -146,9 +128,7 @@
     },
     "/api/auth/me": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Current user (requires Bearer token)",
         "responses": {
           "200": {
@@ -157,17 +137,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "user"
-                  ],
+                  "required": ["user"],
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": [
-                        "id",
-                        "username",
-                        "role"
-                      ],
+                      "required": ["id", "username", "role"],
                       "properties": {
                         "id": {
                           "type": "integer"
@@ -193,9 +167,7 @@
     },
     "/api/guests": {
       "get": {
-        "tags": [
-          "guests"
-        ],
+        "tags": ["guests"],
         "summary": "List guests (picker)",
         "parameters": [],
         "responses": {
@@ -215,9 +187,7 @@
         }
       },
       "post": {
-        "tags": [
-          "guests"
-        ],
+        "tags": ["guests"],
         "summary": "Create guest",
         "requestBody": {
           "required": true,
@@ -248,9 +218,7 @@
     },
     "/api/guests/{id}": {
       "get": {
-        "tags": [
-          "guests"
-        ],
+        "tags": ["guests"],
         "summary": "Get guest by id",
         "parameters": [
           {
@@ -274,9 +242,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "guests"
-        ],
+        "tags": ["guests"],
         "summary": "Update guest (partial body)",
         "parameters": [
           {
@@ -310,9 +276,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "guests"
-        ],
+        "tags": ["guests"],
         "summary": "Delete guest (blocked when reservations reference them)",
         "parameters": [
           {
@@ -334,9 +298,7 @@
     },
     "/api/rooms": {
       "get": {
-        "tags": [
-          "rooms"
-        ],
+        "tags": ["rooms"],
         "summary": "List rooms (optional status filter)",
         "parameters": [
           {
@@ -366,9 +328,7 @@
         }
       },
       "post": {
-        "tags": [
-          "rooms"
-        ],
+        "tags": ["rooms"],
         "summary": "Create room",
         "requestBody": {
           "required": true,
@@ -399,9 +359,7 @@
     },
     "/api/rooms/{id}": {
       "get": {
-        "tags": [
-          "rooms"
-        ],
+        "tags": ["rooms"],
         "summary": "Get room by id",
         "parameters": [
           {
@@ -425,9 +383,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "rooms"
-        ],
+        "tags": ["rooms"],
         "summary": "Update room (partial body)",
         "parameters": [
           {
@@ -461,9 +417,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "rooms"
-        ],
+        "tags": ["rooms"],
         "summary": "Delete room (blocked when reservations reference it)",
         "parameters": [
           {
@@ -485,9 +439,7 @@
     },
     "/api/reservations": {
       "get": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "List reservations",
         "parameters": [
           {
@@ -526,9 +478,7 @@
         }
       },
       "post": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Create reservation (total computed server-side)",
         "requestBody": {
           "required": true,
@@ -565,9 +515,7 @@
     },
     "/api/reservations/{id}": {
       "get": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Get reservation",
         "parameters": [
           {
@@ -591,9 +539,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Update reservation (partial body)",
         "parameters": [
           {
@@ -633,9 +579,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "reservations"
-        ],
+        "tags": ["reservations"],
         "summary": "Delete reservation",
         "parameters": [
           {
@@ -686,12 +630,7 @@
     "schemas": {
       "Guest": {
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "idNumber",
-          "contact"
-        ],
+        "required": ["id", "name", "idNumber", "contact"],
         "properties": {
           "id": {
             "type": "integer"
@@ -711,9 +650,7 @@
       },
       "GuestCreate": {
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "additionalProperties": false,
         "properties": {
           "name": {
@@ -748,12 +685,7 @@
       },
       "Room": {
         "type": "object",
-        "required": [
-          "id",
-          "roomType",
-          "price",
-          "status"
-        ],
+        "required": ["id", "roomType", "price", "status"],
         "properties": {
           "id": {
             "type": "integer"
@@ -771,11 +703,7 @@
       },
       "RoomCreate": {
         "type": "object",
-        "required": [
-          "roomType",
-          "price",
-          "status"
-        ],
+        "required": ["roomType", "price", "status"],
         "additionalProperties": false,
         "properties": {
           "roomType": {
@@ -808,14 +736,7 @@
       },
       "Reservation": {
         "type": "object",
-        "required": [
-          "id",
-          "roomId",
-          "guestId",
-          "checkInDate",
-          "checkOutDate",
-          "totalAmount"
-        ],
+        "required": ["id", "roomId", "guestId", "checkInDate", "checkOutDate", "totalAmount"],
         "properties": {
           "id": {
             "type": "integer"
@@ -843,12 +764,7 @@
       },
       "ReservationCreate": {
         "type": "object",
-        "required": [
-          "roomId",
-          "guestId",
-          "checkInDate",
-          "checkOutDate"
-        ],
+        "required": ["roomId", "guestId", "checkInDate", "checkOutDate"],
         "additionalProperties": false,
         "properties": {
           "roomId": {

@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { cn } from '@renderer/lib/utils'
+import { cn } from '@renderer/lib/utils';
+import * as React from 'react';
 
 function Card({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
   return (
@@ -11,7 +11,7 @@ function Card({ className, ...props }: React.ComponentProps<'div'>): React.JSX.E
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
@@ -24,7 +24,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>): React
       )}
       {...props}
     />
-  )
+  );
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
@@ -34,7 +34,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>): React.
       className={cn('leading-none font-semibold', className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
@@ -44,11 +44,11 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>): 
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
-  )
+  );
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
-  return <div data-slot="card-content" className={cn('px-6', className)} {...props} />
+  return <div data-slot="card-content" className={cn('px-6', className)} {...props} />;
 }
 
-export { Card, CardContent, CardDescription, CardHeader, CardTitle }
+export { Card, CardContent, CardDescription, CardHeader, CardTitle };

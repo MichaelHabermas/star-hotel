@@ -6,41 +6,41 @@
  * for legacy; MVP uses **calendar nights** only (see `docs/E5-FORM-PARITY-MAP.md` — Domain pricing).
  */
 
-const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export class InvalidIsoDateError extends Error {
-  readonly httpStatus = 400 as const
-  readonly errorCode = 'INVALID_DATE' as const
+  readonly httpStatus = 400 as const;
+  readonly errorCode = 'INVALID_DATE' as const;
 
   constructor(message: string) {
-    super(message)
-    this.name = 'InvalidIsoDateError'
+    super(message);
+    this.name = 'InvalidIsoDateError';
   }
 }
 
 function parseIsoDateParts(iso: string): { y: number; m: number; d: number } {
-  const m = ISO_DATE.exec(iso.trim())
+  const m = ISO_DATE.exec(iso.trim());
   if (!m) {
-    throw new InvalidIsoDateError(`Expected YYYY-MM-DD date, got: ${iso}`)
+    throw new InvalidIsoDateError(`Expected YYYY-MM-DD date, got: ${iso}`);
   }
-  const y = Number(m[1])
-  const mo = Number(m[2])
-  const d = Number(m[3])
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
   if (mo < 1 || mo > 12 || d < 1 || d > 31) {
-    throw new InvalidIsoDateError(`Invalid calendar date: ${iso}`)
+    throw new InvalidIsoDateError(`Invalid calendar date: ${iso}`);
   }
-  const utc = Date.UTC(y, mo - 1, d)
-  const check = new Date(utc)
+  const utc = Date.UTC(y, mo - 1, d);
+  const check = new Date(utc);
   if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) {
-    throw new InvalidIsoDateError(`Invalid calendar date: ${iso}`)
+    throw new InvalidIsoDateError(`Invalid calendar date: ${iso}`);
   }
-  return { y, m: mo, d }
+  return { y, m: mo, d };
 }
 
 /** UTC midnight epoch day index (stable for date-only arithmetic). */
 function utcDayIndex(iso: string): number {
-  const { y, m, d } = parseIsoDateParts(iso)
-  return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000)
+  const { y, m, d } = parseIsoDateParts(iso);
+  return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
 }
 
 /**
@@ -48,12 +48,12 @@ function utcDayIndex(iso: string): number {
  * Same check-in and check-out → 0 nights.
  */
 export function countStayNights(checkInIso: string, checkOutIso: string): number {
-  const start = utcDayIndex(checkInIso)
-  const end = utcDayIndex(checkOutIso)
+  const start = utcDayIndex(checkInIso);
+  const end = utcDayIndex(checkOutIso);
   if (end < start) {
-    throw new InvalidIsoDateError('Check-out must be on or after check-in')
+    throw new InvalidIsoDateError('Check-out must be on or after check-in');
   }
-  return end - start
+  return end - start;
 }
 
 /**
@@ -62,11 +62,11 @@ export function countStayNights(checkInIso: string, checkOutIso: string): number
  */
 export function computeReservationTotal(nights: number, pricePerNight: number): number {
   if (!Number.isFinite(nights) || nights < 0) {
-    throw new RangeError('nights must be a non-negative finite number')
+    throw new RangeError('nights must be a non-negative finite number');
   }
   if (!Number.isFinite(pricePerNight) || pricePerNight < 0) {
-    throw new RangeError('pricePerNight must be a non-negative finite number')
+    throw new RangeError('pricePerNight must be a non-negative finite number');
   }
-  const raw = nights * pricePerNight
-  return Math.round(raw * 100) / 100
+  const raw = nights * pricePerNight;
+  return Math.round(raw * 100) / 100;
 }

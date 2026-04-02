@@ -1,9 +1,9 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 /** ISO 8601 calendar date (YYYY-MM-DD). */
-export const isoDateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
+export const isoDateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 
-const positiveInt = z.coerce.number().int().positive()
+const positiveInt = z.coerce.number().int().positive();
 
 export const reservationCreateBodySchema = z
   .object({
@@ -16,9 +16,9 @@ export const reservationCreateBodySchema = z
   .refine((x) => x.checkOutDate >= x.checkInDate, {
     message: 'checkOutDate must be on or after checkInDate',
     path: ['checkOutDate'],
-  })
+  });
 
-export type ReservationCreateBody = z.infer<typeof reservationCreateBodySchema>
+export type ReservationCreateBody = z.infer<typeof reservationCreateBodySchema>;
 
 export const reservationUpdateBodySchema = z
   .object({
@@ -37,22 +37,22 @@ export const reservationUpdateBodySchema = z
       message: 'checkOutDate must be on or after checkInDate',
       path: ['checkOutDate'],
     },
-  )
+  );
 
-export type ReservationUpdateBody = z.infer<typeof reservationUpdateBodySchema>
+export type ReservationUpdateBody = z.infer<typeof reservationUpdateBodySchema>;
 
 export const reservationIdParamsSchema = z.object({
   id: z.coerce.number().int().positive(),
-})
+});
 
 export const reservationListQuerySchema = z
   .object({
     roomId: z.coerce.number().int().positive().optional(),
     guestId: z.coerce.number().int().positive().optional(),
   })
-  .strict()
+  .strict();
 
-export type ReservationListQuery = z.infer<typeof reservationListQuerySchema>
+export type ReservationListQuery = z.infer<typeof reservationListQuerySchema>;
 
 export const reservationResponseSchema = z.object({
   id: z.number(),
@@ -61,6 +61,6 @@ export const reservationResponseSchema = z.object({
   checkInDate: isoDateStringSchema,
   checkOutDate: isoDateStringSchema,
   totalAmount: z.number(),
-})
+});
 
-export type ReservationResponse = z.infer<typeof reservationResponseSchema>
+export type ReservationResponse = z.infer<typeof reservationResponseSchema>;

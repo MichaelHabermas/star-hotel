@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 /** Wire shape for `sendJsonError` / embedded API error responses. */
 export const apiErrorBodySchema = z.object({
@@ -7,6 +7,6 @@ export const apiErrorBodySchema = z.object({
     message: z.string(),
     details: z.unknown().optional(),
   }),
-})
+});
 
-export type ApiErrorBody = z.infer<typeof apiErrorBodySchema>
+export type ApiErrorBody = z.infer<typeof apiErrorBodySchema>;

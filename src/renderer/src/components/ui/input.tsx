@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { cn } from '@renderer/lib/utils'
+import { cn } from '@renderer/lib/utils';
+import * as React from 'react';
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>): React.JSX.Element {
   return (
@@ -12,7 +12,7 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>): Re
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

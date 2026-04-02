@@ -1,5 +1,5 @@
-import { existsSync } from 'node:fs'
-import path from 'node:path'
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 
 /**
  * Resolves built preload bundle path.
@@ -15,15 +15,15 @@ export function resolvePreloadScript(scriptDir: string): string {
     path.join(scriptDir, '../../out/preload/index.js'),
     path.join(scriptDir, '../../out/preload/index.cjs'),
     path.join(scriptDir, '../../out/preload/index.mjs'),
-  ]
+  ];
 
   for (const candidate of candidates) {
     if (existsSync(candidate)) {
-      return candidate
+      return candidate;
     }
   }
 
   throw new Error(
     `[star-hotel] preload bundle not found. scriptDir=${scriptDir}; tried=${candidates.join(', ')}`,
-  )
+  );
 }

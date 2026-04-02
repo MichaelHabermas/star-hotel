@@ -1,23 +1,23 @@
-import type { ReservationListQuery } from '@shared/schemas/reservation'
-import type { ReservationRow, ReservationWrite } from './reservation-repository'
+import type { ReservationListQuery } from '@shared/schemas/reservation';
+import type { ReservationRow, ReservationWrite } from './reservation-repository';
 
 /**
  * Data access surface used by {@link ReservationService}. Enables in-memory fakes for unit tests.
  */
 export type ReservationRepositoryPort = {
-  list(query: ReservationListQuery): ReservationRow[]
-  getById(resId: number): ReservationRow | undefined
-  getRoomPrice(roomId: number): number | undefined
-  guestExists(guestId: number): boolean
+  list(query: ReservationListQuery): ReservationRow[];
+  getById(resId: number): ReservationRow | undefined;
+  getRoomPrice(roomId: number): number | undefined;
+  guestExists(guestId: number): boolean;
   findOverlappingReservation(
     roomId: number,
     checkIn: string,
     checkOut: string,
     excludeResId?: number,
-  ): number | undefined
-  insert(row: ReservationWrite): number
-  update(resId: number, row: ReservationWrite): void
-  delete(resId: number): boolean
+  ): number | undefined;
+  insert(row: ReservationWrite): number;
+  update(resId: number, row: ReservationWrite): void;
+  delete(resId: number): boolean;
   /**
    * Overlap check and insert in one SQLite transaction (TOCTOU-safe on WAL).
    * Implementations that are not SQLite should still perform check-then-write atomically where possible.
@@ -27,12 +27,12 @@ export type ReservationRepositoryPort = {
     checkIn: string,
     checkOut: string,
     row: ReservationWrite,
-  ): number
+  ): number;
   updateWithNoOverlap(
     resId: number,
     roomId: number,
     checkIn: string,
     checkOut: string,
     row: ReservationWrite,
-  ): void
-}
+  ): void;
+};

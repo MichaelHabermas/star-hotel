@@ -1,26 +1,26 @@
-import type { JSX } from 'react'
-import { useEffect } from 'react'
-import { HashRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { AuthRoot } from '@renderer/lib/auth-context'
-import { AppShell } from '@renderer/layout/app-shell'
-import { GuestFormPage } from '@renderer/pages/guest-form-page'
-import { GuestsListPage } from '@renderer/pages/guests-list-page'
-import { HomePage } from '@renderer/pages/home-page'
-import { LoginPage } from '@renderer/pages/login-page'
-import { ReservationFormPage } from '@renderer/pages/reservation-form-page'
-import { ReservationsListPage } from '@renderer/pages/reservations-list-page'
-import { RoomFormPage } from '@renderer/pages/room-form-page'
-import { RoomsListPage } from '@renderer/pages/rooms-list-page'
-import { RequireAuth, RequireGuest } from '@renderer/routes/require-auth'
-import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
-import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry'
+import { AppShell } from '@renderer/layout/app-shell';
+import { AuthRoot } from '@renderer/lib/auth-context';
+import { GuestFormPage } from '@renderer/pages/guest-form-page';
+import { GuestsListPage } from '@renderer/pages/guests-list-page';
+import { HomePage } from '@renderer/pages/home-page';
+import { LoginPage } from '@renderer/pages/login-page';
+import { ReservationFormPage } from '@renderer/pages/reservation-form-page';
+import { ReservationsListPage } from '@renderer/pages/reservations-list-page';
+import { RoomFormPage } from '@renderer/pages/room-form-page';
+import { RoomsListPage } from '@renderer/pages/rooms-list-page';
+import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes';
+import { RequireAuth, RequireGuest } from '@renderer/routes/require-auth';
+import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry';
+import type { JSX } from 'react';
+import { useEffect } from 'react';
+import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
 
 function PostHogRouteListener(): null {
-  const loc = useLocation()
+  const loc = useLocation();
   useEffect(() => {
-    capturePostHogNavigation(loc.pathname)
-  }, [loc.pathname])
-  return null
+    capturePostHogNavigation(loc.pathname);
+  }, [loc.pathname]);
+  return null;
 }
 
 export function App(): JSX.Element {
@@ -42,7 +42,10 @@ export function App(): JSX.Element {
               <Route path="/" element={<HomePage />} />
               <Route path="/reservations" element={<ReservationsListPage />} />
               <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
-              <Route path="/reservations/:reservationId" element={<ReservationFormPage mode="edit" />} />
+              <Route
+                path="/reservations/:reservationId"
+                element={<ReservationFormPage mode="edit" />}
+              />
               <Route path="/rooms" element={<RoomsListPage />} />
               <Route path="/rooms/new" element={<RoomFormPage mode="create" />} />
               <Route path="/rooms/:roomId" element={<RoomFormPage mode="edit" />} />
@@ -59,5 +62,5 @@ export function App(): JSX.Element {
         </Routes>
       </HashRouter>
     </AuthRoot>
-  )
+  );
 }

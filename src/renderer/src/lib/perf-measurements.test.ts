@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
-import { runPerfSmoke } from './perf-measurements'
-import type { StarHotelApp } from './star-hotel-app'
+import { describe, expect, it, vi } from 'vitest';
+import { runPerfSmoke } from './perf-measurements';
+import type { StarHotelApp } from './star-hotel-app';
 
 describe('runPerfSmoke', () => {
   it('returns three non-negative timings', async () => {
@@ -12,15 +12,15 @@ describe('runPerfSmoke', () => {
           list: vi.fn(async () => []),
         },
       },
-    } as unknown as StarHotelApp
+    } as unknown as StarHotelApp;
 
-    const result = await runPerfSmoke(starHotel)
+    const result = await runPerfSmoke(starHotel);
 
-    expect(result.embeddedApiRttMs).toBeGreaterThanOrEqual(0)
-    expect(result.ipcRttMs).toBeGreaterThanOrEqual(0)
-    expect(result.reservationListMs).toBeGreaterThanOrEqual(0)
-    expect(starHotel.pingEmbeddedApi).toHaveBeenCalledTimes(1)
-    expect(starHotel.pingIpc).toHaveBeenCalledTimes(1)
-    expect(starHotel.api.reservations.list).toHaveBeenCalledWith({})
-  })
-})
+    expect(result.embeddedApiRttMs).toBeGreaterThanOrEqual(0);
+    expect(result.ipcRttMs).toBeGreaterThanOrEqual(0);
+    expect(result.reservationListMs).toBeGreaterThanOrEqual(0);
+    expect(starHotel.pingEmbeddedApi).toHaveBeenCalledTimes(1);
+    expect(starHotel.pingIpc).toHaveBeenCalledTimes(1);
+    expect(starHotel.api.reservations.list).toHaveBeenCalledWith({});
+  });
+});

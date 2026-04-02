@@ -546,4 +546,4 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
       },
     },
   },
-}
+};

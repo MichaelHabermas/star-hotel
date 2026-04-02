@@ -1,44 +1,44 @@
-import type { FormEvent, JSX } from 'react'
-import { useId, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Hotel } from 'lucide-react'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { useAuth } from '@renderer/lib/auth-context'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
+} from '@renderer/components/ui/card';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
+import { useAuth } from '@renderer/lib/auth-context';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { Hotel } from 'lucide-react';
+import type { FormEvent, JSX } from 'react';
+import { useId, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginPage(): JSX.Element {
-  const starHotel = useStarHotelApp()
-  const { setToken } = useAuth()
-  const navigate = useNavigate()
-  const formId = useId()
-  const userId = `${formId}-user`
-  const passId = `${formId}-pass`
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [err, setErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const starHotel = useStarHotelApp();
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
+  const formId = useId();
+  const userId = `${formId}-user`;
+  const passId = `${formId}-pass`;
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit(e: FormEvent): Promise<void> {
-    e.preventDefault()
-    setErr(null)
-    setSubmitting(true)
+    e.preventDefault();
+    setErr(null);
+    setSubmitting(true);
     try {
-      const res = await starHotel.api.auth.login({ username: username.trim(), password })
-      setToken(res.token)
-      navigate('/', { replace: true })
+      const res = await starHotel.api.auth.login({ username: username.trim(), password });
+      setToken(res.token);
+      navigate('/', { replace: true });
     } catch (error: unknown) {
-      setErr(starHotel.formatEmbeddedApiUserMessage(error))
+      setErr(starHotel.formatEmbeddedApiUserMessage(error));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -46,7 +46,9 @@ export function LoginPage(): JSX.Element {
     <div className="bg-background flex min-h-screen flex-col items-center justify-center p-6">
       <div className="mb-8 flex items-center gap-2">
         <Hotel className="text-primary size-10" aria-hidden />
-        <span className="font-display text-foreground text-xl font-semibold tracking-tight">Star Hotel</span>
+        <span className="font-display text-foreground text-xl font-semibold tracking-tight">
+          Star Hotel
+        </span>
       </div>
       <Card className="border-border w-full max-w-sm shadow-sm">
         <CardHeader>
@@ -93,5 +95,5 @@ export function LoginPage(): JSX.Element {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,128 +1,134 @@
-import type { FormEvent, JSX } from 'react'
-import { useCallback, useEffect, useId, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
-import { roomCreateBodySchema, roomUpdateBodySchema } from '@shared/schemas/room'
+} from '@renderer/components/ui/card';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@renderer/components/ui/select';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { roomCreateBodySchema, roomUpdateBodySchema } from '@shared/schemas/room';
+import type { FormEvent, JSX } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 type RoomFormPageProps = {
-  readonly mode: 'create' | 'edit'
-}
+  readonly mode: 'create' | 'edit';
+};
 
-const STATUSES = ['Available', 'Occupied'] as const
+const STATUSES = ['Available', 'Occupied'] as const;
 
 export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
-  const starHotel = useStarHotelApp()
-  const navigate = useNavigate()
-  const { roomId: idParam } = useParams<{ roomId: string }>()
-  const formId = useId()
-  const priceId = `${formId}-price`
-  const typeId = `${formId}-type`
-  const statusId = `${formId}-status`
+  const starHotel = useStarHotelApp();
+  const navigate = useNavigate();
+  const { roomId: idParam } = useParams<{ roomId: string }>();
+  const formId = useId();
+  const priceId = `${formId}-price`;
+  const typeId = `${formId}-type`;
+  const statusId = `${formId}-status`;
 
-  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN
-  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0
+  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN;
+  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0;
 
-  const [roomType, setRoomType] = useState('')
-  const [price, setPrice] = useState('')
-  const [status, setStatus] = useState<string>(STATUSES[0])
+  const [roomType, setRoomType] = useState('');
+  const [price, setPrice] = useState('');
+  const [status, setStatus] = useState<string>(STATUSES[0]);
 
-  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
-  const [loadErr, setLoadErr] = useState<string | null>(null)
-  const [submitErr, setSubmitErr] = useState<string | null>(null)
-  const [fieldErr, setFieldErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [fieldErr, setFieldErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadRoom = useCallback(async () => {
     if (!editIdValid) {
-      return
+      return;
     }
-    setLoadState('loading')
-    setLoadErr(null)
+    setLoadState('loading');
+    setLoadErr(null);
     try {
-      const r = await starHotel.api.rooms.get(editId)
-      setRoomType(r.roomType)
-      setPrice(String(r.price))
-      setStatus(r.status)
-      setLoadState('ok')
+      const r = await starHotel.api.rooms.get(editId);
+      setRoomType(r.roomType);
+      setPrice(String(r.price));
+      setStatus(r.status);
+      setLoadState('ok');
     } catch (err) {
-      setLoadState('err')
-      setLoadErr(starHotel.formatEmbeddedApiUserMessage(err))
+      setLoadState('err');
+      setLoadErr(starHotel.formatEmbeddedApiUserMessage(err));
     }
-  }, [editIdValid, editId, starHotel])
+  }, [editIdValid, editId, starHotel]);
 
   useEffect(() => {
     if (mode === 'edit') {
-      void loadRoom()
+      void loadRoom();
     } else {
-      setLoadState('ok')
+      setLoadState('ok');
     }
-  }, [mode, loadRoom])
+  }, [mode, loadRoom]);
 
   async function onSubmit(e: FormEvent): Promise<void> {
-    e.preventDefault()
-    setSubmitErr(null)
-    setFieldErr(null)
+    e.preventDefault();
+    setSubmitErr(null);
+    setFieldErr(null);
 
-    const priceNum = Number.parseFloat(price)
+    const priceNum = Number.parseFloat(price);
     if (mode === 'create') {
       const parsed = roomCreateBodySchema.safeParse({
         roomType: roomType.trim(),
         price: priceNum,
         status,
-      })
+      });
       if (!parsed.success) {
-        setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input')
-        return
+        setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input');
+        return;
       }
-      setSubmitting(true)
+      setSubmitting(true);
       try {
-        await starHotel.api.rooms.create(parsed.data)
-        navigate('/rooms')
+        await starHotel.api.rooms.create(parsed.data);
+        navigate('/rooms');
       } catch (err) {
-        setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
+        setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err));
       } finally {
-        setSubmitting(false)
+        setSubmitting(false);
       }
-      return
+      return;
     }
 
     if (!editIdValid) {
-      return
+      return;
     }
-    const body: Record<string, unknown> = {}
+    const body: Record<string, unknown> = {};
     if (roomType.trim() !== '') {
-      body.roomType = roomType.trim()
+      body.roomType = roomType.trim();
     }
     if (price.trim() !== '') {
-      body.price = priceNum
+      body.price = priceNum;
     }
     if (status !== '') {
-      body.status = status
+      body.status = status;
     }
-    const parsed = roomUpdateBodySchema.safeParse(body)
+    const parsed = roomUpdateBodySchema.safeParse(body);
     if (!parsed.success) {
-      setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input')
-      return
+      setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input');
+      return;
     }
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      await starHotel.api.rooms.update(editId, parsed.data)
-      navigate('/rooms')
+      await starHotel.api.rooms.update(editId, parsed.data);
+      navigate('/rooms');
     } catch (err) {
-      setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
+      setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -136,7 +142,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
           <Link to="/rooms">Back to list</Link>
         </Button>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && (loadState === 'loading' || loadState === 'idle')) {
@@ -146,7 +152,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
           Loading room…
         </p>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && loadState === 'err') {
@@ -164,10 +170,10 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const title = mode === 'create' ? 'New room' : `Edit room #${editId}`
+  const title = mode === 'create' ? 'New room' : `Edit room #${editId}`;
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
@@ -256,5 +262,5 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

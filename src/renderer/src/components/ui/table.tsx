@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { cn } from '@renderer/lib/utils'
+import { cn } from '@renderer/lib/utils';
+import * as React from 'react';
 
 function Table({ className, ...props }: React.ComponentProps<'table'>): React.JSX.Element {
   return (
@@ -10,11 +10,11 @@ function Table({ className, ...props }: React.ComponentProps<'table'>): React.JS
         {...props}
       />
     </div>
-  )
+  );
 }
 
 function TableHeader({ className, ...props }: React.ComponentProps<'thead'>): React.JSX.Element {
-  return <thead data-slot="table-header" className={cn('[&_tr]:border-b', className)} {...props} />
+  return <thead data-slot="table-header" className={cn('[&_tr]:border-b', className)} {...props} />;
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<'tbody'>): React.JSX.Element {
@@ -24,7 +24,7 @@ function TableBody({ className, ...props }: React.ComponentProps<'tbody'>): Reac
       className={cn('[&_tr:last-child]:border-0', className)}
       {...props}
     />
-  )
+  );
 }
 
 function TableRow({ className, ...props }: React.ComponentProps<'tr'>): React.JSX.Element {
@@ -37,7 +37,7 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>): React.JS
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableHead({ className, ...props }: React.ComponentProps<'th'>): React.JSX.Element {
@@ -50,7 +50,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>): React.J
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableCell({ className, ...props }: React.ComponentProps<'td'>): React.JSX.Element {
@@ -60,7 +60,7 @@ function TableCell({ className, ...props }: React.ComponentProps<'td'>): React.J
       className={cn('p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0', className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow }
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow };

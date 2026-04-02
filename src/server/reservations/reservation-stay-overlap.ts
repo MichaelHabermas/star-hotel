@@ -8,5 +8,5 @@ export function stayRangesOverlapHalfOpen(
   existingCheckIn: string,
   existingCheckOut: string,
 ): boolean {
-  return existingCheckIn < newCheckOut && existingCheckOut > newCheckIn
+  return existingCheckIn < newCheckOut && existingCheckOut > newCheckIn;
 }

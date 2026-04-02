@@ -1,25 +1,25 @@
-import type { JSX } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
-import { Button } from '@renderer/components/ui/button'
-import { GlobalErrorBoundary } from '@renderer/components/global-error-boundary'
-import { useAuth } from '@renderer/lib/auth-context'
-import { cn } from '@renderer/lib/utils'
-import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
+import { GlobalErrorBoundary } from '@renderer/components/global-error-boundary';
+import { Button } from '@renderer/components/ui/button';
+import { useAuth } from '@renderer/lib/auth-context';
+import { cn } from '@renderer/lib/utils';
+import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes';
+import { LogOut } from 'lucide-react';
+import type { JSX } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
 
 function navClass({ isActive }: { isActive: boolean }): string {
-  const base = 'rounded-md px-3 py-2 text-sm font-medium transition-colors'
+  const base = 'rounded-md px-3 py-2 text-sm font-medium transition-colors';
 
   return cn(
     base,
     isActive
       ? 'bg-secondary text-secondary-foreground'
       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-  )
+  );
 }
 
 export function AppShell(): JSX.Element {
-  const { logout } = useAuth()
+  const { logout } = useAuth();
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <header className="bg-card border-border shadow-xs border-b">
@@ -66,5 +66,5 @@ export function AppShell(): JSX.Element {
         </GlobalErrorBoundary>
       </main>
     </div>
-  )
+  );
 }

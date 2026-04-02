@@ -1,13 +1,13 @@
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
-import path from 'node:path'
-import { defineConfig } from 'vitest/config'
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import { defineConfig } from 'vitest/config';
 
 const sharedAliases = {
   '@renderer': path.resolve(__dirname, 'src/renderer/src'),
   '@shared': path.resolve(__dirname, 'src/shared'),
   '@domain': path.resolve(__dirname, 'src/domain'),
-} as const
+} as const;
 
 /** Tests that run in Node (no DOM, no renderer setup file). */
 const nodeTestGlobs = [
@@ -15,7 +15,7 @@ const nodeTestGlobs = [
   'src/server/**/*.{test,spec}.{ts,tsx}',
   'src/shared/**/*.{test,spec}.{ts,tsx}',
   'src/main/**/*.{test,spec}.{ts,tsx}',
-] as const
+] as const;
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -45,4 +45,4 @@ export default defineConfig({
       },
     ],
   },
-})
+});

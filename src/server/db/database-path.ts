@@ -1,4 +1,4 @@
-import path from 'node:path'
+import path from 'node:path';
 
 /**
  * SQLite file path for the embedded app database (main process only).
@@ -6,5 +6,5 @@ import path from 'node:path'
  * Shared network / multi-seat installs are out of scope for MVP; see docs/DECISIONS.md (T4).
  */
 export function resolveDatabaseFilePath(userDataDir: string): string {
-  return path.join(userDataDir, 'database.sqlite')
+  return path.join(userDataDir, 'database.sqlite');
 }

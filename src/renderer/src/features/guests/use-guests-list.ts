@@ -1,31 +1,31 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app'
-import type { GuestResponse } from '@shared/schemas/guest'
+import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
+import type { GuestResponse } from '@shared/schemas/guest';
+import { useCallback, useEffect, useState } from 'react';
 
 export type GuestsListState =
   | { kind: 'loading' }
   | { kind: 'err'; message: string }
-  | { kind: 'ok'; rows: GuestResponse[] }
+  | { kind: 'ok'; rows: GuestResponse[] };
 
 export function useGuestsList(app: StarHotelApp): {
-  list: GuestsListState
-  reload: () => Promise<void>
+  list: GuestsListState;
+  reload: () => Promise<void>;
 } {
-  const [list, setList] = useState<GuestsListState>({ kind: 'loading' })
+  const [list, setList] = useState<GuestsListState>({ kind: 'loading' });
 
   const reload = useCallback(async () => {
-    setList({ kind: 'loading' })
+    setList({ kind: 'loading' });
     try {
-      const rows = await app.api.guests.list({})
-      setList({ kind: 'ok', rows })
+      const rows = await app.api.guests.list({});
+      setList({ kind: 'ok', rows });
     } catch (err) {
-      setList({ kind: 'err', message: app.formatEmbeddedApiUserMessage(err) })
+      setList({ kind: 'err', message: app.formatEmbeddedApiUserMessage(err) });
     }
-  }, [app])
+  }, [app]);
 
   useEffect(() => {
-    void reload()
-  }, [reload])
+    void reload();
+  }, [reload]);
 
-  return { list, reload }
+  return { list, reload };
 }

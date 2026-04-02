@@ -1,18 +1,18 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app'
-import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider'
-import type { GuestResponse } from '@shared/schemas/guest'
-import type { RoomResponse } from '@shared/schemas/room'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { ReservationFormPage } from './reservation-form-page'
+import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
+import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
+import type { GuestResponse } from '@shared/schemas/guest';
+import type { RoomResponse } from '@shared/schemas/room';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ReservationFormPage } from './reservation-form-page';
 
-const guest: GuestResponse = { id: 1, name: 'Guest One', idNumber: null, contact: null }
-const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'vacant' }
+const guest: GuestResponse = { id: 1, name: 'Guest One', idNumber: null, contact: null };
+const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'vacant' };
 
 function createListApp(overrides?: {
-  readonly guestsList?: () => Promise<GuestResponse[]>
-  readonly roomsList?: () => Promise<RoomResponse[]>
+  readonly guestsList?: () => Promise<GuestResponse[]>;
+  readonly roomsList?: () => Promise<RoomResponse[]>;
 }): StarHotelApp {
   return {
     api: {
@@ -42,8 +42,9 @@ function createListApp(overrides?: {
         delete: vi.fn(),
       },
     },
-    formatEmbeddedApiUserMessage: (err: unknown) => (err instanceof Error ? err.message : String(err)),
-  } as unknown as StarHotelApp
+    formatEmbeddedApiUserMessage: (err: unknown) =>
+      err instanceof Error ? err.message : String(err),
+  } as unknown as StarHotelApp;
 }
 
 function renderCreatePage(app: StarHotelApp) {
@@ -55,42 +56,44 @@ function renderCreatePage(app: StarHotelApp) {
         </Routes>
       </StarHotelAppProvider>
     </MemoryRouter>,
-  )
+  );
 }
 
 describe('ReservationFormPage', () => {
   afterEach(() => {
-    cleanup()
-  })
+    cleanup();
+  });
 
   it('shows catalog error alert and Retry when guest list fails', async () => {
     const app = createListApp({
       guestsList: () => Promise.reject(new Error('network down')),
-    })
+    });
 
-    renderCreatePage(app)
+    renderCreatePage(app);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/Could not load guests or rooms/i)
-    expect(screen.getByRole('button', { name: /^Retry$/i })).toBeInTheDocument()
-  })
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Could not load guests or rooms/i);
+    expect(screen.getByRole('button', { name: /^Retry$/i })).toBeInTheDocument();
+  });
 
   it('shows field validation message after submit with empty required fields', async () => {
-    const app = createListApp()
+    const app = createListApp();
 
-    const { container } = renderCreatePage(app)
+    const { container } = renderCreatePage(app);
 
     await waitFor(() => {
-      expect(screen.queryByText(/Loading guests and rooms/i)).not.toBeInTheDocument()
-    })
+      expect(screen.queryByText(/Loading guests and rooms/i)).not.toBeInTheDocument();
+    });
 
-    const form = container.querySelector('form')
-    expect(form).not.toBeNull()
+    const form = container.querySelector('form');
+    expect(form).not.toBeNull();
 
-    const submitBtn = within(form as HTMLElement).getByRole('button', { name: /Create reservation/i })
-    fireEvent.click(submitBtn)
+    const submitBtn = within(form as HTMLElement).getByRole('button', {
+      name: /Create reservation/i,
+    });
+    fireEvent.click(submitBtn);
 
-    const alert = await within(form as HTMLElement).findByRole('alert')
-    expect(alert.textContent).not.toMatch(/Could not load guests or rooms/i)
-    expect(alert.textContent?.length).toBeGreaterThan(0)
-  })
-})
+    const alert = await within(form as HTMLElement).findByRole('alert');
+    expect(alert.textContent).not.toMatch(/Could not load guests or rooms/i);
+    expect(alert.textContent?.length).toBeGreaterThan(0);
+  });
+});

@@ -1,5 +1,5 @@
-import type { JSX } from 'react'
+import type { JSX } from 'react';
 
 export function DevErrorTestPage(): JSX.Element {
-  throw new Error('Dev error boundary test — intentional throw')
+  throw new Error('Dev error boundary test — intentional throw');
 }

@@ -1,22 +1,26 @@
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
-import * as React from 'react'
-import { cn } from '@renderer/lib/utils'
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { cn } from '@renderer/lib/utils';
+import { X } from 'lucide-react';
+import * as React from 'react';
 
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>): React.JSX.Element {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
-function DialogTrigger(props: React.ComponentProps<typeof DialogPrimitive.Trigger>): React.JSX.Element {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+function DialogTrigger(
+  props: React.ComponentProps<typeof DialogPrimitive.Trigger>,
+): React.JSX.Element {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
-function DialogPortal(props: React.ComponentProps<typeof DialogPrimitive.Portal>): React.JSX.Element {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+function DialogPortal(
+  props: React.ComponentProps<typeof DialogPrimitive.Portal>,
+): React.JSX.Element {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
 function DialogClose(props: React.ComponentProps<typeof DialogPrimitive.Close>): React.JSX.Element {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
 function DialogOverlay({
@@ -32,7 +36,7 @@ function DialogOverlay({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogContent({
@@ -40,7 +44,9 @@ function DialogContent({
   children,
   showClose = true,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & { showClose?: boolean }): React.JSX.Element {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  showClose?: boolean;
+}): React.JSX.Element {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -64,7 +70,7 @@ function DialogContent({
         ) : null}
       </DialogPrimitive.Content>
     </DialogPortal>
-  )
+  );
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
@@ -74,7 +80,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>): Rea
       className={cn('flex flex-col gap-1.5 text-center sm:text-left', className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogTitle({
@@ -87,7 +93,7 @@ function DialogTitle({
       className={cn('text-lg leading-none font-semibold', className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogDescription({
@@ -100,7 +106,7 @@ function DialogDescription({
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<'div'>): React.JSX.Element {
@@ -110,7 +116,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<'div'>): Rea
       className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -122,4 +128,4 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-}
+};

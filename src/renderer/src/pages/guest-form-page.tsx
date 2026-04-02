@@ -1,121 +1,121 @@
-import type { FormEvent, JSX } from 'react'
-import { useCallback, useEffect, useId, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
-import { guestCreateBodySchema, guestUpdateBodySchema } from '@shared/schemas/guest'
+} from '@renderer/components/ui/card';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { guestCreateBodySchema, guestUpdateBodySchema } from '@shared/schemas/guest';
+import type { FormEvent, JSX } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 type GuestFormPageProps = {
-  readonly mode: 'create' | 'edit'
-}
+  readonly mode: 'create' | 'edit';
+};
 
 export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
-  const starHotel = useStarHotelApp()
-  const navigate = useNavigate()
-  const { guestId: idParam } = useParams<{ guestId: string }>()
-  const formId = useId()
-  const nameId = `${formId}-name`
-  const idNumId = `${formId}-idnum`
-  const contactId = `${formId}-contact`
+  const starHotel = useStarHotelApp();
+  const navigate = useNavigate();
+  const { guestId: idParam } = useParams<{ guestId: string }>();
+  const formId = useId();
+  const nameId = `${formId}-name`;
+  const idNumId = `${formId}-idnum`;
+  const contactId = `${formId}-contact`;
 
-  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN
-  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0
+  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN;
+  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0;
 
-  const [name, setName] = useState('')
-  const [idNumber, setIdNumber] = useState('')
-  const [contact, setContact] = useState('')
+  const [name, setName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [contact, setContact] = useState('');
 
-  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
-  const [loadErr, setLoadErr] = useState<string | null>(null)
-  const [submitErr, setSubmitErr] = useState<string | null>(null)
-  const [fieldErr, setFieldErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [fieldErr, setFieldErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadGuest = useCallback(async () => {
     if (!editIdValid) {
-      return
+      return;
     }
-    setLoadState('loading')
-    setLoadErr(null)
+    setLoadState('loading');
+    setLoadErr(null);
     try {
-      const g = await starHotel.api.guests.get(editId)
-      setName(g.name)
-      setIdNumber(g.idNumber ?? '')
-      setContact(g.contact ?? '')
-      setLoadState('ok')
+      const g = await starHotel.api.guests.get(editId);
+      setName(g.name);
+      setIdNumber(g.idNumber ?? '');
+      setContact(g.contact ?? '');
+      setLoadState('ok');
     } catch (err) {
-      setLoadState('err')
-      setLoadErr(starHotel.formatEmbeddedApiUserMessage(err))
+      setLoadState('err');
+      setLoadErr(starHotel.formatEmbeddedApiUserMessage(err));
     }
-  }, [editIdValid, editId, starHotel])
+  }, [editIdValid, editId, starHotel]);
 
   useEffect(() => {
     if (mode === 'edit') {
-      void loadGuest()
+      void loadGuest();
     } else {
-      setLoadState('ok')
+      setLoadState('ok');
     }
-  }, [mode, loadGuest])
+  }, [mode, loadGuest]);
 
   async function onSubmit(e: FormEvent): Promise<void> {
-    e.preventDefault()
-    setSubmitErr(null)
-    setFieldErr(null)
+    e.preventDefault();
+    setSubmitErr(null);
+    setFieldErr(null);
 
     if (mode === 'create') {
       const parsed = guestCreateBodySchema.safeParse({
         name: name.trim(),
         idNumber: idNumber.trim() === '' ? undefined : idNumber.trim(),
         contact: contact.trim() === '' ? undefined : contact.trim(),
-      })
+      });
       if (!parsed.success) {
-        setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input')
-        return
+        setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input');
+        return;
       }
-      setSubmitting(true)
+      setSubmitting(true);
       try {
-        await starHotel.api.guests.create(parsed.data)
-        navigate('/guests')
+        await starHotel.api.guests.create(parsed.data);
+        navigate('/guests');
       } catch (err) {
-        setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
+        setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err));
       } finally {
-        setSubmitting(false)
+        setSubmitting(false);
       }
-      return
+      return;
     }
 
     if (!editIdValid) {
-      return
+      return;
     }
-    const body: Record<string, unknown> = {}
+    const body: Record<string, unknown> = {};
     if (name.trim() !== '') {
-      body.name = name.trim()
+      body.name = name.trim();
     }
-    body.idNumber = idNumber.trim() === '' ? null : idNumber.trim()
-    body.contact = contact.trim() === '' ? null : contact.trim()
+    body.idNumber = idNumber.trim() === '' ? null : idNumber.trim();
+    body.contact = contact.trim() === '' ? null : contact.trim();
 
-    const parsed = guestUpdateBodySchema.safeParse(body)
+    const parsed = guestUpdateBodySchema.safeParse(body);
     if (!parsed.success) {
-      setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input')
-      return
+      setFieldErr(parsed.error.issues[0]?.message ?? 'Invalid input');
+      return;
     }
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      await starHotel.api.guests.update(editId, parsed.data)
-      navigate('/guests')
+      await starHotel.api.guests.update(editId, parsed.data);
+      navigate('/guests');
     } catch (err) {
-      setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err))
+      setSubmitErr(starHotel.formatEmbeddedApiUserMessage(err));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -129,7 +129,7 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
           <Link to="/guests">Back to list</Link>
         </Button>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && (loadState === 'loading' || loadState === 'idle')) {
@@ -139,7 +139,7 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
           Loading guest…
         </p>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && loadState === 'err') {
@@ -157,10 +157,10 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const title = mode === 'create' ? 'New guest' : `Edit guest #${editId}`
+  const title = mode === 'create' ? 'New guest' : `Edit guest #${editId}`;
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
@@ -175,7 +175,9 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
       <Card>
         <CardHeader>
           <CardTitle className="font-ui text-lg">{title}</CardTitle>
-          <CardDescription id={`${formId}-hint`}>Name, optional ID reference, and contact.</CardDescription>
+          <CardDescription id={`${formId}-hint`}>
+            Name, optional ID reference, and contact.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -187,11 +189,22 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
           >
             <div className="space-y-2">
               <Label htmlFor={nameId}>Name</Label>
-              <Input id={nameId} value={name} onChange={(ev) => setName(ev.target.value)} required autoComplete="name" />
+              <Input
+                id={nameId}
+                value={name}
+                onChange={(ev) => setName(ev.target.value)}
+                required
+                autoComplete="name"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor={idNumId}>ID / reference (optional)</Label>
-              <Input id={idNumId} value={idNumber} onChange={(ev) => setIdNumber(ev.target.value)} autoComplete="off" />
+              <Input
+                id={idNumId}
+                value={idNumber}
+                onChange={(ev) => setIdNumber(ev.target.value)}
+                autoComplete="off"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor={contactId}>Contact (optional)</Label>
@@ -227,5 +240,5 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

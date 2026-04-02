@@ -1,18 +1,18 @@
-import * as SelectPrimitive from '@radix-ui/react-select'
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
-import * as React from 'react'
-import { cn } from '@renderer/lib/utils'
+import * as SelectPrimitive from '@radix-ui/react-select';
+import { cn } from '@renderer/lib/utils';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import * as React from 'react';
 
 function Select(props: React.ComponentProps<typeof SelectPrimitive.Root>): React.JSX.Element {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+  return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
 function SelectGroup(props: React.ComponentProps<typeof SelectPrimitive.Group>): React.JSX.Element {
-  return <SelectPrimitive.Group data-slot="select-group" {...props} />
+  return <SelectPrimitive.Group data-slot="select-group" {...props} />;
 }
 
 function SelectValue(props: React.ComponentProps<typeof SelectPrimitive.Value>): React.JSX.Element {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />
+  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
 function SelectTrigger({
@@ -34,7 +34,7 @@ function SelectTrigger({
         <ChevronDown className="size-4 opacity-50" aria-hidden />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
-  )
+  );
 }
 
 function SelectContent({
@@ -73,7 +73,7 @@ function SelectContent({
         </SelectPrimitive.ScrollDownButton>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
-  )
+  );
 }
 
 function SelectItem({
@@ -97,7 +97,7 @@ function SelectItem({
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
-  )
+  );
 }
 
-export { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue }
+export { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue };

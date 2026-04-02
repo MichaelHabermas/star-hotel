@@ -1,14 +1,11 @@
-import type { JSX } from 'react'
-import { useId } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
+} from '@renderer/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -16,35 +13,44 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@renderer/components/ui/dialog'
-import { Input } from '@renderer/components/ui/input'
-import { Label } from '@renderer/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@renderer/components/ui/select'
-import { useReservationEditor } from '@renderer/features/reservations/use-reservation-editor'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
+} from '@renderer/components/ui/dialog';
+import { Input } from '@renderer/components/ui/input';
+import { Label } from '@renderer/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@renderer/components/ui/select';
+import { useReservationEditor } from '@renderer/features/reservations/use-reservation-editor';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import type { JSX } from 'react';
+import { useId } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 type ReservationFormPageProps = {
-  readonly mode: 'create' | 'edit'
-}
+  readonly mode: 'create' | 'edit';
+};
 
-const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' })
+const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' });
 
 export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Element {
-  const starHotel = useStarHotelApp()
-  const navigate = useNavigate()
-  const { reservationId: idParam } = useParams<{ reservationId: string }>()
-  const formId = useId()
-  const guestSelectId = `${formId}-guest`
-  const roomSelectId = `${formId}-room`
-  const checkInId = `${formId}-checkin`
-  const checkOutId = `${formId}-checkout`
+  const starHotel = useStarHotelApp();
+  const navigate = useNavigate();
+  const { reservationId: idParam } = useParams<{ reservationId: string }>();
+  const formId = useId();
+  const guestSelectId = `${formId}-guest`;
+  const roomSelectId = `${formId}-room`;
+  const checkInId = `${formId}-checkin`;
+  const checkOutId = `${formId}-checkout`;
 
-  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN
-  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0
+  const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN;
+  const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0;
 
-  const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate })
-  const { catalog, setDeleteErr, createPreview } = editor
-  const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog
+  const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate });
+  const { catalog, setDeleteErr, createPreview } = editor;
+  const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog;
 
   if (mode === 'edit' && !editIdValid) {
     return (
@@ -56,7 +62,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
           <Link to="/reservations">Back to list</Link>
         </Button>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && (editor.loadState === 'loading' || editor.loadState === 'idle')) {
@@ -66,7 +72,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
           Loading reservation…
         </p>
       </div>
-    )
+    );
   }
 
   if (mode === 'edit' && editor.loadState === 'err') {
@@ -84,14 +90,14 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const title = mode === 'create' ? 'New reservation' : `Edit reservation #${editId}`
+  const title = mode === 'create' ? 'New reservation' : `Edit reservation #${editId}`;
   const description =
     mode === 'create'
       ? 'Select guest, room, and stay dates. Estimated total uses the same nightly rate and night count as the server.'
-      : 'Update stay details. Total is recalculated when dates or room change.'
+      : 'Update stay details. Total is recalculated when dates or room change.';
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
@@ -121,8 +127,15 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                 className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
                 role="alert"
               >
-                <p className="text-destructive text-sm">Could not load guests or rooms: {refsErr}</p>
-                <Button type="button" variant="outline" size="sm" onClick={() => void reloadCatalog()}>
+                <p className="text-destructive text-sm">
+                  Could not load guests or rooms: {refsErr}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void reloadCatalog()}
+                >
                   Retry
                 </Button>
               </div>
@@ -228,7 +241,9 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
               >
                 <p className="text-muted-foreground">
                   Estimated stay:{' '}
-                  <span className="text-foreground font-medium">{createPreview.nights} night(s)</span>
+                  <span className="text-foreground font-medium">
+                    {createPreview.nights} night(s)
+                  </span>
                 </p>
                 <p className="text-muted-foreground mt-1">
                   Estimated total:{' '}
@@ -242,7 +257,9 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
             {mode === 'edit' && editor.totalAmount !== null ? (
               <p className="text-muted-foreground text-sm">
                 Current total:{' '}
-                <span className="text-foreground font-medium">{money.format(editor.totalAmount)}</span>
+                <span className="text-foreground font-medium">
+                  {money.format(editor.totalAmount)}
+                </span>
               </p>
             ) : null}
 
@@ -268,7 +285,11 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                   rooms.length === 0
                 }
               >
-                {editor.submitting ? 'Saving…' : mode === 'create' ? 'Create reservation' : 'Save changes'}
+                {editor.submitting
+                  ? 'Saving…'
+                  : mode === 'create'
+                    ? 'Create reservation'
+                    : 'Save changes'}
               </Button>
               <Button type="button" variant="outline" asChild disabled={editor.submitting}>
                 <Link to="/reservations">Cancel</Link>
@@ -280,8 +301,8 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                   className="sm:ml-auto"
                   disabled={editor.submitting}
                   onClick={() => {
-                    setDeleteErr(null)
-                    editor.setDeleteOpen(true)
+                    setDeleteErr(null);
+                    editor.setDeleteOpen(true);
                   }}
                 >
                   Delete
@@ -297,8 +318,8 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
           <DialogHeader>
             <DialogTitle>Delete this reservation?</DialogTitle>
             <DialogDescription id="delete-form-desc">
-              This cannot be undone. The room will be available for other bookings (subject to overlap
-              rules).
+              This cannot be undone. The room will be available for other bookings (subject to
+              overlap rules).
             </DialogDescription>
           </DialogHeader>
           {editor.deleteErr ? (
@@ -327,5 +348,5 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

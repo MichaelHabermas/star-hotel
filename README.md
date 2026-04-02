@@ -29,16 +29,16 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 
 ## Project layout (modular boundaries)
 
-| Path            | Role                                                                 |
-| --------------- | -------------------------------------------------------------------- |
-| `src/main/`     | Electron main process (window lifecycle, security defaults)          |
-| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                      |
-| `src/renderer/` | React UI only — no Node, no SQLite                                   |
-| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                |
-| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there |
-| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                |
+| Path            | Role                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                       |
+| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                   |
+| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                |
+| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                             |
+| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                              |
+| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                             |
 | `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)) |
-| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))          |
+| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                       |
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
@@ -46,13 +46,13 @@ Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
 Telemetry is **env-gated** (see [.env.example](.env.example)). **T7 PII policy:** [docs/T7-TELEMETRY-PII.md](docs/T7-TELEMETRY-PII.md).
 
-| Topic | Doc / location |
-|-------|----------------|
-| Structured logging (Express + main) | `STAR_HOTEL_LOG_LEVEL`; JSON access lines — [T7 sample](docs/T7-TELEMETRY-PII.md#sample-structured-log-line-express-access) |
-| Sentry (main + renderer) | `SENTRY_DSN`, `VITE_SENTRY_DSN`; source maps — [docs/SENTRY-SOURCE-MAPS.md](docs/SENTRY-SOURCE-MAPS.md) |
-| PostHog | `VITE_POSTHOG_KEY`, optional `VITE_POSTHOG_HOST` |
-| Crashpad | [docs/CRASH-REPORTING.md](docs/CRASH-REPORTING.md), optional `SENTRY_MINIDUMP_URL` |
-| Perf smoke (IPC / HTTP / list query) | Home → **Perf smoke (E7)**; methodology [docs/PERF.md](docs/PERF.md) |
+| Topic                                | Doc / location                                                                                                              |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Structured logging (Express + main)  | `STAR_HOTEL_LOG_LEVEL`; JSON access lines — [T7 sample](docs/T7-TELEMETRY-PII.md#sample-structured-log-line-express-access) |
+| Sentry (main + renderer)             | `SENTRY_DSN`, `VITE_SENTRY_DSN`; source maps — [docs/SENTRY-SOURCE-MAPS.md](docs/SENTRY-SOURCE-MAPS.md)                     |
+| PostHog                              | `VITE_POSTHOG_KEY`, optional `VITE_POSTHOG_HOST`                                                                            |
+| Crashpad                             | [docs/CRASH-REPORTING.md](docs/CRASH-REPORTING.md), optional `SENTRY_MINIDUMP_URL`                                          |
+| Perf smoke (IPC / HTTP / list query) | Home → **Perf smoke (E7)**; methodology [docs/PERF.md](docs/PERF.md)                                                        |
 
 ## Embedded Express API (Epic E3)
 
@@ -60,20 +60,20 @@ The main process runs an HTTP server on **loopback only** (`127.0.0.1`), not on 
 
 **PRD traceability matrix:** [docs/E3-BACKEND-API.md](docs/E3-BACKEND-API.md).
 
-| Topic                   | Detail                                                                                                                                                                                                                  |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Default port**        | `45123` — see [`src/shared/constants.ts`](src/shared/constants.ts).                                                                                                                                                     |
-| **Override**            | Set **`STAR_HOTEL_PORT`** to an integer in `1`–`65535`. Invalid or missing values fall back to the default ([`resolveApiPortFromEnv`](src/shared/embedded-api-config.ts)).                                              |
-| **Renderer base URL**   | Preload/renderer may receive **`--star-hotel-api-base=http://127.0.0.1:<port>`** (see [`API_BASE_ARG_PREFIX`](src/shared/embedded-api-config.ts)); otherwise the port env + [`buildApiBaseUrl`](src/shared/embedded-api-config.ts) apply. |
-| **Port already in use** | `listen` fails with **`EADDRINUSE`**. The app does **not** auto-pick another port; free the port or change `STAR_HOTEL_PORT`.                                                                                           |
-| **Startup order**       | After Electron **`app.whenReady()`**, main calls [`ensureEmbeddedApiAndIpc`](src/main/embedded-api-stack.ts) so `/health`, `/api/*`, and IPC handlers exist before the first window loads ([`bootstrap.ts`](src/main/bootstrap.ts)).   |
-| **Shutdown order**      | On **`before-quit`**, main closes the HTTP server (drain `server.close`) then calls [`persistence.close()`](src/main/embedded-api-stack.ts) so SQLite is not left busy while the port is still bound.                   |
-| **Health**              | `GET /health` returns `{ "ok": true }` after SQLite migrations complete.                                                                                                                                                |
-| **Auth (E8)**         | `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` — Bearer session tokens; Vitest sets `STAR_HOTEL_SKIP_AUTH=1` so server tests skip auth. Default operator: `admin` / `changeme` (see [seed-default-user](src/server/dev/seed-default-user.ts)). |
-| **OpenAPI / Swagger**   | `GET /api/openapi.json` — machine-readable spec. **`GET /api/docs`** — Swagger UI (try requests against the embedded API on loopback only).                                                                             |
+| Topic                   | Detail                                                                                                                                                                                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default port**        | `45123` — see [`src/shared/constants.ts`](src/shared/constants.ts).                                                                                                                                                                                                                                                             |
+| **Override**            | Set **`STAR_HOTEL_PORT`** to an integer in `1`–`65535`. Invalid or missing values fall back to the default ([`resolveApiPortFromEnv`](src/shared/embedded-api-config.ts)).                                                                                                                                                      |
+| **Renderer base URL**   | Preload/renderer may receive **`--star-hotel-api-base=http://127.0.0.1:<port>`** (see [`API_BASE_ARG_PREFIX`](src/shared/embedded-api-config.ts)); otherwise the port env + [`buildApiBaseUrl`](src/shared/embedded-api-config.ts) apply.                                                                                       |
+| **Port already in use** | `listen` fails with **`EADDRINUSE`**. The app does **not** auto-pick another port; free the port or change `STAR_HOTEL_PORT`.                                                                                                                                                                                                   |
+| **Startup order**       | After Electron **`app.whenReady()`**, main calls [`ensureEmbeddedApiAndIpc`](src/main/embedded-api-stack.ts) so `/health`, `/api/*`, and IPC handlers exist before the first window loads ([`bootstrap.ts`](src/main/bootstrap.ts)).                                                                                            |
+| **Shutdown order**      | On **`before-quit`**, main closes the HTTP server (drain `server.close`) then calls [`persistence.close()`](src/main/embedded-api-stack.ts) so SQLite is not left busy while the port is still bound.                                                                                                                           |
+| **Health**              | `GET /health` returns `{ "ok": true }` after SQLite migrations complete.                                                                                                                                                                                                                                                        |
+| **Auth (E8)**           | `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me` — Bearer session tokens; Vitest sets `STAR_HOTEL_SKIP_AUTH=1` so server tests skip auth. Default operator: `admin` / `changeme` (see [seed-default-user](src/server/dev/seed-default-user.ts)).                                                             |
+| **OpenAPI / Swagger**   | `GET /api/openapi.json` — machine-readable spec. **`GET /api/docs`** — Swagger UI (try requests against the embedded API on loopback only).                                                                                                                                                                                     |
 | **Spec & client types** | Canonical description is [`starHotelOpenApiDocument`](src/server/openapi/openapi-spec.ts). After editing it, run **`pnpm codegen:api`** to refresh [`openapi-spec.json`](src/server/openapi/openapi-spec.json) and generated [`openapi-types.ts`](src/shared/api/generated/openapi-types.ts) (used by `openapi-fetch` clients). |
-| **Reservations (MVP)**  | `GET/POST /api/reservations`, `GET/PATCH/DELETE /api/reservations/:id` — Zod-validated JSON; totals follow [`src/domain/reservation-pricing.ts`](src/domain/reservation-pricing.ts) (legacy `DateDiff` × nightly rate). |
-| **Guests & rooms**      | Full CRUD: `GET/POST /api/guests`, `GET/PATCH/DELETE /api/guests/:id`, `GET/POST /api/rooms`, `GET/PATCH/DELETE /api/rooms/:id` (Zod on bodies; delete blocked when reservations reference the row).                                                                                        |
+| **Reservations (MVP)**  | `GET/POST /api/reservations`, `GET/PATCH/DELETE /api/reservations/:id` — Zod-validated JSON; totals follow [`src/domain/reservation-pricing.ts`](src/domain/reservation-pricing.ts) (legacy `DateDiff` × nightly rate).                                                                                                         |
+| **Guests & rooms**      | Full CRUD: `GET/POST /api/guests`, `GET/PATCH/DELETE /api/guests/:id`, `GET/POST /api/rooms`, `GET/PATCH/DELETE /api/rooms/:id` (Zod on bodies; delete blocked when reservations reference the row).                                                                                                                            |
 
 ## SQLite database (Epic E2)
 

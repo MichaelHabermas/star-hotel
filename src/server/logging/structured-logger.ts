@@ -1,14 +1,14 @@
-import winston from 'winston'
+import winston from 'winston';
 
 function resolveLogLevel(): string {
   if (process.env['VITEST'] === 'true' || process.env['NODE_ENV'] === 'test') {
-    return 'silent'
+    return 'silent';
   }
-  const raw = process.env['STAR_HOTEL_LOG_LEVEL']
+  const raw = process.env['STAR_HOTEL_LOG_LEVEL'];
   if (raw === 'silent') {
-    return 'silent'
+    return 'silent';
   }
-  return raw ?? 'info'
+  return raw ?? 'info';
 }
 
 /**
@@ -25,11 +25,11 @@ export function createStructuredLogger(service: string): winston.Logger {
       winston.format.json(),
     ),
     transports: [new winston.transports.Console({ stderrLevels: ['error'] })],
-  })
+  });
 }
 
 /** Express embedded API + HTTP access (see {@link createHttpAccessLogMiddleware}). */
-export const embeddedApiLogger = createStructuredLogger('embedded-api')
+export const embeddedApiLogger = createStructuredLogger('embedded-api');
 
 /** Main process (bootstrap, lifecycle). */
-export const mainProcessLogger = createStructuredLogger('main')
+export const mainProcessLogger = createStructuredLogger('main');

@@ -1,20 +1,11 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  type ColumnDef,
-} from '@tanstack/react-table'
-import type { JSX } from 'react'
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Button } from '@renderer/components/ui/button'
+import { Button } from '@renderer/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@renderer/components/ui/card'
+} from '@renderer/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -22,25 +13,38 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@renderer/components/ui/dialog'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@renderer/components/ui/table'
-import { useGuestsList } from '@renderer/features/guests/use-guests-list'
-import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
-import type { GuestResponse } from '@shared/schemas/guest'
+} from '@renderer/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@renderer/components/ui/table';
+import { useGuestsList } from '@renderer/features/guests/use-guests-list';
+import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import type { GuestResponse } from '@shared/schemas/guest';
+import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table';
+import type { JSX } from 'react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export function GuestsListPage(): JSX.Element {
-  const starHotel = useStarHotelApp()
-  const { list, reload } = useGuestsList(starHotel)
-  const [deleteTarget, setDeleteTarget] = useState<GuestResponse | null>(null)
-  const [deleting, setDeleting] = useState(false)
-  const [deleteErr, setDeleteErr] = useState<string | null>(null)
+  const starHotel = useStarHotelApp();
+  const { list, reload } = useGuestsList(starHotel);
+  const [deleteTarget, setDeleteTarget] = useState<GuestResponse | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteErr, setDeleteErr] = useState<string | null>(null);
 
   const columns = useMemo<ColumnDef<GuestResponse>[]>(
     () => [
       {
         accessorKey: 'id',
         header: 'ID',
-        cell: ({ getValue }) => <span className="font-mono tabular-nums">{String(getValue())}</span>,
+        cell: ({ getValue }) => (
+          <span className="font-mono tabular-nums">{String(getValue())}</span>
+        ),
       },
       {
         accessorKey: 'name',
@@ -50,16 +54,16 @@ export function GuestsListPage(): JSX.Element {
         accessorKey: 'idNumber',
         header: 'ID / Ref',
         cell: ({ getValue }) => {
-          const v = getValue() as string | null
-          return v ?? '—'
+          const v = getValue() as string | null;
+          return v ?? '—';
         },
       },
       {
         accessorKey: 'contact',
         header: 'Contact',
         cell: ({ getValue }) => {
-          const v = getValue() as string | null
-          return v ?? '—'
+          const v = getValue() as string | null;
+          return v ?? '—';
         },
       },
       {
@@ -78,8 +82,8 @@ export function GuestsListPage(): JSX.Element {
               size="sm"
               aria-label={`Delete guest ${row.original.id}`}
               onClick={() => {
-                setDeleteErr(null)
-                setDeleteTarget(row.original)
+                setDeleteErr(null);
+                setDeleteTarget(row.original);
               }}
             >
               Delete
@@ -89,29 +93,29 @@ export function GuestsListPage(): JSX.Element {
       },
     ],
     [],
-  )
+  );
 
-  const rows = list.kind === 'ok' ? list.rows : []
+  const rows = list.kind === 'ok' ? list.rows : [];
   const table = useReactTable({
     data: rows,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   async function confirmDelete(): Promise<void> {
     if (!deleteTarget) {
-      return
+      return;
     }
-    setDeleting(true)
-    setDeleteErr(null)
+    setDeleting(true);
+    setDeleteErr(null);
     try {
-      await starHotel.api.guests.delete(deleteTarget.id)
-      setDeleteTarget(null)
-      await reload()
+      await starHotel.api.guests.delete(deleteTarget.id);
+      setDeleteTarget(null);
+      await reload();
     } catch (err) {
-      setDeleteErr(starHotel.formatEmbeddedApiUserMessage(err))
+      setDeleteErr(starHotel.formatEmbeddedApiUserMessage(err));
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
   }
 
@@ -139,7 +143,10 @@ export function GuestsListPage(): JSX.Element {
             </p>
           ) : null}
           {list.kind === 'err' ? (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" role="alert">
+            <div
+              className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+              role="alert"
+            >
               <p className="text-destructive text-sm">{list.message}</p>
               <Button type="button" variant="outline" size="sm" onClick={() => void reload()}>
                 Retry
@@ -186,8 +193,8 @@ export function GuestsListPage(): JSX.Element {
         open={deleteTarget !== null}
         onOpenChange={(open) => {
           if (!open) {
-            setDeleteTarget(null)
-            setDeleteErr(null)
+            setDeleteTarget(null);
+            setDeleteErr(null);
           }
         }}
       >
@@ -210,19 +217,24 @@ export function GuestsListPage(): JSX.Element {
               type="button"
               variant="outline"
               onClick={() => {
-                setDeleteTarget(null)
-                setDeleteErr(null)
+                setDeleteTarget(null);
+                setDeleteErr(null);
               }}
               disabled={deleting}
             >
               Cancel
             </Button>
-            <Button type="button" variant="destructive" disabled={deleting} onClick={() => void confirmDelete()}>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleting}
+              onClick={() => void confirmDelete()}
+            >
               {deleting ? 'Deleting…' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

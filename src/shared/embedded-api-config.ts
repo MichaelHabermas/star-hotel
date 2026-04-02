@@ -1,23 +1,23 @@
-import { DEFAULT_API_PORT } from './constants'
+import { DEFAULT_API_PORT } from './constants';
 
 /** Env var for embedded Express TCP port (main and preload). */
-export const STAR_HOTEL_PORT_ENV = 'STAR_HOTEL_PORT' as const
+export const STAR_HOTEL_PORT_ENV = 'STAR_HOTEL_PORT' as const;
 
 /** Renderer argv prefix: full base URL for embedded API (overrides port env). */
-export const API_BASE_ARG_PREFIX = '--star-hotel-api-base=' as const
+export const API_BASE_ARG_PREFIX = '--star-hotel-api-base=' as const;
 
 function parseTcpPort(raw: string | undefined): number | null {
   if (raw === undefined || raw === '') {
-    return null
+    return null;
   }
-  const n = Number(raw)
+  const n = Number(raw);
   if (!Number.isFinite(n) || !Number.isInteger(n)) {
-    return null
+    return null;
   }
   if (n < 1 || n > 65535) {
-    return null
+    return null;
   }
-  return n
+  return n;
 }
 
 /**
@@ -27,7 +27,7 @@ function parseTcpPort(raw: string | undefined): number | null {
 export function resolveApiPortFromEnv(
   env: NodeJS.ProcessEnv | Record<string, string | undefined>,
 ): number {
-  return parseTcpPort(env[STAR_HOTEL_PORT_ENV]) ?? DEFAULT_API_PORT
+  return parseTcpPort(env[STAR_HOTEL_PORT_ENV]) ?? DEFAULT_API_PORT;
 }
 
 /**
@@ -37,12 +37,12 @@ export function resolveApiPortFromEnv(
 export function resolveApiPort(
   env: NodeJS.ProcessEnv | Record<string, string | undefined>,
 ): number {
-  return resolveApiPortFromEnv(env)
+  return resolveApiPortFromEnv(env);
 }
 
 /** Base URL for the embedded API (loopback, fixed host — port is the variable part). */
 export function buildApiBaseUrl(port: number): string {
-  return `http://127.0.0.1:${port}`
+  return `http://127.0.0.1:${port}`;
 }
 
 /**
@@ -52,9 +52,9 @@ export function readRendererEmbeddedApiBaseUrl(
   argv: readonly string[],
   env: NodeJS.ProcessEnv | Record<string, string | undefined>,
 ): string {
-  const apiBaseArg = argv.find((arg) => arg.startsWith(API_BASE_ARG_PREFIX))
+  const apiBaseArg = argv.find((arg) => arg.startsWith(API_BASE_ARG_PREFIX));
   if (apiBaseArg) {
-    return apiBaseArg.slice(API_BASE_ARG_PREFIX.length)
+    return apiBaseArg.slice(API_BASE_ARG_PREFIX.length);
   }
-  return buildApiBaseUrl(resolveApiPortFromEnv(env))
+  return buildApiBaseUrl(resolveApiPortFromEnv(env));
 }

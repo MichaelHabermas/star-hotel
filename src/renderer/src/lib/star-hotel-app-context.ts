@@ -1,4 +1,4 @@
-import { createContext } from 'react'
-import type { StarHotelApp } from './star-hotel-app'
+import { createContext } from 'react';
+import type { StarHotelApp } from './star-hotel-app';
 
-export const StarHotelAppContext = createContext<StarHotelApp | null>(null)
+export const StarHotelAppContext = createContext<StarHotelApp | null>(null);

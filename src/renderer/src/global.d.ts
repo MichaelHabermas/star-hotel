@@ -1,9 +1,9 @@
-import type { StarHotelPreloadAPI } from '@shared/preload-contract'
+import type { StarHotelPreloadAPI } from '@shared/preload-contract';
 
 declare global {
   interface Window {
-    readonly starHotel: StarHotelPreloadAPI
+    readonly starHotel: StarHotelPreloadAPI;
   }
 }
 
-export {}
+export {};

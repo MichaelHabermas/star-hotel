@@ -1,16 +1,16 @@
-import { computeReservationTotal, countStayNights } from '../../domain/reservation-pricing'
 import type {
   ReservationCreateBody,
   ReservationListQuery,
   ReservationResponse,
   ReservationUpdateBody,
-} from '@shared/schemas/reservation'
-import { GuestNotFoundError } from '../guests/guest-errors'
-import { RoomNotFoundError } from '../rooms/room-errors'
-import { mapSqliteConstraintError } from '../db/db-errors'
-import { ReservationNotFoundError } from './reservation-errors'
-import type { ReservationRepositoryPort } from './reservation-repository-port'
-import type { ReservationRow } from './reservation-repository'
+} from '@shared/schemas/reservation';
+import { computeReservationTotal, countStayNights } from '../../domain/reservation-pricing';
+import { mapSqliteConstraintError } from '../db/db-errors';
+import { GuestNotFoundError } from '../guests/guest-errors';
+import { RoomNotFoundError } from '../rooms/room-errors';
+import { ReservationNotFoundError } from './reservation-errors';
+import type { ReservationRow } from './reservation-repository';
+import type { ReservationRepositoryPort } from './reservation-repository-port';
 
 function rowToResponse(row: ReservationRow): ReservationResponse {
   return {
@@ -20,47 +20,47 @@ function rowToResponse(row: ReservationRow): ReservationResponse {
     checkInDate: row.CheckInDate,
     checkOutDate: row.CheckOutDate,
     totalAmount: row.TotalAmount,
-  }
+  };
 }
 
 export class ReservationService {
   constructor(private readonly repo: ReservationRepositoryPort) {}
 
   list(query: ReservationListQuery): ReservationResponse[] {
-    return this.repo.list(query).map(rowToResponse)
+    return this.repo.list(query).map(rowToResponse);
   }
 
   get(resId: number): ReservationResponse {
-    const row = this.repo.getById(resId)
+    const row = this.repo.getById(resId);
     if (!row) {
-      throw new ReservationNotFoundError(resId)
+      throw new ReservationNotFoundError(resId);
     }
-    return rowToResponse(row)
+    return rowToResponse(row);
   }
 
   private assertGuest(guestId: number): void {
     if (!this.repo.guestExists(guestId)) {
-      throw new GuestNotFoundError(guestId)
+      throw new GuestNotFoundError(guestId);
     }
   }
 
   private assertRoomAndPrice(roomId: number): number {
-    const price = this.repo.getRoomPrice(roomId)
+    const price = this.repo.getRoomPrice(roomId);
     if (price === undefined) {
-      throw new RoomNotFoundError(roomId)
+      throw new RoomNotFoundError(roomId);
     }
-    return price
+    return price;
   }
 
   private computeTotal(roomId: number, checkIn: string, checkOut: string): number {
-    const price = this.assertRoomAndPrice(roomId)
-    const nights = countStayNights(checkIn, checkOut)
-    return computeReservationTotal(nights, price)
+    const price = this.assertRoomAndPrice(roomId);
+    const nights = countStayNights(checkIn, checkOut);
+    return computeReservationTotal(nights, price);
   }
 
   create(body: ReservationCreateBody): ReservationResponse {
-    this.assertGuest(body.guestId)
-    const totalAmount = this.computeTotal(body.roomId, body.checkInDate, body.checkOutDate)
+    this.assertGuest(body.guestId);
+    const totalAmount = this.computeTotal(body.roomId, body.checkInDate, body.checkOutDate);
     try {
       const id = this.repo.insertWithNoOverlap(body.roomId, body.checkInDate, body.checkOutDate, {
         roomId: body.roomId,
@@ -68,34 +68,36 @@ export class ReservationService {
         checkInDate: body.checkInDate,
         checkOutDate: body.checkOutDate,
         totalAmount,
-      })
-      return this.get(id)
+      });
+      return this.get(id);
     } catch (e) {
-      throw mapSqliteConstraintError(e)
+      throw mapSqliteConstraintError(e);
     }
   }
 
   update(resId: number, body: ReservationUpdateBody): ReservationResponse {
-    const existing = this.repo.getById(resId)
+    const existing = this.repo.getById(resId);
     if (!existing) {
-      throw new ReservationNotFoundError(resId)
+      throw new ReservationNotFoundError(resId);
     }
 
-    const roomId = body.roomId ?? existing.RoomID
-    const guestId = body.guestId ?? existing.GuestID
-    const checkInDate = body.checkInDate ?? existing.CheckInDate
-    const checkOutDate = body.checkOutDate ?? existing.CheckOutDate
+    const roomId = body.roomId ?? existing.RoomID;
+    const guestId = body.guestId ?? existing.GuestID;
+    const checkInDate = body.checkInDate ?? existing.CheckInDate;
+    const checkOutDate = body.checkOutDate ?? existing.CheckOutDate;
 
     if (body.guestId !== undefined) {
-      this.assertGuest(guestId)
+      this.assertGuest(guestId);
     }
 
     const datesOrRoomChanged =
-      body.roomId !== undefined || body.checkInDate !== undefined || body.checkOutDate !== undefined
+      body.roomId !== undefined ||
+      body.checkInDate !== undefined ||
+      body.checkOutDate !== undefined;
 
     const totalAmount = datesOrRoomChanged
       ? this.computeTotal(roomId, checkInDate, checkOutDate)
-      : existing.TotalAmount
+      : existing.TotalAmount;
 
     try {
       this.repo.updateWithNoOverlap(resId, roomId, checkInDate, checkOutDate, {
@@ -104,17 +106,17 @@ export class ReservationService {
         checkInDate,
         checkOutDate,
         totalAmount,
-      })
-      return this.get(resId)
+      });
+      return this.get(resId);
     } catch (e) {
-      throw mapSqliteConstraintError(e)
+      throw mapSqliteConstraintError(e);
     }
   }
 
   delete(resId: number): void {
-    const deleted = this.repo.delete(resId)
+    const deleted = this.repo.delete(resId);
     if (!deleted) {
-      throw new ReservationNotFoundError(resId)
+      throw new ReservationNotFoundError(resId);
     }
   }
 }

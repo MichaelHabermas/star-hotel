@@ -1,4 +1,4 @@
-import { Menu, type MenuItemConstructorOptions } from 'electron'
+import { Menu, type MenuItemConstructorOptions } from 'electron';
 
 const DEV_MENU_TEMPLATE: MenuItemConstructorOptions[] = [
   { role: 'appMenu' },
@@ -19,12 +19,12 @@ const DEV_MENU_TEMPLATE: MenuItemConstructorOptions[] = [
     ],
   },
   { role: 'windowMenu' },
-]
+];
 
 export function configureAppMenu(isDev: boolean): void {
   if (!isDev) {
-    return
+    return;
   }
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(DEV_MENU_TEMPLATE))
+  Menu.setApplicationMenu(Menu.buildFromTemplate(DEV_MENU_TEMPLATE));
 }

@@ -4,6 +4,6 @@
  */
 export const IPC_CHANNELS = {
   ping: 'star-hotel:ipc:ping',
-} as const
+} as const;
 
-export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
+export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];

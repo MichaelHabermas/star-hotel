@@ -1,12 +1,12 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron';
 
 /** Non-macOS: quit when all windows are closed. Safe to register at module load. */
 export function registerWindowAllClosed(): void {
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-      app.quit()
+      app.quit();
     }
-  })
+  });
 }
 
 /**
@@ -16,7 +16,7 @@ export function registerWindowAllClosed(): void {
 export function registerActivateHandler(createMainWindow: () => void): void {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow()
+      createMainWindow();
     }
-  })
+  });
 }

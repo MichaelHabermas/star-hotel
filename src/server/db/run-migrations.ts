@@ -1,4 +1,4 @@
-import type DatabaseType from 'better-sqlite3'
+import type DatabaseType from 'better-sqlite3';
 
 /** Forward-only migrations; version numbers must be unique and monotonic. */
 const MIGRATIONS: readonly { readonly version: number; readonly sql: string }[] = [
@@ -41,13 +41,13 @@ CREATE INDEX IF NOT EXISTS idx_reservation_guest ON tbl_reservation(GuestID);
 CREATE INDEX IF NOT EXISTS idx_reservation_room_dates ON tbl_reservation(RoomID, CheckInDate, CheckOutDate);
 `,
   },
-]
+];
 
 /**
  * Applies pending migrations in order. Safe to call on every startup (idempotent).
  * Expects the database connection to be open; sets WAL + foreign_keys on the caller side.
  */
-type SqliteDatabase = InstanceType<typeof DatabaseType>
+type SqliteDatabase = InstanceType<typeof DatabaseType>;
 
 export function runMigrations(db: SqliteDatabase): void {
   db.exec(`
@@ -55,21 +55,21 @@ export function runMigrations(db: SqliteDatabase): void {
       version INTEGER PRIMARY KEY NOT NULL,
       applied_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-  `)
+  `);
 
   const appliedRows = db.prepare('SELECT version FROM schema_migrations').all() as {
-    version: number
-  }[]
-  const applied = new Set(appliedRows.map((r) => r.version))
+    version: number;
+  }[];
+  const applied = new Set(appliedRows.map((r) => r.version));
 
   for (const m of MIGRATIONS) {
     if (applied.has(m.version)) {
-      continue
+      continue;
     }
     const run = db.transaction(() => {
-      db.exec(m.sql)
-      db.prepare('INSERT INTO schema_migrations (version) VALUES (?)').run(m.version)
-    })
-    run()
+      db.exec(m.sql);
+      db.prepare('INSERT INTO schema_migrations (version) VALUES (?)').run(m.version);
+    });
+    run();
   }
 }

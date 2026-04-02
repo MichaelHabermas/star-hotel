@@ -4,31 +4,5 @@
   "printWidth": 100,
   "trailingComma": "all",
   "arrowParens": "always",
-  "plugins": [
-    "prettier-plugin-organize-imports"
-  ],
-  "importOrder": [
-    "^@shared/(.*)$",
-    "^@renderer/(.*)$",
-    "^@server/(.*)$",
-    "^@domain/(.*)$",
-    "^@hooks/(.*)$",
-    "^@components/(.*)$",
-    "^@pages/(.*)$",
-    "^@lib/(.*)$",
-    "^@utils/(.*)$",
-    "^@types/(.*)$"
-  ],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true,
-  "importOrderCaseInsensitive": true,
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
-  "importOrderMergeDuplicateImports": true,
-  "importOrderCombineTypeSpecifier": true,
-  "importOrderCombineExport": true,
-  "importOrderCombineImport": true,
-  "importOrderCombineTypeImport": true,
-  "importOrderCombineExportImport": true,
-  "importOrderBuiltinModules": true,
-  "importOrderExternalModules": true
+  "plugins": ["prettier-plugin-organize-imports"]
 }
