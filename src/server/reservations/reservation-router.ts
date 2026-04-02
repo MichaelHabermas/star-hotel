@@ -4,46 +4,22 @@ import {
   reservationListQuerySchema,
   reservationUpdateBodySchema,
 } from '@shared/schemas/reservation'
-import type { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
-import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
+import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit'
 import { ReservationRepository } from './reservation-repository'
 import { ReservationService } from './reservation-service'
 
-function asyncHandler(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
-): (req: Request, res: Response, next: NextFunction) => void {
-  return (req, res, next) => {
-    void fn(req, res, next).catch(next)
-  }
-}
-
-export function createReservationRouter(persistence: HotelSqlitePersistencePort): Router {
+export function createReservationRouter(kit: SqliteHttpAdapterKit): Router {
   const router = Router()
+  const getReservationService = kit.createLazySqliteService(
+    (db) => new ReservationService(new ReservationRepository(db)),
+  )
 
-  let serviceInit: Promise<ReservationService> | null = null
-  function getReservationService(): Promise<ReservationService> {
-    if (!serviceInit) {
-      serviceInit = (async () => {
-        await persistence.isReady()
-        return new ReservationService(new ReservationRepository(persistence.getDatabase()))
-      })()
-    }
-    return serviceInit
-  }
-
-  router.use(async (_req, _res, next) => {
-    try {
-      await getReservationService()
-      next()
-    } catch (err) {
-      next(err)
-    }
-  })
+  router.use(kit.ensurePersistenceReady)
 
   router.get(
     '/',
-    asyncHandler(async (req, res, next) => {
+    kit.asyncHandler(async (req, res, next) => {
       try {
         const q = reservationListQuerySchema.parse(req.query)
         const svc = await getReservationService()
@@ -56,7 +32,7 @@ export function createReservationRouter(persistence: HotelSqlitePersistencePort)
 
   router.get(
     '/:id',
-    asyncHandler(async (req, res, next) => {
+    kit.asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
         const svc = await getReservationService()
@@ -69,7 +45,7 @@ export function createReservationRouter(persistence: HotelSqlitePersistencePort)
 
   router.post(
     '/',
-    asyncHandler(async (req, res, next) => {
+    kit.asyncHandler(async (req, res, next) => {
       try {
         const body = reservationCreateBodySchema.parse(req.body)
         const svc = await getReservationService()
@@ -82,7 +58,7 @@ export function createReservationRouter(persistence: HotelSqlitePersistencePort)
 
   router.patch(
     '/:id',
-    asyncHandler(async (req, res, next) => {
+    kit.asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
         const body = reservationUpdateBodySchema.parse(req.body)
@@ -96,7 +72,7 @@ export function createReservationRouter(persistence: HotelSqlitePersistencePort)
 
   router.delete(
     '/:id',
-    asyncHandler(async (req, res, next) => {
+    kit.asyncHandler(async (req, res, next) => {
       try {
         const { id } = reservationIdParamsSchema.parse(req.params)
         const svc = await getReservationService()

@@ -1,7 +1,7 @@
 import type { Express } from 'express'
-import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
+import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit'
 import { createRoomRouter } from './room-router'
 
-export function registerSqliteRoomRoutes(app: Express, persistence: HotelSqlitePersistencePort): void {
-  app.use('/api/rooms', createRoomRouter(persistence))
+export function registerSqliteRoomRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+  app.use('/api/rooms', createRoomRouter(kit))
 }

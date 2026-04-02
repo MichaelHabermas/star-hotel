@@ -6,6 +6,7 @@ import type { ReservationRow, ReservationWrite } from './reservation-repository'
 import { GuestNotFoundError } from '../guests/guest-errors'
 import { RoomNotFoundError } from '../rooms/room-errors'
 import { ReservationConflictError, ReservationNotFoundError } from './reservation-errors'
+import { stayRangesOverlapHalfOpen } from './reservation-stay-overlap'
 
 /** Minimal in-memory repo for unit tests (mirrors overlap semantics of SQL layer). */
 class InMemoryReservationRepository implements ReservationRepositoryPort {
@@ -61,7 +62,7 @@ class InMemoryReservationRepository implements ReservationRepositoryPort {
       if (excludeResId !== undefined && row.ResID === excludeResId) {
         continue
       }
-      if (row.CheckInDate < checkOut && row.CheckOutDate > checkIn) {
+      if (stayRangesOverlapHalfOpen(checkIn, checkOut, row.CheckInDate, row.CheckOutDate)) {
         return row.ResID
       }
     }

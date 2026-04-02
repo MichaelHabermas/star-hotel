@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createServerApp } from './create-app'
+import { createSqliteHttpAdapterKit } from './http/sqlite-http-adapter-kit'
 import {
   createSqlitePersistencePort,
   type SqlitePersistencePort,
@@ -31,10 +32,11 @@ describe('createServerApp — reservations API', () => {
     await persistence.isReady()
     const { roomId, guestId } = seedRoomAndGuest(persistence.getDatabase())
 
+    const kit = createSqliteHttpAdapterKit(persistence)
     const app = createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
-        registerSqliteReservationRoutes(expressApp, persistence)
+        registerSqliteReservationRoutes(expressApp, kit)
       },
     })
 

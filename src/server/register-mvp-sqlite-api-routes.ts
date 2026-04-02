@@ -1,6 +1,7 @@
 import type { Express } from 'express'
-import { registerSqliteGuestRoutes } from './guests/register-sqlite-guest-routes'
+import { createSqliteHttpAdapterKit } from './http/sqlite-http-adapter-kit'
 import type { HotelSqlitePersistencePort } from './ports/hotel-sqlite-persistence-port'
+import { registerSqliteGuestRoutes } from './guests/register-sqlite-guest-routes'
 import { registerSqliteReservationRoutes } from './reservations/register-sqlite-reservation-routes'
 import { registerSqliteRoomRoutes } from './rooms/register-sqlite-room-routes'
 
@@ -12,7 +13,8 @@ export function registerMvpSqliteApiRoutes(
   app: Express,
   persistence: HotelSqlitePersistencePort,
 ): void {
-  registerSqliteGuestRoutes(app, persistence)
-  registerSqliteRoomRoutes(app, persistence)
-  registerSqliteReservationRoutes(app, persistence)
+  const kit = createSqliteHttpAdapterKit(persistence)
+  registerSqliteGuestRoutes(app, kit)
+  registerSqliteRoomRoutes(app, kit)
+  registerSqliteReservationRoutes(app, kit)
 }

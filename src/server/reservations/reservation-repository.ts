@@ -92,6 +92,7 @@ export class ReservationRepository implements ReservationRepositoryPort {
 
   /**
    * Half-open stay overlap: [checkIn, checkOut) vs existing rows (ISO dates).
+   * Same predicate as `stayRangesOverlapHalfOpen` in `reservation-stay-overlap.ts`.
    */
   findOverlappingReservation(
     roomId: number,

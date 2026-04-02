@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "codegen:api": "tsx scripts/export-openapi.ts && openapi-typescript src/server/openapi/openapi-spec.json -o src/shared/api/generated/openapi-types.ts",
+    "codegen:api:check": "pnpm codegen:api && git diff --exit-code -- src/server/openapi/openapi-spec.json src/shared/api/generated/openapi-types.ts",
     "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck",
     "postinstall": "electron-rebuild -f -w better-sqlite3",
     "rebuild:native": "electron-rebuild -f -w better-sqlite3"

@@ -4,7 +4,8 @@ import { buildApiBaseUrl, resolveApiPortFromEnv } from '@shared/embedded-api-con
 import { resolveDatabaseFilePath } from '../server/db/database-path'
 import { createSqlitePersistencePort as defaultCreateSqlitePersistencePort } from '../server/persistence/sqlite-persistence'
 import type { PersistencePort } from '../server/ports/persistence'
-import { registerMvpSqliteApiRoutes } from '../server/register-mvp-sqlite-api-routes'
+import { createMvpSqliteApiComposition } from '../server/mvp-sqlite-api-composition'
+import { registerEmbeddedApiShutdownHandlers } from './embedded-api-shutdown'
 import { startEmbeddedApiServer as defaultStartEmbeddedApiServer } from './http-server'
 import { registerIpcHandlers as registerIpcHandlersImpl } from './ipc-handlers'
 
@@ -43,7 +44,6 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
   let persistence: PersistencePort | null = null
   let embeddedApiServerPromise: Promise<http.Server> | null = null
   let ipcRegistered = false
-  let shutdownStarted = false
 
   function ensureEmbeddedApiServer(): Promise<http.Server> {
     if (!embeddedApiServerPromise) {
@@ -56,7 +56,7 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
       embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
         persistence: sqlite,
         registerApiRoutes: (app) => {
-          registerMvpSqliteApiRoutes(app, sqlite)
+          createMvpSqliteApiComposition(sqlite).mount(app)
         },
       })
     }
@@ -84,35 +84,9 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
   }
 
   function registerShutdownHandlers(app: App): void {
-    app.on('before-quit', (e) => {
-      if (shutdownStarted) {
-        return
-      }
-      shutdownStarted = true
-      e.preventDefault()
-      void (async () => {
-        try {
-          if (embeddedApiServerPromise) {
-            const server = await embeddedApiServerPromise
-            await new Promise<void>((resolve, reject) => {
-              server.close((err) => {
-                if (err) {
-                  reject(err)
-                } else {
-                  resolve()
-                }
-              })
-            })
-          }
-          if (persistence) {
-            await persistence.close()
-          }
-        } catch (err) {
-          console.error('[star-hotel] shutdown cleanup failed', err)
-        } finally {
-          app.quit()
-        }
-      })()
+    registerEmbeddedApiShutdownHandlers(app, {
+      getEmbeddedApiServerPromise: () => embeddedApiServerPromise,
+      getPersistence: () => persistence,
     })
   }
 

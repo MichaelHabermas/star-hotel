@@ -33,4 +33,18 @@ export default tseslint.config(
       globals: { ...globals.browser, ...globals.node, ...globals.vitest },
     },
   },
+  {
+    files: ['src/renderer/**/*.ts', 'src/renderer/**/*.tsx'],
+    ignores: ['src/renderer/src/App.tsx', 'src/renderer/src/test/setup.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'MemberExpression[object.name="window"][property.name="starHotel"]',
+          message:
+            'Use useStarHotelApp() / StarHotelApp; direct window.starHotel is only allowed in App.tsx and test setup.',
+        },
+      ],
+    },
+  },
 )
