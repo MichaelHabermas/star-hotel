@@ -1,3 +1,4 @@
+import { DEV_SEED_RESERVATIONS_ANCHOR_DATE } from '@shared/constants';
 import type DatabaseType from 'better-sqlite3';
 import { ReservationRepository } from '../reservations/reservation-repository';
 import { ReservationService } from '../reservations/reservation-service';
@@ -9,7 +10,7 @@ export const DEV_FAKE_RESERVATION_COUNT = 40;
 
 const SEED_GUEST_ROW_COUNT = 45;
 
-const ANCHOR_CHECK_IN = '2025-06-01';
+const ANCHOR_CHECK_IN = DEV_SEED_RESERVATIONS_ANCHOR_DATE;
 const SEED_ROOM_ROWS: readonly { type: string; price: number; status: string }[] = [
   { type: 'Standard', price: 99, status: 'Available' },
   { type: 'Standard', price: 109, status: 'Available' },

@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@renderer/components/ui/table';
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { DEV_SEED_RESERVATIONS_ANCHOR_DATE } from '@shared/constants';
 import type { DaySheetReportResponse } from '@shared/schemas/report';
 import type { JSX } from 'react';
 import { useCallback, useEffect, useId, useState } from 'react';
@@ -30,6 +31,11 @@ function todayIsoDate(): string {
   return `${y}-${m}-${day}`;
 }
 
+/** In dev, default to seeded data anchor so day sheet isn’t empty on first load. */
+function initialDaySheetDate(): string {
+  return import.meta.env.DEV ? DEV_SEED_RESERVATIONS_ANCHOR_DATE : todayIsoDate();
+}
+
 const pct = new Intl.NumberFormat(undefined, {
   style: 'percent',
   minimumFractionDigits: 0,
@@ -41,7 +47,7 @@ export function DaySheetReportPage(): JSX.Element {
   const formId = useId();
   const dateInputId = `${formId}-date`;
 
-  const [date, setDate] = useState(todayIsoDate);
+  const [date, setDate] = useState(initialDaySheetDate);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
   const [data, setData] = useState<DaySheetReportResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -82,9 +88,17 @@ export function DaySheetReportPage(): JSX.Element {
       <Card className="border-border/80 shadow-sm print:border-0 print:shadow-none">
         <CardHeader className="border-border/60 border-b print:border-border">
           <CardTitle className="font-display text-xl tracking-tight">Day sheet</CardTitle>
-          <CardDescription className="font-ui">
-            Rooms with an active stay on the selected calendar date (half-open stay model: check-in
-            ≤ date &lt; check-out).
+          <CardDescription className="font-ui space-y-1">
+            <span className="block">
+              Rooms with an active stay on the selected night (same rules as reservations: check-in
+              ≤ date &lt; check-out; the check-out date itself is vacant).
+            </span>
+            {import.meta.env.DEV ? (
+              <span className="text-muted-foreground block text-xs">
+                Dev seed uses stays starting {DEV_SEED_RESERVATIONS_ANCHOR_DATE}; if you see no
+                rows, pick a date that falls inside a reservation’s stay on the Reservations screen.
+              </span>
+            ) : null}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
@@ -137,7 +151,8 @@ export function DaySheetReportPage(): JSX.Element {
 
               {data.lines.length === 0 ? (
                 <p className="text-muted-foreground text-sm" role="status">
-                  No active stays for this date.
+                  No active stays for this date. The check-out day is not counted as occupied; use a
+                  date from check-in through the night before check-out.
                 </p>
               ) : (
                 <Table>

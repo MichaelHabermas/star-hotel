@@ -15,6 +15,17 @@ import type { FormEvent, JSX } from 'react';
 import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+/** Matches seed default user (see `seed-default-user.ts` / README); dev-only prefill. */
+const DEV_LOGIN_DEFAULTS = { username: 'admin', password: 'changeme' } as const;
+
+function devInitialUsername(): string {
+  return import.meta.env.DEV ? DEV_LOGIN_DEFAULTS.username : '';
+}
+
+function devInitialPassword(): string {
+  return import.meta.env.DEV ? DEV_LOGIN_DEFAULTS.password : '';
+}
+
 export function LoginPage(): JSX.Element {
   const starHotel = useStarHotelApp();
   const { setToken } = useAuth();
@@ -22,8 +33,8 @@ export function LoginPage(): JSX.Element {
   const formId = useId();
   const userId = `${formId}-user`;
   const passId = `${formId}-pass`;
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(() => devInitialUsername());
+  const [password, setPassword] = useState(() => devInitialPassword());
   const [err, setErr] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
