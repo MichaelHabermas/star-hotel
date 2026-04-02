@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
+import { computeReservationTotal, countStayNights } from '../domain/reservation-pricing';
 import { createServerApp } from './create-app';
 import { createSqliteHttpAdapterKit } from './http/sqlite-http-adapter-kit';
 import {
@@ -50,12 +51,13 @@ describe('createServerApp — reservations API', () => {
       })
       .expect(201);
 
+    const expectedTotal = computeReservationTotal(countStayNights('2026-06-01', '2026-06-04'), 100);
     expect(createRes.body).toMatchObject({
       roomId,
       guestId,
       checkInDate: '2026-06-01',
       checkOutDate: '2026-06-04',
-      totalAmount: 300,
+      totalAmount: expectedTotal,
     });
 
     const id = createRes.body.id as number;

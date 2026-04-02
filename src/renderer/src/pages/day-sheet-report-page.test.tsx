@@ -1,10 +1,14 @@
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
+import {
+  asStarHotelApp,
+  createMockStarHotelApp,
+  type MockStarHotelApp,
+} from '@renderer/test-utils/mock-star-hotel-app';
 import { DEV_SEED_RESERVATIONS_ANCHOR_DATE } from '@shared/constants';
 import type { DaySheetReportResponse } from '@shared/schemas/report';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { DaySheetReportPage } from './day-sheet-report-page';
 
 const sheetOk: DaySheetReportResponse = {
@@ -26,33 +30,18 @@ const sheetOk: DaySheetReportResponse = {
 
 function createApp(overrides?: {
   readonly getDaySheet?: (date: string) => Promise<DaySheetReportResponse>;
-}): StarHotelApp {
-  return {
-    api: {
-      auth: { login: vi.fn(), logout: vi.fn(), me: vi.fn() },
-      guests: { list: vi.fn() },
-      rooms: { list: vi.fn() },
-      reservations: {
-        list: vi.fn(),
-        get: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-      },
-      reports: {
-        getFolio: vi.fn(),
-        getDaySheet: vi.fn(overrides?.getDaySheet ?? (() => Promise.resolve(sheetOk))),
-      },
-    },
-    formatEmbeddedApiUserMessage: (err: unknown) =>
-      err instanceof Error ? err.message : String(err),
-  } as unknown as StarHotelApp;
+}): MockStarHotelApp {
+  const app = createMockStarHotelApp();
+  app.api.reports.getDaySheet.mockImplementation(
+    overrides?.getDaySheet ?? (() => Promise.resolve(sheetOk)),
+  );
+  return app;
 }
 
-function renderDaySheet(app: StarHotelApp) {
+function renderDaySheet(app: MockStarHotelApp) {
   return render(
     <MemoryRouter initialEntries={['/reports/day-sheet']}>
-      <StarHotelAppProvider app={app}>
+      <StarHotelAppProvider app={asStarHotelApp(app)}>
         <Routes>
           <Route path="/reports/day-sheet" element={<DaySheetReportPage />} />
         </Routes>

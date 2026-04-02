@@ -1,24 +1,25 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { z as zod } from './zod-openapi';
 
-export const loginBodySchema = z
+export const loginBodySchema = zod
   .object({
-    username: z.string().min(1, 'Username is required'),
-    password: z.string().min(1, 'Password is required'),
+    username: zod.string().min(1, 'Username is required'),
+    password: zod.string().min(1, 'Password is required'),
   })
   .strict();
 
 export type LoginBody = z.infer<typeof loginBodySchema>;
 
-export const authUserResponseSchema = z.object({
-  id: z.number(),
-  username: z.string(),
-  role: z.string(),
+export const authUserResponseSchema = zod.object({
+  id: zod.number(),
+  username: zod.string(),
+  role: zod.string(),
 });
 
 export type AuthUserResponse = z.infer<typeof authUserResponseSchema>;
 
-export const loginResponseSchema = z.object({
-  token: z.string(),
+export const loginResponseSchema = zod.object({
+  token: zod.string(),
   user: authUserResponseSchema,
 });
 

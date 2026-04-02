@@ -1,4 +1,8 @@
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
+import {
+  asStarHotelApp,
+  createMockStarHotelApp,
+  type MockStarHotelApp,
+} from '@renderer/test-utils/mock-star-hotel-app';
 import type { ReservationResponse } from '@shared/schemas/reservation';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -13,22 +17,17 @@ const sampleRow: ReservationResponse = {
   totalAmount: 200,
 };
 
-function mockApp(reservations: Partial<StarHotelApp['api']['reservations']>): StarHotelApp {
-  return {
-    api: {
-      guests: { list: vi.fn() },
-      rooms: { list: vi.fn() },
-      reservations: {
-        list: vi.fn().mockResolvedValue([]),
-        get: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-        ...reservations,
-      },
-    },
-    formatEmbeddedApiUserMessage: (e: unknown) => (e instanceof Error ? e.message : String(e)),
-  } as unknown as StarHotelApp;
+function mockApp(reservations: Partial<MockStarHotelApp['api']['reservations']>): MockStarHotelApp {
+  const app = createMockStarHotelApp();
+  Object.assign(app.api.reservations, {
+    list: vi.fn().mockResolvedValue([]),
+    get: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    ...reservations,
+  });
+  return app;
 }
 
 describe('useReservationsList', () => {
@@ -36,7 +35,7 @@ describe('useReservationsList', () => {
     const app = mockApp({
       list: vi.fn().mockResolvedValue([sampleRow]),
     });
-    const { result } = renderHook(() => useReservationsList(app));
+    const { result } = renderHook(() => useReservationsList(asStarHotelApp(app)));
 
     await waitFor(() => {
       expect(result.current.list).toEqual({ kind: 'ok', rows: [sampleRow] });
@@ -48,7 +47,7 @@ describe('useReservationsList', () => {
     const app = mockApp({
       list: vi.fn().mockRejectedValue(new Error('network failed')),
     });
-    const { result } = renderHook(() => useReservationsList(app));
+    const { result } = renderHook(() => useReservationsList(asStarHotelApp(app)));
 
     await waitFor(() => {
       expect(result.current.list).toEqual({ kind: 'err', message: 'network failed' });

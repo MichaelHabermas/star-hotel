@@ -1,41 +1,42 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { z as zod } from './zod-openapi';
 
-export const roomIdParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+export const roomIdParamsSchema = zod.object({
+  id: zod.coerce.number().int().positive(),
 });
 
-export const roomListQuerySchema = z
+export const roomListQuerySchema = zod
   .object({
-    status: z.string().min(1).optional(),
+    status: zod.string().min(1).optional(),
   })
   .strict();
 
 export type RoomListQuery = z.infer<typeof roomListQuerySchema>;
 
-export const roomResponseSchema = z.object({
-  id: z.number(),
-  roomType: z.string(),
-  price: z.number(),
-  status: z.string(),
+export const roomResponseSchema = zod.object({
+  id: zod.number(),
+  roomType: zod.string(),
+  price: zod.number(),
+  status: zod.string(),
 });
 
 export type RoomResponse = z.infer<typeof roomResponseSchema>;
 
-export const roomCreateBodySchema = z
+export const roomCreateBodySchema = zod
   .object({
-    roomType: z.string().min(1, 'Room type is required'),
-    price: z.number().finite().nonnegative('Price must be zero or positive'),
-    status: z.string().min(1, 'Status is required'),
+    roomType: zod.string().min(1, 'Room type is required'),
+    price: zod.number().finite().nonnegative('Price must be zero or positive'),
+    status: zod.string().min(1, 'Status is required'),
   })
   .strict();
 
 export type RoomCreateBody = z.infer<typeof roomCreateBodySchema>;
 
-export const roomUpdateBodySchema = z
+export const roomUpdateBodySchema = zod
   .object({
-    roomType: z.string().min(1).optional(),
-    price: z.number().finite().nonnegative().optional(),
-    status: z.string().min(1).optional(),
+    roomType: zod.string().min(1).optional(),
+    price: zod.number().finite().nonnegative().optional(),
+    status: zod.string().min(1).optional(),
   })
   .strict();
 

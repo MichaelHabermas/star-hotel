@@ -830,15 +830,7 @@ export interface components {
             id: number;
             roomId: number;
             guestId: number;
-            /**
-             * Format: date
-             * @example 2026-06-01
-             */
             checkInDate: string;
-            /**
-             * Format: date
-             * @example 2026-06-04
-             */
             checkOutDate: string;
             totalAmount: number;
         };
@@ -855,19 +847,34 @@ export interface components {
             checkOutDate?: string;
         };
         FolioReport: {
-            /** Format: date-time */
             generatedAt: string;
-            reservation: components["schemas"]["FolioReservationDetail"];
-            guest: components["schemas"]["FolioGuest"];
-            room: components["schemas"]["FolioRoom"];
+            reservation: {
+                id: number;
+                roomId: number;
+                guestId: number;
+                checkInDate: string;
+                checkOutDate: string;
+                totalAmount: number;
+                nights: number;
+            };
+            guest: {
+                id: number;
+                name: string;
+                idNumber: string | null;
+                contact: string | null;
+            };
+            room: {
+                id: number;
+                roomType: string;
+                price: number;
+                status: string;
+            };
         };
         FolioReservationDetail: {
             id: number;
             roomId: number;
             guestId: number;
-            /** Format: date */
             checkInDate: string;
-            /** Format: date */
             checkOutDate: string;
             totalAmount: number;
             nights: number;
@@ -885,21 +892,25 @@ export interface components {
             status: string;
         };
         DaySheetReport: {
-            /** Format: date */
             date: string;
             totalRooms: number;
             occupancyCount: number;
             occupancyRate: number;
-            lines: components["schemas"]["DaySheetLine"][];
+            lines: {
+                reservationId: number;
+                roomId: number;
+                roomType: string;
+                guestName: string;
+                checkInDate: string;
+                checkOutDate: string;
+            }[];
         };
         DaySheetLine: {
             reservationId: number;
             roomId: number;
             roomType: string;
             guestName: string;
-            /** Format: date */
             checkInDate: string;
-            /** Format: date */
             checkOutDate: string;
         };
     };

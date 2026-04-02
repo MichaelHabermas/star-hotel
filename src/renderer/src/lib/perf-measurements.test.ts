@@ -1,20 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
+import { asStarHotelApp, createMockStarHotelApp } from '@renderer/test-utils/mock-star-hotel-app';
+import { describe, expect, it } from 'vitest';
 import { runPerfSmoke } from './perf-measurements';
-import type { StarHotelApp } from './star-hotel-app';
 
 describe('runPerfSmoke', () => {
   it('returns three non-negative timings', async () => {
-    const starHotel = {
-      pingEmbeddedApi: vi.fn(async () => {}),
-      pingIpc: vi.fn(async () => {}),
-      api: {
-        reservations: {
-          list: vi.fn(async () => []),
-        },
-      },
-    } as unknown as StarHotelApp;
+    const starHotel = createMockStarHotelApp();
+    starHotel.pingEmbeddedApi.mockImplementation(async () => {});
+    starHotel.pingIpc.mockImplementation(async () => {});
+    starHotel.api.reservations.list.mockImplementation(async () => []);
 
-    const result = await runPerfSmoke(starHotel);
+    const result = await runPerfSmoke(asStarHotelApp(starHotel));
 
     expect(result.embeddedApiRttMs).toBeGreaterThanOrEqual(0);
     expect(result.ipcRttMs).toBeGreaterThanOrEqual(0);

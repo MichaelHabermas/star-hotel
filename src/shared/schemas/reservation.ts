@@ -1,11 +1,12 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { z as zod } from './zod-openapi';
 
 /** ISO 8601 calendar date (YYYY-MM-DD). */
-export const isoDateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
+export const isoDateStringSchema = zod.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 
-const positiveInt = z.coerce.number().int().positive();
+const positiveInt = zod.coerce.number().int().positive();
 
-export const reservationCreateBodySchema = z
+export const reservationCreateBodySchema = zod
   .object({
     roomId: positiveInt,
     guestId: positiveInt,
@@ -20,7 +21,7 @@ export const reservationCreateBodySchema = z
 
 export type ReservationCreateBody = z.infer<typeof reservationCreateBodySchema>;
 
-export const reservationUpdateBodySchema = z
+export const reservationUpdateBodySchema = zod
   .object({
     roomId: positiveInt.optional(),
     guestId: positiveInt.optional(),
@@ -41,26 +42,26 @@ export const reservationUpdateBodySchema = z
 
 export type ReservationUpdateBody = z.infer<typeof reservationUpdateBodySchema>;
 
-export const reservationIdParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+export const reservationIdParamsSchema = zod.object({
+  id: zod.coerce.number().int().positive(),
 });
 
-export const reservationListQuerySchema = z
+export const reservationListQuerySchema = zod
   .object({
-    roomId: z.coerce.number().int().positive().optional(),
-    guestId: z.coerce.number().int().positive().optional(),
+    roomId: zod.coerce.number().int().positive().optional(),
+    guestId: zod.coerce.number().int().positive().optional(),
   })
   .strict();
 
 export type ReservationListQuery = z.infer<typeof reservationListQuerySchema>;
 
-export const reservationResponseSchema = z.object({
-  id: z.number(),
-  roomId: z.number(),
-  guestId: z.number(),
+export const reservationResponseSchema = zod.object({
+  id: zod.number(),
+  roomId: zod.number(),
+  guestId: zod.number(),
   checkInDate: isoDateStringSchema,
   checkOutDate: isoDateStringSchema,
-  totalAmount: z.number(),
+  totalAmount: zod.number(),
 });
 
 export type ReservationResponse = z.infer<typeof reservationResponseSchema>;

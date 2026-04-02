@@ -729,6 +729,505 @@
     }
   },
   "components": {
+    "schemas": {
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "idNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "idNumber",
+          "contact"
+        ]
+      },
+      "GuestCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "idNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "GuestPatch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "idNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Room": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "roomType": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "roomType",
+          "price",
+          "status"
+        ]
+      },
+      "RoomCreate": {
+        "type": "object",
+        "properties": {
+          "roomType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "roomType",
+          "price",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "RoomPatch": {
+        "type": "object",
+        "properties": {
+          "roomType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "Reservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "roomId": {
+            "type": "number"
+          },
+          "guestId": {
+            "type": "number"
+          },
+          "checkInDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "roomId",
+          "guestId",
+          "checkInDate",
+          "checkOutDate",
+          "totalAmount"
+        ]
+      },
+      "ReservationCreate": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "guestId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "checkInDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "required": [
+          "roomId",
+          "guestId",
+          "checkInDate",
+          "checkOutDate"
+        ],
+        "additionalProperties": false
+      },
+      "ReservationPatch": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "guestId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "checkInDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FolioReport": {
+        "type": "object",
+        "properties": {
+          "generatedAt": {
+            "type": "string"
+          },
+          "reservation": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "roomId": {
+                "type": "number"
+              },
+              "guestId": {
+                "type": "number"
+              },
+              "checkInDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "checkOutDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "totalAmount": {
+                "type": "number"
+              },
+              "nights": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "id",
+              "roomId",
+              "guestId",
+              "checkInDate",
+              "checkOutDate",
+              "totalAmount",
+              "nights"
+            ]
+          },
+          "guest": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "idNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "contact": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "idNumber",
+              "contact"
+            ]
+          },
+          "room": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "roomType": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "roomType",
+              "price",
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "generatedAt",
+          "reservation",
+          "guest",
+          "room"
+        ]
+      },
+      "FolioReservationDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "roomId": {
+            "type": "number"
+          },
+          "guestId": {
+            "type": "number"
+          },
+          "checkInDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "nights": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "roomId",
+          "guestId",
+          "checkInDate",
+          "checkOutDate",
+          "totalAmount",
+          "nights"
+        ]
+      },
+      "FolioGuest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "idNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contact": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "idNumber",
+          "contact"
+        ]
+      },
+      "FolioRoom": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "roomType": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "roomType",
+          "price",
+          "status"
+        ]
+      },
+      "DaySheetReport": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "totalRooms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "occupancyCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "occupancyRate": {
+            "type": "number"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reservationId": {
+                  "type": "number"
+                },
+                "roomId": {
+                  "type": "number"
+                },
+                "roomType": {
+                  "type": "string"
+                },
+                "guestName": {
+                  "type": "string"
+                },
+                "checkInDate": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                },
+                "checkOutDate": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                }
+              },
+              "required": [
+                "reservationId",
+                "roomId",
+                "roomType",
+                "guestName",
+                "checkInDate",
+                "checkOutDate"
+              ]
+            }
+          }
+        },
+        "required": [
+          "date",
+          "totalRooms",
+          "occupancyCount",
+          "occupancyRate",
+          "lines"
+        ]
+      },
+      "DaySheetLine": {
+        "type": "object",
+        "properties": {
+          "reservationId": {
+            "type": "number"
+          },
+          "roomId": {
+            "type": "number"
+          },
+          "roomType": {
+            "type": "string"
+          },
+          "guestName": {
+            "type": "string"
+          },
+          "checkInDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "required": [
+          "reservationId",
+          "roomId",
+          "roomType",
+          "guestName",
+          "checkInDate",
+          "checkOutDate"
+        ]
+      }
+    },
     "parameters": {
       "GuestId": {
         "name": "id",
@@ -755,391 +1254,6 @@
         "schema": {
           "type": "integer",
           "minimum": 1
-        }
-      }
-    },
-    "schemas": {
-      "Guest": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "idNumber",
-          "contact"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "idNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "contact": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GuestCreate": {
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "idNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "contact": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GuestPatch": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "idNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "contact": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "Room": {
-        "type": "object",
-        "required": [
-          "id",
-          "roomType",
-          "price",
-          "status"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "roomType": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number"
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
-      "RoomCreate": {
-        "type": "object",
-        "required": [
-          "roomType",
-          "price",
-          "status"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "roomType": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "minimum": 0
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
-      "RoomPatch": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "roomType": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "minimum": 0
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
-      "Reservation": {
-        "type": "object",
-        "required": [
-          "id",
-          "roomId",
-          "guestId",
-          "checkInDate",
-          "checkOutDate",
-          "totalAmount"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "roomId": {
-            "type": "integer"
-          },
-          "guestId": {
-            "type": "integer"
-          },
-          "checkInDate": {
-            "type": "string",
-            "format": "date",
-            "example": "2026-06-01"
-          },
-          "checkOutDate": {
-            "type": "string",
-            "format": "date",
-            "example": "2026-06-04"
-          },
-          "totalAmount": {
-            "type": "number"
-          }
-        }
-      },
-      "ReservationCreate": {
-        "type": "object",
-        "required": [
-          "roomId",
-          "guestId",
-          "checkInDate",
-          "checkOutDate"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "roomId": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "guestId": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "checkInDate": {
-            "type": "string",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-          },
-          "checkOutDate": {
-            "type": "string",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-          }
-        }
-      },
-      "ReservationPatch": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "roomId": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "guestId": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "checkInDate": {
-            "type": "string",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-          },
-          "checkOutDate": {
-            "type": "string",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-          }
-        }
-      },
-      "FolioReport": {
-        "type": "object",
-        "required": [
-          "generatedAt",
-          "reservation",
-          "guest",
-          "room"
-        ],
-        "properties": {
-          "generatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reservation": {
-            "$ref": "#/components/schemas/FolioReservationDetail"
-          },
-          "guest": {
-            "$ref": "#/components/schemas/FolioGuest"
-          },
-          "room": {
-            "$ref": "#/components/schemas/FolioRoom"
-          }
-        }
-      },
-      "FolioReservationDetail": {
-        "type": "object",
-        "required": [
-          "id",
-          "roomId",
-          "guestId",
-          "checkInDate",
-          "checkOutDate",
-          "totalAmount",
-          "nights"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "roomId": {
-            "type": "integer"
-          },
-          "guestId": {
-            "type": "integer"
-          },
-          "checkInDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "checkOutDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "totalAmount": {
-            "type": "number"
-          },
-          "nights": {
-            "type": "integer",
-            "minimum": 0
-          }
-        }
-      },
-      "FolioGuest": {
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "idNumber",
-          "contact"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "idNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "contact": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "FolioRoom": {
-        "type": "object",
-        "required": [
-          "id",
-          "roomType",
-          "price",
-          "status"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "roomType": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number"
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
-      "DaySheetReport": {
-        "type": "object",
-        "required": [
-          "date",
-          "totalRooms",
-          "occupancyCount",
-          "occupancyRate",
-          "lines"
-        ],
-        "properties": {
-          "date": {
-            "type": "string",
-            "format": "date"
-          },
-          "totalRooms": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "occupancyCount": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "occupancyRate": {
-            "type": "number"
-          },
-          "lines": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DaySheetLine"
-            }
-          }
-        }
-      },
-      "DaySheetLine": {
-        "type": "object",
-        "required": [
-          "reservationId",
-          "roomId",
-          "roomType",
-          "guestName",
-          "checkInDate",
-          "checkOutDate"
-        ],
-        "properties": {
-          "reservationId": {
-            "type": "integer"
-          },
-          "roomId": {
-            "type": "integer"
-          },
-          "roomType": {
-            "type": "string"
-          },
-          "guestName": {
-            "type": "string"
-          },
-          "checkInDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "checkOutDate": {
-            "type": "string",
-            "format": "date"
-          }
         }
       }
     },

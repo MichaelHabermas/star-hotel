@@ -1,11 +1,12 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { z as zod } from './zod-openapi';
 
 /** Wire shape for `sendJsonError` / embedded API error responses. */
-export const apiErrorBodySchema = z.object({
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.unknown().optional(),
+export const apiErrorBodySchema = zod.object({
+  error: zod.object({
+    code: zod.string(),
+    message: zod.string(),
+    details: zod.unknown().optional(),
   }),
 });
 

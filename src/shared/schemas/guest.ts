@@ -1,38 +1,39 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import { z as zod } from './zod-openapi';
 
-export const guestIdParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+export const guestIdParamsSchema = zod.object({
+  id: zod.coerce.number().int().positive(),
 });
 
 /** Reject unknown query keys on list endpoint. */
-export const guestListQuerySchema = z.object({}).strict();
+export const guestListQuerySchema = zod.object({}).strict();
 
 export type GuestListQuery = z.infer<typeof guestListQuerySchema>;
 
-export const guestResponseSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  idNumber: z.string().nullable(),
-  contact: z.string().nullable(),
+export const guestResponseSchema = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  idNumber: zod.string().nullable(),
+  contact: zod.string().nullable(),
 });
 
 export type GuestResponse = z.infer<typeof guestResponseSchema>;
 
-export const guestCreateBodySchema = z
+export const guestCreateBodySchema = zod
   .object({
-    name: z.string().min(1, 'Name is required'),
-    idNumber: z.string().nullable().optional(),
-    contact: z.string().nullable().optional(),
+    name: zod.string().min(1, 'Name is required'),
+    idNumber: zod.string().nullable().optional(),
+    contact: zod.string().nullable().optional(),
   })
   .strict();
 
 export type GuestCreateBody = z.infer<typeof guestCreateBodySchema>;
 
-export const guestUpdateBodySchema = z
+export const guestUpdateBodySchema = zod
   .object({
-    name: z.string().min(1).optional(),
-    idNumber: z.string().nullable().optional(),
-    contact: z.string().nullable().optional(),
+    name: zod.string().min(1).optional(),
+    idNumber: zod.string().nullable().optional(),
+    contact: zod.string().nullable().optional(),
   })
   .strict();
 

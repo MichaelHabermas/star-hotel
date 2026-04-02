@@ -1,4 +1,4 @@
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
+import { asStarHotelApp, createMockStarHotelApp } from '@renderer/test-utils/mock-star-hotel-app';
 import type { GuestResponse } from '@shared/schemas/guest';
 import type { ReservationResponse } from '@shared/schemas/reservation';
 import type { RoomResponse } from '@shared/schemas/room';
@@ -10,58 +10,35 @@ import { useReservationEditor } from './use-reservation-editor';
 const guest: GuestResponse = { id: 1, name: 'A', idNumber: null, contact: null };
 const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'vacant' };
 
+const defaultReservation: ReservationResponse = {
+  id: 1,
+  roomId: 1,
+  guestId: 1,
+  checkInDate: '2026-01-10',
+  checkOutDate: '2026-01-12',
+  totalAmount: 200,
+};
+
 function createMockApp(options?: {
   readonly createImpl?: () => Promise<ReservationResponse>;
   readonly getImpl?: () => Promise<ReservationResponse>;
 }): {
-  readonly app: StarHotelApp;
+  readonly app: ReturnType<typeof createMockStarHotelApp>;
   readonly create: ReturnType<typeof vi.fn>;
 } {
+  const app = createMockStarHotelApp();
+  app.api.guests.list.mockResolvedValue([guest]);
+  app.api.rooms.list.mockResolvedValue([room]);
+  app.api.reservations.list.mockResolvedValue([]);
   const create = vi.fn<() => Promise<ReservationResponse>>(
-    options?.createImpl ??
-      (() =>
-        Promise.resolve({
-          id: 1,
-          roomId: 1,
-          guestId: 1,
-          checkInDate: '2026-01-10',
-          checkOutDate: '2026-01-12',
-          totalAmount: 200,
-        })),
+    options?.createImpl ?? (() => Promise.resolve(defaultReservation)),
   );
-
-  const app = {
-    api: {
-      guests: { list: vi.fn().mockResolvedValue([guest]) },
-      rooms: { list: vi.fn().mockResolvedValue([room]) },
-      reservations: {
-        list: vi.fn().mockResolvedValue([]),
-        get:
-          options?.getImpl ??
-          vi.fn().mockResolvedValue({
-            id: 1,
-            roomId: 1,
-            guestId: 1,
-            checkInDate: '2026-01-10',
-            checkOutDate: '2026-01-12',
-            totalAmount: 200,
-          }),
-        create,
-        update: vi.fn().mockResolvedValue({
-          id: 1,
-          roomId: 1,
-          guestId: 1,
-          checkInDate: '2026-01-10',
-          checkOutDate: '2026-01-12',
-          totalAmount: 200,
-        }),
-        delete: vi.fn().mockResolvedValue(undefined),
-      },
-    },
-    formatEmbeddedApiUserMessage: (err: unknown) =>
-      err instanceof Error ? err.message : String(err),
-  } as unknown as StarHotelApp;
-
+  app.api.reservations.create.mockImplementation(create);
+  app.api.reservations.get.mockImplementation(
+    options?.getImpl ?? (() => Promise.resolve(defaultReservation)),
+  );
+  app.api.reservations.update.mockResolvedValue(defaultReservation);
+  app.api.reservations.delete.mockResolvedValue(undefined);
   return { app, create };
 }
 
@@ -75,7 +52,7 @@ describe('useReservationEditor', () => {
     const navigate = vi.fn();
 
     const { result } = renderHook(() =>
-      useReservationEditor(app, {
+      useReservationEditor(asStarHotelApp(app), {
         mode: 'create',
         editId: 0,
         editIdValid: false,
@@ -100,7 +77,7 @@ describe('useReservationEditor', () => {
     const navigate = vi.fn();
 
     const { result } = renderHook(() =>
-      useReservationEditor(app, {
+      useReservationEditor(asStarHotelApp(app), {
         mode: 'create',
         editId: 0,
         editIdValid: false,
@@ -140,7 +117,7 @@ describe('useReservationEditor', () => {
     const navigate = vi.fn();
 
     const { result } = renderHook(() =>
-      useReservationEditor(app, {
+      useReservationEditor(asStarHotelApp(app), {
         mode: 'create',
         editId: 0,
         editIdValid: false,
@@ -174,7 +151,7 @@ describe('useReservationEditor', () => {
     const navigate = vi.fn();
 
     const { result } = renderHook(() =>
-      useReservationEditor(app, {
+      useReservationEditor(asStarHotelApp(app), {
         mode: 'edit',
         editId: 99,
         editIdValid: true,

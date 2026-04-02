@@ -1,4 +1,5 @@
 import type { GuestCreateBody, GuestResponse, GuestUpdateBody } from '@shared/schemas/guest';
+import { emptyOrUndefinedToNull } from '../../domain/optional-string';
 import { GuestInUseError, GuestNotFoundError } from './guest-errors';
 import type { GuestRepository, GuestRow } from './guest-repository';
 
@@ -29,8 +30,8 @@ export class GuestService {
   create(body: GuestCreateBody): GuestResponse {
     const id = this.repo.insert({
       Name: body.name,
-      ID_Number: body.idNumber === '' || body.idNumber === undefined ? null : body.idNumber,
-      Contact: body.contact === '' || body.contact === undefined ? null : body.contact,
+      ID_Number: emptyOrUndefinedToNull(body.idNumber),
+      Contact: emptyOrUndefinedToNull(body.contact),
     });
     return this.get(id);
   }

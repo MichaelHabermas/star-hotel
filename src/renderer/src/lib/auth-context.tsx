@@ -32,6 +32,17 @@ export function useAuth(): AuthContextValue {
   return v;
 }
 
+/** Test-only: supplies auth context without `AuthRoot` (pair with `StarHotelAppProvider`). */
+export function AuthTestRoot({
+  children,
+  value,
+}: {
+  readonly children: ReactNode;
+  readonly value: AuthContextValue;
+}): JSX.Element {
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
 export function AuthRoot({ children }: { readonly children: ReactNode }): JSX.Element {
   const [token, setTokenState] = useState<string | null>(() => readSessionToken());
   const [user, setUserState] = useState<AuthUserResponse | null>(() => readStoredUser());

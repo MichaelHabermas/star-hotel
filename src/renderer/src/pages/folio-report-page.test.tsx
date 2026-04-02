@@ -1,9 +1,13 @@
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
+import {
+  asStarHotelApp,
+  createMockStarHotelApp,
+  type MockStarHotelApp,
+} from '@renderer/test-utils/mock-star-hotel-app';
 import type { FolioReportResponse } from '@shared/schemas/report';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { FolioReportPage } from './folio-report-page';
 
 const folioOk: FolioReportResponse = {
@@ -23,33 +27,18 @@ const folioOk: FolioReportResponse = {
 
 function createApp(overrides?: {
   readonly getFolio?: (id: number) => Promise<FolioReportResponse>;
-}): StarHotelApp {
-  return {
-    api: {
-      auth: { login: vi.fn(), logout: vi.fn(), me: vi.fn() },
-      guests: { list: vi.fn() },
-      rooms: { list: vi.fn() },
-      reservations: {
-        list: vi.fn(),
-        get: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-      },
-      reports: {
-        getFolio: vi.fn(overrides?.getFolio ?? (() => Promise.resolve(folioOk))),
-        getDaySheet: vi.fn(),
-      },
-    },
-    formatEmbeddedApiUserMessage: (err: unknown) =>
-      err instanceof Error ? err.message : String(err),
-  } as unknown as StarHotelApp;
+}): MockStarHotelApp {
+  const app = createMockStarHotelApp();
+  app.api.reports.getFolio.mockImplementation(
+    overrides?.getFolio ?? (() => Promise.resolve(folioOk)),
+  );
+  return app;
 }
 
-function renderFolio(app: StarHotelApp, path = '/reports/folio/1') {
+function renderFolio(app: MockStarHotelApp, path = '/reports/folio/1') {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <StarHotelAppProvider app={app}>
+      <StarHotelAppProvider app={asStarHotelApp(app)}>
         <Routes>
           <Route path="/reports/folio/:reservationId" element={<FolioReportPage />} />
         </Routes>

@@ -53,6 +53,15 @@ Electron Renderer Process (sandboxed)
 
 **Security model:** `contextIsolation: true`, `nodeIntegration: false`. Renderer communicates with main exclusively via the typed `contextBridge` preload. All data operations flow through Express REST endpoints inside main.
 
+## Testing the embedded API (main process)
+
+`createEmbeddedApiStack` in [`src/main/embedded-api-stack.ts`](src/main/embedded-api-stack.ts) wires SQLite, Express route registration, and IPC. For tests you can inject:
+
+- **`createSqlitePersistencePort`** — use `createSqlitePersistencePort({ dbFilePath: ':memory:' })` (or another adapter implementing `PersistencePort`) so business logic runs without touching user data on disk.
+- **`startEmbeddedApiServer`** — swap the HTTP listener when you need to avoid binding real ports or to use a pre-built `Express` app (see [`embedded-api-stack.test.ts`](src/main/embedded-api-stack.test.ts) and Supertest-based [`create-app.*.test.ts`](src/server/create-app.test.ts) patterns).
+
+Domain routes are registered per vertical slice (guests, rooms, reservations, reports, auth); slice entry points are [`src/server/guests/index.ts`](src/server/guests/index.ts), [`src/server/rooms/index.ts`](src/server/rooms/index.ts), and [`src/server/reservations/index.ts`](src/server/reservations/index.ts).
+
 ## Database Schema (from legacy Access migration)
 
 ```sql

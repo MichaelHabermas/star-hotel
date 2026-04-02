@@ -1,10 +1,14 @@
-import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
+import {
+  asStarHotelApp,
+  createMockStarHotelApp,
+  type MockStarHotelApp,
+} from '@renderer/test-utils/mock-star-hotel-app';
 import type { GuestResponse } from '@shared/schemas/guest';
 import type { RoomResponse } from '@shared/schemas/room';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { ReservationFormPage } from './reservation-form-page';
 
 const guest: GuestResponse = { id: 1, name: 'Guest One', idNumber: null, contact: null };
@@ -13,44 +17,26 @@ const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'v
 function createListApp(overrides?: {
   readonly guestsList?: () => Promise<GuestResponse[]>;
   readonly roomsList?: () => Promise<RoomResponse[]>;
-}): StarHotelApp {
-  return {
-    api: {
-      auth: {
-        login: vi.fn(),
-        logout: vi.fn(),
-        me: vi.fn(),
-      },
-      guests: {
-        list: vi.fn(overrides?.guestsList ?? (() => Promise.resolve([guest]))),
-      },
-      rooms: {
-        list: vi.fn(overrides?.roomsList ?? (() => Promise.resolve([room]))),
-      },
-      reservations: {
-        list: vi.fn().mockResolvedValue([]),
-        get: vi.fn(),
-        create: vi.fn().mockResolvedValue({
-          id: 1,
-          roomId: 1,
-          guestId: 1,
-          checkInDate: '2026-01-10',
-          checkOutDate: '2026-01-12',
-          totalAmount: 200,
-        }),
-        update: vi.fn(),
-        delete: vi.fn(),
-      },
-    },
-    formatEmbeddedApiUserMessage: (err: unknown) =>
-      err instanceof Error ? err.message : String(err),
-  } as unknown as StarHotelApp;
+}): MockStarHotelApp {
+  const app = createMockStarHotelApp();
+  app.api.guests.list.mockImplementation(overrides?.guestsList ?? (() => Promise.resolve([guest])));
+  app.api.rooms.list.mockImplementation(overrides?.roomsList ?? (() => Promise.resolve([room])));
+  app.api.reservations.list.mockResolvedValue([]);
+  app.api.reservations.create.mockResolvedValue({
+    id: 1,
+    roomId: 1,
+    guestId: 1,
+    checkInDate: '2026-01-10',
+    checkOutDate: '2026-01-12',
+    totalAmount: 200,
+  });
+  return app;
 }
 
-function renderCreatePage(app: StarHotelApp) {
+function renderCreatePage(app: MockStarHotelApp) {
   return render(
     <MemoryRouter initialEntries={['/reservations/new']}>
-      <StarHotelAppProvider app={app}>
+      <StarHotelAppProvider app={asStarHotelApp(app)}>
         <Routes>
           <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
         </Routes>

@@ -1,10 +1,16 @@
+import { getStarHotelZodOpenApiComponents } from './zod-component-registry';
+
 /**
  * OpenAPI 3 description of the loopback embedded API (see README — default port 45123).
  * Served at GET /api/openapi.json; Swagger UI at GET /api/docs.
  *
  * **`paths` keys** must match `EMBEDDED_OPENAPI_DOCUMENTED_PATHS` in `@shared/api/embedded-api-paths`
  * (see `openapi-documented-paths.test.ts`).
+ *
+ * DTO `components.schemas` are generated from Zod in `@shared/schemas` via `zod-component-registry.ts`.
  */
+const zodComponents = getStarHotelZodOpenApiComponents();
+
 export const starHotelOpenApiDocument: Record<string, unknown> = {
   openapi: '3.0.3',
   info: {
@@ -459,6 +465,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
     },
   },
   components: {
+    ...zodComponents,
     parameters: {
       GuestId: {
         name: 'id',
@@ -477,183 +484,6 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         in: 'path',
         required: true,
         schema: { type: 'integer', minimum: 1 },
-      },
-    },
-    schemas: {
-      Guest: {
-        type: 'object',
-        required: ['id', 'name', 'idNumber', 'contact'],
-        properties: {
-          id: { type: 'integer' },
-          name: { type: 'string' },
-          idNumber: { type: 'string', nullable: true },
-          contact: { type: 'string', nullable: true },
-        },
-      },
-      GuestCreate: {
-        type: 'object',
-        required: ['name'],
-        additionalProperties: false,
-        properties: {
-          name: { type: 'string' },
-          idNumber: { type: 'string', nullable: true },
-          contact: { type: 'string', nullable: true },
-        },
-      },
-      GuestPatch: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          name: { type: 'string' },
-          idNumber: { type: 'string', nullable: true },
-          contact: { type: 'string', nullable: true },
-        },
-      },
-      Room: {
-        type: 'object',
-        required: ['id', 'roomType', 'price', 'status'],
-        properties: {
-          id: { type: 'integer' },
-          roomType: { type: 'string' },
-          price: { type: 'number' },
-          status: { type: 'string' },
-        },
-      },
-      RoomCreate: {
-        type: 'object',
-        required: ['roomType', 'price', 'status'],
-        additionalProperties: false,
-        properties: {
-          roomType: { type: 'string' },
-          price: { type: 'number', minimum: 0 },
-          status: { type: 'string' },
-        },
-      },
-      RoomPatch: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          roomType: { type: 'string' },
-          price: { type: 'number', minimum: 0 },
-          status: { type: 'string' },
-        },
-      },
-      Reservation: {
-        type: 'object',
-        required: ['id', 'roomId', 'guestId', 'checkInDate', 'checkOutDate', 'totalAmount'],
-        properties: {
-          id: { type: 'integer' },
-          roomId: { type: 'integer' },
-          guestId: { type: 'integer' },
-          checkInDate: { type: 'string', format: 'date', example: '2026-06-01' },
-          checkOutDate: { type: 'string', format: 'date', example: '2026-06-04' },
-          totalAmount: { type: 'number' },
-        },
-      },
-      ReservationCreate: {
-        type: 'object',
-        required: ['roomId', 'guestId', 'checkInDate', 'checkOutDate'],
-        additionalProperties: false,
-        properties: {
-          roomId: { type: 'integer', minimum: 1 },
-          guestId: { type: 'integer', minimum: 1 },
-          checkInDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
-          checkOutDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
-        },
-      },
-      ReservationPatch: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          roomId: { type: 'integer', minimum: 1 },
-          guestId: { type: 'integer', minimum: 1 },
-          checkInDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
-          checkOutDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
-        },
-      },
-      FolioReport: {
-        type: 'object',
-        required: ['generatedAt', 'reservation', 'guest', 'room'],
-        properties: {
-          generatedAt: { type: 'string', format: 'date-time' },
-          reservation: { $ref: '#/components/schemas/FolioReservationDetail' },
-          guest: { $ref: '#/components/schemas/FolioGuest' },
-          room: { $ref: '#/components/schemas/FolioRoom' },
-        },
-      },
-      FolioReservationDetail: {
-        type: 'object',
-        required: [
-          'id',
-          'roomId',
-          'guestId',
-          'checkInDate',
-          'checkOutDate',
-          'totalAmount',
-          'nights',
-        ],
-        properties: {
-          id: { type: 'integer' },
-          roomId: { type: 'integer' },
-          guestId: { type: 'integer' },
-          checkInDate: { type: 'string', format: 'date' },
-          checkOutDate: { type: 'string', format: 'date' },
-          totalAmount: { type: 'number' },
-          nights: { type: 'integer', minimum: 0 },
-        },
-      },
-      FolioGuest: {
-        type: 'object',
-        required: ['id', 'name', 'idNumber', 'contact'],
-        properties: {
-          id: { type: 'integer' },
-          name: { type: 'string' },
-          idNumber: { type: 'string', nullable: true },
-          contact: { type: 'string', nullable: true },
-        },
-      },
-      FolioRoom: {
-        type: 'object',
-        required: ['id', 'roomType', 'price', 'status'],
-        properties: {
-          id: { type: 'integer' },
-          roomType: { type: 'string' },
-          price: { type: 'number' },
-          status: { type: 'string' },
-        },
-      },
-      DaySheetReport: {
-        type: 'object',
-        required: ['date', 'totalRooms', 'occupancyCount', 'occupancyRate', 'lines'],
-        properties: {
-          date: { type: 'string', format: 'date' },
-          totalRooms: { type: 'integer', minimum: 0 },
-          occupancyCount: { type: 'integer', minimum: 0 },
-          occupancyRate: { type: 'number' },
-          lines: {
-            type: 'array',
-            items: { $ref: '#/components/schemas/DaySheetLine' },
-          },
-        },
-      },
-      DaySheetLine: {
-        type: 'object',
-        required: [
-          'reservationId',
-          'roomId',
-          'roomType',
-          'guestName',
-          'checkInDate',
-          'checkOutDate',
-        ],
-        properties: {
-          reservationId: { type: 'integer' },
-          roomId: { type: 'integer' },
-          roomType: { type: 'string' },
-          guestName: { type: 'string' },
-          checkInDate: { type: 'string', format: 'date' },
-          checkOutDate: { type: 'string', format: 'date' },
-        },
       },
     },
     responses: {
