@@ -23,7 +23,7 @@ Supporting documentation for **US6.3**, **US6.4**, and the PRD **50-case evaluat
 The course spec references a **~50-case** matrix (happy / edge / concurrency). This is a **roadmap**, not a commitment to 50 automated cases in E6.
 
 | Category | Intent | Examples (planned IDs) | Where covered first |
-|----------|--------|------------------------|----------------------|
+| ---------- | -------- | ------------------------ | ---------------------- |
 | **H — Happy path** | Core CRUD and read paths | H1 create reservation; H2 list; H3 edit; H4 delete | Renderer + server tests; manual `pnpm dev` |
 | **E — Edge** | Validation, empty DB, bad IDs | E1 Zod field errors; E2 invalid reservation id; E3 empty guest/room catalogs; E4 date ordering / leap years | `use-reservation-editor` tests; `reservation-pricing` tests; form RTL |
 | **C — Concurrency / data** | WAL + transactions; overlap rules | C1 overlap rejection; C2 concurrent writes (stretch) | `reservation-service.test.ts`; server integration tests |

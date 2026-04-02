@@ -8,7 +8,7 @@ Repo: `MichaelHabermas/star-hotel`
 ## Affected pages / routes (planned; no implementation yet)
 
 | Area | What to test | Priority |
-|------|----------------|----------|
+| ------ | ---------------- | ---------- |
 | First parity form (TBD from legacy `.frm` map) | CRUD through React → IPC → Express → SQLite | P0 |
 | Auth / roles (if in MVP slice) | Role-gated routes, password upgrade from legacy | P1 |
 | Room grid / reservation list | Empty, loading, large N rows, sort/filter | P0 |

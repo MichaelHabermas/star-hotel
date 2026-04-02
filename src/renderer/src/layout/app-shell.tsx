@@ -19,15 +19,19 @@ function navClass({ isActive }: { isActive: boolean }): string {
 }
 
 export function AppShell(): JSX.Element {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <header className="bg-card border-border shadow-xs border-b">
-        <div className="mx-auto flex max-w-5xl items-center gap-8 px-4 py-3 md:px-6">
-          <span className="font-display text-foreground text-lg font-semibold tracking-tight">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-6">
+          <NavLink
+            to="/"
+            end
+            className="font-display text-foreground text-lg font-semibold tracking-tight hover:text-primary"
+          >
             Star Hotel
-          </span>
-          <nav className="font-ui flex flex-1 gap-1" aria-label="Primary">
+          </NavLink>
+          <nav className="font-ui flex flex-1 flex-wrap gap-1" aria-label="Primary">
             <NavLink to="/" end className={navClass}>
               Home
             </NavLink>
@@ -48,16 +52,28 @@ export function AppShell(): JSX.Element {
                 ))
               : null}
           </nav>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground shrink-0 gap-1.5"
-            onClick={() => void logout()}
-          >
-            <LogOut className="size-4" aria-hidden />
-            Sign out
-          </Button>
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            {user ? (
+              <span
+                className="text-muted-foreground hidden max-w-[14rem] truncate text-right text-xs sm:block"
+                title={`${user.username} (${user.role})`}
+              >
+                <span className="text-foreground font-medium">{user.username}</span>
+                <span className="text-muted-foreground"> · </span>
+                <span className="font-mono text-[0.7rem]">{user.role}</span>
+              </span>
+            ) : null}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground gap-1.5"
+              onClick={() => void logout()}
+            >
+              <LogOut className="size-4" aria-hidden />
+              Sign out
+            </Button>
+          </div>
         </div>
       </header>
       <main className="flex-1">

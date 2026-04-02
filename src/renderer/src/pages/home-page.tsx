@@ -72,7 +72,7 @@ export function HomePage(): JSX.Element {
             </h1>
             <p className="text-muted-foreground text-sm">
               Front desk, inventory, and guests — same surface as the legacy main menu, rebuilt for
-              speed.
+              speed. Use the header or the cards below to open each module.
             </p>
           </div>
         </div>

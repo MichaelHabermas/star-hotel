@@ -33,7 +33,7 @@ export function LoginPage(): JSX.Element {
     setSubmitting(true);
     try {
       const res = await starHotel.api.auth.login({ username: username.trim(), password });
-      setToken(res.token);
+      setToken(res.token, res.user);
       navigate('/', { replace: true });
     } catch (error: unknown) {
       setErr(starHotel.formatEmbeddedApiUserMessage(error));
@@ -50,7 +50,7 @@ export function LoginPage(): JSX.Element {
           Star Hotel
         </span>
       </div>
-      <Card className="border-border w-full max-w-sm shadow-sm">
+      <Card className="border-border w-full max-w-sm border-l-4 border-l-primary shadow-sm">
         <CardHeader>
           <CardTitle className="font-ui text-lg">Sign in</CardTitle>
           <CardDescription>

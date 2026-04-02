@@ -9,7 +9,7 @@ Canonical decisions for **E1.5 (visual design)** and gates **T4**, **T5**, and *
 ## E1.5 Visual design and style lab scope
 
 | Field | Value |
-|--------|--------|
+| -------- | -------- |
 | **Status** | Accepted |
 | **Date** | 2026-04-01 |
 
@@ -39,7 +39,7 @@ Canonical decisions for **E1.5 (visual design)** and gates **T4**, **T5**, and *
 ## T4 — Migration fork (clean install vs `.mdb` import)
 
 | Field | Value |
-|--------|--------|
+| -------- | -------- |
 | **Status** | Accepted |
 | **Date** | 2026-03-31 |
 
@@ -79,7 +79,7 @@ E2 must freeze SQLite schema and migration strategy. Legacy data lives in `StarH
 ### Layering (SOLID / modular preview)
 
 | Layer | T4 impact |
-|--------|-----------|
+| -------- | ----------- |
 | **domain** | Pure rules unchanged; import adapters would map legacy rows → domain DTOs if Phase 2 ships. |
 | **server** | Owns migrations, WAL SQLite, and (later) import command/service boundary. |
 | **shared** | Zod schemas for API + any future import row shape. |
@@ -90,7 +90,7 @@ E2 must freeze SQLite schema and migration strategy. Legacy data lives in `StarH
 ## T5 — Report scope contract (E9)
 
 | Field | Value |
-|--------|--------|
+| -------- | -------- |
 | **Status** | Accepted |
 | **Date** | 2026-03-31 |
 
@@ -123,7 +123,7 @@ Legacy reports use Crystal via `P2smon.dll` ([PRE-SEARCH.md](./PRE-SEARCH.md)). 
 ## T2 — Primary workflow priority (post-MVP / E8 ordering)
 
 | Field | Value |
-|--------|--------|
+| -------- | -------- |
 | **Status** | Accepted |
 | **Date** | 2026-03-31 |
 
@@ -134,7 +134,7 @@ Spec rubric rewards coherent breadth; build order should follow **front-desk val
 ### Decision — ranked backlog
 
 | Priority | Workflow | PRD anchor |
-|----------|-----------|------------|
+| ---------- | ----------- | ------------ |
 | 1 | Reservations / check-in (guest + room + dates + totals) | [PRD — US8.5](./PRD.md) |
 | 2 | Rooms management (status, rates, inventory) | US8.3 |
 | 3 | Guests management | US8.4 |
@@ -159,7 +159,7 @@ Implementation order is reflected under **Epic E8** in [PRD.md](./PRD.md) (“Im
 ## Embedded API config and IPC vs HTTP (renderer boundary)
 
 | Field | Value |
-|--------|--------|
+| -------- | -------- |
 | **Status** | Accepted |
 | **Date** | 2026-03-31 |
 

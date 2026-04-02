@@ -3,7 +3,7 @@
 Authoritative epic text: [PRD.md § Epic E3](./PRD.md). This matrix maps PRD user stories and tasks to implementation for sign-off.
 
 | PRD item | Requirement | Implementation |
-|----------|---------------|----------------|
+| ---------- | --------------- | ---------------- |
 | **US3.1** | Server bootstrap in main; lifecycle tied to app ready/quit | [`startStarHotelMain`](../src/main/bootstrap.ts) awaits `ensureEmbeddedApiAndIpc()` after `whenReady` (Express + SQLite + IPC); quit on listen failure. Shutdown: [`createEmbeddedApiStack`](../src/main/embedded-api-stack.ts) `before-quit` closes HTTP server then SQLite. |
 | **T3.1.1.1** | Port selection / conflict handling documented | [README § Embedded Express API](../README.md#embedded-express-api-epic-e3): `STAR_HOTEL_PORT`, `--star-hotel-api-base=`, `EADDRINUSE` (no auto port bump). |
 | **US3.1 DoD** | Health returns 200 | [`GET /health`](../src/server/create-app.ts) after `persistence.isReady()`. |

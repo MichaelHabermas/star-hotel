@@ -206,6 +206,62 @@ describe('ReservationService', () => {
     ).toThrow(ReservationConflictError);
   });
 
+  it('update allows non-overlapping date change on same room', () => {
+    const repo = new InMemoryReservationRepository();
+    repo.seedRoom(1, 100);
+    repo.seedGuest(10);
+    const svc = new ReservationService(repo);
+
+    const a = svc.create({
+      roomId: 1,
+      guestId: 10,
+      checkInDate: '2026-06-01',
+      checkOutDate: '2026-06-05',
+    });
+    const b = svc.create({
+      roomId: 1,
+      guestId: 10,
+      checkInDate: '2026-06-10',
+      checkOutDate: '2026-06-12',
+    });
+
+    const moved = svc.update(b.id, {
+      checkInDate: '2026-06-06',
+      checkOutDate: '2026-06-09',
+    });
+    expect(moved.checkInDate).toBe('2026-06-06');
+    expect(moved.checkOutDate).toBe('2026-06-09');
+    expect(moved.totalAmount).toBe(300);
+    expect(svc.get(a.id).checkInDate).toBe('2026-06-01');
+  });
+
+  it('update throws ReservationConflictError when new dates overlap another reservation', () => {
+    const repo = new InMemoryReservationRepository();
+    repo.seedRoom(1, 100);
+    repo.seedGuest(10);
+    const svc = new ReservationService(repo);
+
+    svc.create({
+      roomId: 1,
+      guestId: 10,
+      checkInDate: '2026-06-01',
+      checkOutDate: '2026-06-10',
+    });
+    const second = svc.create({
+      roomId: 1,
+      guestId: 10,
+      checkInDate: '2026-06-10',
+      checkOutDate: '2026-06-15',
+    });
+
+    expect(() =>
+      svc.update(second.id, {
+        checkInDate: '2026-06-05',
+        checkOutDate: '2026-06-08',
+      }),
+    ).toThrow(ReservationConflictError);
+  });
+
   it('get throws ReservationNotFoundError for unknown id', () => {
     const repo = new InMemoryReservationRepository();
     const svc = new ReservationService(repo);

@@ -9,7 +9,7 @@ Modernization of a legacy Visual Basic 6.0 + Microsoft Access hotel reservation 
 ## Stack (non-negotiable per spec)
 
 | Layer | Technology |
-|-------|-----------|
+| ------- | ----------- |
 | Desktop shell | Electron |
 | Frontend | React 19 + Tailwind CSS v4 + shadcn/ui |
 | Backend | Express.js (runs in Electron Main process) |
@@ -39,7 +39,7 @@ pnpm typecheck       # tsc --noEmit (main/preload + renderer)
 
 ## Architecture
 
-```
+```text
 Electron Main Process (Node.js)
 ├── Express.js server  ← all business logic & DB operations
 ├── SQLite (better-sqlite3, WAL mode)

@@ -7,7 +7,7 @@
 [`src/main/telemetry-main.ts`](../src/main/telemetry-main.ts) calls `crashReporter.start` at main-process startup **before** `app.whenReady()` (required on macOS).
 
 | Mode | Behavior |
-|------|----------|
+| ------ | ---------- |
 | **`SENTRY_MINIDUMP_URL` unset** | Crash reports are collected locally; **not** uploaded (`uploadToServer: false`). Useful for dev without a backend. |
 | **`SENTRY_MINIDUMP_URL` set** | Minidumps POST to the URL (use the **Minidump endpoint** from your Sentry project’s Client Keys / SDK setup). |
 

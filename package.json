@@ -13,7 +13,7 @@
     "posttest": "electron-rebuild -f -w better-sqlite3,argon2",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
+    "format": "prettier --log-level silent --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "codegen:api": "tsx scripts/export-openapi.ts && openapi-typescript src/server/openapi/openapi-spec.json -o src/shared/api/generated/openapi-types.ts",

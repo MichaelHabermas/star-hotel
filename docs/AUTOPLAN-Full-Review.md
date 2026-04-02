@@ -31,7 +31,7 @@
 ### 0A — Premise challenge
 
 | Premise | Assessment | Risk |
-|---------|------------|------|
+| --------- | ------------ | ------ |
 | Interview-grade polish beats shipping a web-first product | Valid for stated hiring audience; misaligned if buyer were a hotel ops director | Medium |
 | Stack is fixed non-negotiable | Valid as external constraint | Low |
 | PRE-SEARCH “completed” schema map | Partially assumed; `modLogic.bas (or similar)`, unresolved reports | **High** |
@@ -57,7 +57,7 @@ Crystal/P2smon        toward spec deliverables         optional cloud sync,
 ### 0C-bis — Implementation alternatives (mandatory)
 
 | Approach | Summary | Effort | Risk | Verdict |
-|----------|---------|--------|------|---------|
+| ---------- | --------- | -------- | ------ | --------- |
 | **A — Spec stack, B+A sequencing** (Design doc) | MVP gate first + perf/UX budget early | M | Med | **Selected** — matches rubric |
 | **B — Thin strangler** (keep Access read-only longer) | Lower migration risk | S | Low for data | **Rejected** — violates stack mandate |
 | **C — Breadth-first parity** | Many screens early | L | High miss MVP | **Rejected** — fails 24h gate |
@@ -73,7 +73,7 @@ Crystal/P2smon        toward spec deliverables         optional cloud sync,
 ### 0E — Temporal interrogation
 
 | Window | Decisions to lock |
-|--------|-------------------|
+| -------- | ------------------- |
 | Hour 1 | Scaffold, native module story for Vite, DB file path |
 | Hour 2–3 | IPC contract shape, Zod boundaries, first REST routes |
 | Hour 4–5 | First form choice, parity with which legacy form |
@@ -107,7 +107,7 @@ Independent read: the Design doc is unusually honest about audience (**hotel-tec
 **CEO dual voices — consensus table**
 
 | Dimension | Claude | Codex | Consensus |
-|-----------|--------|-------|-----------|
+| ----------- | -------- | ------- | ----------- |
 | Premises valid? | Mostly; audience premise strong | Challenges completeness of discovery | **PARTIAL** — lock legacy facts next |
 | Right problem? | Yes for graded sprint | Reframe if real buyer is ops | **DISAGREE** → taste if pitch shifts |
 | Scope calibration | Tight if B+A held | Too many mandatory deliverables | **DISAGREE** — defer to TODOS |
@@ -156,7 +156,7 @@ After sprint: credible **desktop vertical slice** + architecture story. **Not** 
 ### CEO — Error and Rescue Registry (plan-level, pre-code)
 
 | Failure | Planned mitigation (from docs) | Gap |
-|---------|-------------------------------|-----|
+| --------- | ------------------------------- | ----- |
 | Renderer throw | Global error boundary | OK in spec |
 | SQLite locked | WAL | **Incomplete** — add busy handler |
 | Migration corrupt row | Verification protocol mentioned | Needs concrete quarantine UX |
@@ -164,7 +164,7 @@ After sprint: credible **desktop vertical slice** + architecture story. **Not** 
 ### CEO — Failure modes registry (plan-level)
 
 | Mode | Severity | Mitigation in plan? |
-|------|----------|---------------------|
+| ------ | ---------- | --------------------- |
 | Wrong billing parity | High | Tests from `.bas` |
 | Telemetry leaks PII | High | **Not yet** |
 | Report parity creep | High | Open scope (T5) |
@@ -206,7 +206,7 @@ After sprint: credible **desktop vertical slice** + architecture story. **Not** 
 **Design litmus scorecard (0–10)**
 
 | Dimension | Score | To reach 10 |
-|-----------|-------|-------------|
+| ----------- | ------- | ------------- |
 | Hierarchy | 6 | Rank screens by revenue and frequency |
 | States | 5 | Publish state matrix v1 |
 | Journey | 6 | One storyboard PDF for hero path |
@@ -247,7 +247,7 @@ After sprint: credible **desktop vertical slice** + architecture story. **Not** 
 **ENG dual voices — consensus table**
 
 | Dimension | Claude | Codex | Consensus |
-|-----------|--------|-------|-----------|
+| ----------- | -------- | ------- | ----------- |
 | Architecture sound? | Yes with facade discipline | Questions Express | **DISAGREE** → taste |
 | Tests sufficient in plan? | Need integration | Same | **CONFIRMED** |
 | Performance risks? | IPC + SQLite | Same + packaging | **CONFIRMED** |
@@ -329,7 +329,7 @@ No implementation. Reference **external** legacy repo for parity tests.
 ### Eng — Failure modes with critical gap flags
 
 | Failure | Test? | Handling? | User-visible? | Critical? |
-|---------|-------|-----------|---------------|-----------|
+| --------- | ------- | ----------- | --------------- | ----------- |
 | SQLite BUSY | No | No | Maybe white screen | **YES** |
 | IPC parse error | No | Partial | Toast | **YES** until done |
 | Bad migration row | No | Partial | Unknown | **YES** |
@@ -359,7 +359,7 @@ No implementation. Reference **external** legacy repo for parity tests.
 ## Decision Audit Trail
 
 | # | Phase | Decision | Principle | Rationale | Rejected |
-|---|-------|----------|-----------|-----------|----------|
+| --- | ------- | ---------- | ----------- | ----------- | ---------- |
 | 1 | CEO | Keep B+A sequencing | P1 completeness | MVP gate de-risks disqualification | Breadth-first |
 | 2 | CEO | Defer strangler Access approach | P4 DRY + spec lock | Forbidden stack | — |
 | 3 | CEO | Optional competitive one-pager (T8) | P6 bias to action | Codex raised; not blocking grade | Full market research |
@@ -430,7 +430,7 @@ See file; includes state matrix, migration decision, report contract, packaging 
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
-|--------|---------|-----|------|--------|----------|
+| -------- | --------- | ----- | ------ | -------- | ---------- |
 | CEO Review | `/plan-ceo-review` | Scope and strategy | 1 | Complete | See Phase 1; Codex + primary |
 | Codex Review | `/codex review` | Independent 2nd opinion | 3 | Complete | CEO, Design, Eng prompts |
 | Eng Review | `/plan-eng-review` | Architecture and tests | 1 | Complete | Phase 3 |

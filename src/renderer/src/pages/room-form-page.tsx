@@ -185,7 +185,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
         </Button>
       </div>
 
-      <Card>
+      <Card className="border-border/80 border-l-4 border-l-primary shadow-sm">
         <CardHeader>
           <CardTitle className="font-ui text-lg">{title}</CardTitle>
           <CardDescription id={`${formId}-hint`}>

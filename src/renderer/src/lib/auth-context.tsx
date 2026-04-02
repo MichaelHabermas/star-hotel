@@ -4,10 +4,13 @@ import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
 import { DEFAULT_API_PORT } from '@shared/constants';
 import { buildApiBaseUrl } from '@shared/embedded-api-config';
 import type { StarHotelPreloadAPI } from '@shared/preload-contract';
+import type { AuthUserResponse } from '@shared/schemas/auth';
+import { authUserResponseSchema } from '@shared/schemas/auth';
 import type { JSX, ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const SESSION_KEY = 'star-hotel-session-token';
+const SESSION_USER_KEY = 'star-hotel-session-user';
 
 const FALLBACK_BRIDGE: StarHotelPreloadAPI = {
   platform: 'unknown',
@@ -32,9 +35,25 @@ function resolveStarHotelBridge(): StarHotelPreloadAPI {
   return FALLBACK_BRIDGE;
 }
 
+function readStoredUser(): AuthUserResponse | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_USER_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed = JSON.parse(raw) as unknown;
+    const r = authUserResponseSchema.safeParse(parsed);
+    return r.success ? r.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export type AuthContextValue = {
   readonly token: string | null;
-  setToken: (token: string | null) => void;
+  readonly user: AuthUserResponse | null;
+  /** Persists token; pass `user` from login response so role/username are available without an extra round-trip. */
+  setToken: (token: string | null, user?: AuthUserResponse | null) => void;
   logout: () => Promise<void>;
 };
 
@@ -50,13 +69,24 @@ export function useAuth(): AuthContextValue {
 
 export function AuthRoot({ children }: { readonly children: ReactNode }): JSX.Element {
   const [token, setTokenState] = useState<string | null>(() => sessionStorage.getItem(SESSION_KEY));
+  const [user, setUserState] = useState<AuthUserResponse | null>(() => readStoredUser());
 
-  const setToken = useCallback((t: string | null) => {
+  const setToken = useCallback((t: string | null, sessionUser?: AuthUserResponse | null) => {
     setTokenState(t);
     if (t) {
       sessionStorage.setItem(SESSION_KEY, t);
+      if (sessionUser !== undefined) {
+        setUserState(sessionUser);
+        if (sessionUser) {
+          sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(sessionUser));
+        } else {
+          sessionStorage.removeItem(SESSION_USER_KEY);
+        }
+      }
     } else {
       sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_USER_KEY);
+      setUserState(null);
     }
   }, []);
 
@@ -70,6 +100,29 @@ export function AuthRoot({ children }: { readonly children: ReactNode }): JSX.El
     [token],
   );
 
+  useEffect(() => {
+    if (!token || user) {
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { user: u } = await starHotelApp.api.auth.me();
+        if (!cancelled) {
+          setUserState(u);
+          sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(u));
+        }
+      } catch {
+        if (!cancelled) {
+          setToken(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, user, starHotelApp, setToken]);
+
   const logout = useCallback(async () => {
     try {
       await starHotelApp.api.auth.logout();
@@ -80,8 +133,8 @@ export function AuthRoot({ children }: { readonly children: ReactNode }): JSX.El
   }, [starHotelApp, setToken]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ token, setToken, logout }),
-    [token, setToken, logout],
+    () => ({ token, user, setToken, logout }),
+    [token, user, setToken, logout],
   );
 
   return (

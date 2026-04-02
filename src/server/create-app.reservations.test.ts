@@ -83,6 +83,25 @@ describe('createServerApp — reservations API', () => {
         expect(res.body.error.code).toBe('RESERVATION_OVERLAP');
       });
 
+    const other = await request(app)
+      .post('/api/reservations')
+      .send({
+        roomId,
+        guestId,
+        checkInDate: '2026-07-01',
+        checkOutDate: '2026-07-05',
+      })
+      .expect(201);
+    const otherId = other.body.id as number;
+
+    await request(app)
+      .patch(`/api/reservations/${otherId}`)
+      .send({ checkInDate: '2026-06-02', checkOutDate: '2026-06-03' })
+      .expect(409)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('RESERVATION_OVERLAP');
+      });
+
     await request(app)
       .post('/api/reservations')
       .send({ roomId: 99999, guestId, checkInDate: '2026-07-01', checkOutDate: '2026-07-02' })

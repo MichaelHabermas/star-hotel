@@ -40,7 +40,7 @@
 - Substituting Tauri/NW.js or non-mandated stack.
 - Claiming parity for behaviors neither tested nor explicitly scoped (T5, T4).
 
-### **User stories & acceptance criteria** are folded under **Epics** below (checkbox format).
+### **User stories & acceptance criteria** are folded under **Epics** below (checkbox format)
 
 ---
 
@@ -101,9 +101,9 @@ sequenceDiagram
   P-->>R: typed_result
 ```
 
-### **Integration points:** Internal REST only (no cloud API required for MVP). Post-MVP: Sentry DSN, PostHog key (env-gated; see T7 in [TODOS.md](./TODOS.md)).
+### **Integration points:** Internal REST only (no cloud API required for MVP). Post-MVP: Sentry DSN, PostHog key (env-gated; see T7 in [TODOS.md](./TODOS.md))
 
-### **Security & privacy:** `contextIsolation: true`, `nodeIntegration: false`; parameterized queries; Zod at HTTP boundary; Argon2 for `tbl_user` passwords ([PRE-SEARCH.md](./PRE-SEARCH.md)); structured logging with PII redaction policy before telemetry (T7).
+### **Security & privacy:** `contextIsolation: true`, `nodeIntegration: false`; parameterized queries; Zod at HTTP boundary; Argon2 for `tbl_user` passwords ([PRE-SEARCH.md](./PRE-SEARCH.md)); structured logging with PII redaction policy before telemetry (T7)
 
 ### **Engineering principles (non-negotiable for implementation)**
 
@@ -178,7 +178,7 @@ flowchart LR
 Use Cursor **Task** subagents (or equivalent) with **narrow prompts** and **readonly** where appropriate:
 
 | Phase | Suggested role focus | Typical subagent |
-|-------|----------------------|------------------|
+| ------- | ---------------------- | ------------------ |
 | Discovery / parity | Map legacy forms, schema, edge cases | `explore` (quick/medium) |
 | Scaffold & native modules | Shell, Vite externals, pnpm scripts | `shell` / `generalPurpose` |
 | Visual / A-B exploration | Design lab routes, token variants, side-by-side comparisons | `generalPurpose` (use **frontend-design** skill when implementing UI) |
@@ -209,7 +209,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 **MVP milestone (marked here on the timeline):** When **E3**, **E4**, **E5**, and **E6** are all checked, you are at the **single** MVP checkpoint—**complete**, **demo-able**, and **shipable** mean the same thing ([§1 — MVP milestone](#mvp-milestone-one-bar-complete--demo-able--shipable)). Anything below this line is **after** MVP.
 
 - [x] **E7** — Performance budget & observability
-- [ ] **E8** — Full parity UI (module breadth per spec)
+- [x] **E8** — Full parity UI (module breadth per spec)
 - [ ] **E9** — Reports (scope per T5)
 - [ ] **E10** — Packaging & course submission
 
@@ -433,29 +433,29 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay stable—use the order above for sequencing:
 
-- [ ] **US8.1 — Auth / session (`tbl_user`, Argon2)**  
+- [x] **US8.1 — Auth / session (`tbl_user`, Argon2)**  
   - **Feature F8.1.1:** Login flow; role surfaced for future authorization.  
-    - [ ] **T8.1.1.1:** Password hashing uses Argon2; no plaintext storage.  
+    - [x] **T8.1.1.1:** Password hashing uses Argon2; no plaintext storage.  
     - **DoD:** Legacy weak credentials migrated or reset per T4 decision.
 
-- [ ] **US8.2 — Dashboard / navigation shell**  
+- [x] **US8.2 — Dashboard / navigation shell**  
   - **Feature F8.2.1:** SPA navigation replacing VB6 hub.  
     - **DoD:** ≤100 ms perceived on route change under typical data volumes or documented.
 
-- [ ] **US8.3 — Rooms management**  
+- [x] **US8.3 — Rooms management**  
   - **Feature F8.3.1:** CRUD + status consistent with `tbl_room`.  
     - **DoD:** Matches legacy rules or gap list entry.
 
-- [ ] **US8.4 — Guests management**  
+- [x] **US8.4 — Guests management**  
   - **Feature F8.4.1:** CRUD + contact fields.  
     - **DoD:** Zod + DB constraints enforced.
 
-- [ ] **US8.5 — Reservations / check-in workflow**  
+- [x] **US8.5 — Reservations / check-in workflow**  
   - **Feature F8.5.1:** Links guest + room + dates + total.  
-    - [ ] **T8.5.1.1:** Uses extracted pricing logic (E3/E6).  
+    - [x] **T8.5.1.1:** Uses extracted pricing logic (E3/E6).  
     - **DoD:** Overlap rules covered by tests.
 
-- [ ] **US8.6 — State matrix doc (T1)**  
+- [x] **US8.6 — State matrix doc (T1)**  
   - **Feature F8.6.1:** Per-screen L/E/E/partial catalog.  
     - **DoD:** Linked from README; reviewed against UI.
 
@@ -513,7 +513,7 @@ Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay
 ## Appendix — Spec cross-reference
 
 | Topic | Source |
-|-------|--------|
+| ------- | -------- |
 | MVP gate checklist | [VB6-Hotel-App-Modernization-Project-specs.md](./VB6-Hotel-App-Modernization-Project-specs.md) §MVP Requirements |
 | Build strategy order | Same, §Build Strategy |
 | Performance table | Same, §Performance Targets |

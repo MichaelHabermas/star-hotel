@@ -116,17 +116,19 @@ export function RoomsListPage(): JSX.Element {
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-5">
+        <div className="border-l-4 border-l-primary pl-4">
           <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Rooms</h1>
-          <p className="text-muted-foreground text-sm">Inventory, rates, and status (tbl_room).</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Inventory, nightly rates, and housekeeping status (tbl_room).
+          </p>
         </div>
         <Button type="button" asChild>
           <Link to="/rooms/new">New room</Link>
         </Button>
       </div>
 
-      <Card>
+      <Card className="border-border/80 shadow-sm">
         <CardHeader>
           <CardTitle>Room list</CardTitle>
           <CardDescription>

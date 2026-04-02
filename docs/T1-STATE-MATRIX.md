@@ -1,26 +1,23 @@
 # T1 — UI state matrix (loading / empty / error / partial)
 
-Deferred item **T1** in [TODOS.md](./TODOS.md): per-screen catalog of **L**oading, **E**mpty, **E**rror, and **P**artial (stale) states.
+**Epic E8 / US8.6.** Catalog of primary screens and how they behave under async and failure conditions. **Authority:** [TODOS.md](./TODOS.md) T1; implementation routes in [App.tsx](../src/renderer/src/App.tsx).
 
-## Conventions
+**Partial** means some reference data loaded while other requests are still in flight or failed (e.g. list loads but guest/room catalog failed).
 
-- **Loading:** in-flight fetch or mutation; prefer accessible `role="status"` and `aria-live="polite"` where appropriate.
-- **Empty:** zero rows or no selectable catalog data; short copy + primary action when applicable.
-- **Error:** failed request or validation; `role="alert"`; include Retry when safe.
-- **Partial:** mixed success (e.g. list ok but reference catalog failed) — surface inline banner, don’t block unrelated data.
+| Screen / route | Loading | Empty | Error | Partial |
+| ---------------- | --------- | ------- | ------- | --------- |
+| `/login` | Sign-in button shows “Signing in…” while request runs | N/A (form always visible) | Inline alert with API message on failed login | N/A |
+| `/` (Operations hub) | Perf smoke buttons show loading while each probe runs | N/A | Perf / reservation smoke errors shown in card | N/A |
+| `/reservations` | “Loading reservations…” (`aria-live`) | “No reservations yet” + CTA | Banner with message + Retry | Catalog error banner + Retry catalog; list may still show if reservations loaded |
+| `/reservations/new`, `/reservations/:id` | “Loading reservation…” (edit) | N/A | Load error + Retry / Back; submit error under form | Catalog error for guest/room pickers + Retry |
+| `/rooms` | “Loading rooms…” | “No rooms yet” + CTA | Message + Retry | N/A |
+| `/rooms/new`, `/rooms/:id` | “Loading room…” (edit) | N/A | Load/submit errors with Retry where applicable | N/A |
+| `/guests` | “Loading guests…” | “No guests yet” + CTA | Message + Retry | N/A |
+| `/guests/new`, `/guests/:id` | “Loading guest…” (edit) | N/A | Load/submit errors with Retry where applicable | N/A |
+| App shell (all authenticated routes) | User label hidden until `GET /api/auth/me` completes if only token was restored | N/A | Failed `me()` clears session and returns user to login | Username + role shown after login or successful `me` |
 
-## Screens (Epic E8)
+**Delete dialogs:** destructive errors appear inline in the dialog (`role="alert"`); cancel remains available.
 
-| Route | Loading | Empty | Error | Partial |
-|-------|---------|-------|-------|---------|
-| `/login` | Submit disabled while posting | — | Invalid credentials message | — |
-| `/` (hub) | — | — | Perf / list smoke errors in dev card | — |
-| `/reservations` | List loading line | No reservations + link to new | List fetch error + Retry | Catalog error banner (guests/rooms) + Retry catalog |
-| `/reservations/new`, `/reservations/:id` | Load reservation (edit); catalog loading | No guests/rooms in DB | Catalog error + Retry; submit errors | — |
-| `/rooms` | List loading | No rooms + New room | List error + Retry | — |
-| `/rooms/new`, `/rooms/:id` | Load room (edit) | — | Load/submit errors | — |
-| `/guests` | List loading | No guests + New guest | List error + Retry | — |
-| `/guests/new`, `/guests/:id` | Load guest (edit) | — | Load/submit errors | — |
-| `/dev/error-test` (dev) | — | — | Intentional throw for boundary | — |
+**Dev-only routes** (`#/dev/*` when `import.meta.env.DEV`): follow the same pattern as other pages (loading/error where applicable).
 
-Review against implemented UI after material changes; link from README stays stable.
+**Review:** Revisit this matrix when adding E9 reports or new modules.

@@ -3,7 +3,7 @@
 Authoritative epic text: [PRD.md § Epic E4](./PRD.md). This matrix maps PRD user stories and tasks to implementation for sign-off.
 
 | PRD item | Requirement | Implementation |
-|----------|-------------|----------------|
+| ---------- | ------------- | ---------------- |
 | **Epic DoD** | Minimal typed preload; renderer has no Node/fs/sqlite | [`src/preload/index.ts`](../src/preload/index.ts) (`contextBridge.exposeInMainWorld`); Electron [`src/main/window.ts`](../src/main/window.ts) `nodeIntegration: false`, `contextIsolation: true` (see main bootstrap). |
 | **Epic DoD** | Bridge calls Express via fetch / structured HTTP client | [`createStarHotelApp`](../src/renderer/src/lib/star-hotel-app.ts) builds [`createReservationsHttpClient`](../src/shared/api/reservations-http-client.ts), [`createGuestsHttpClient`](../src/shared/api/guests-http-client.ts), [`createRoomsHttpClient`](../src/shared/api/rooms-http-client.ts) with `baseUrl` from preload + renderer `fetch`. |
 | **Epic DoD** | Types shared from `shared` (DRY) | Zod + clients under [`src/shared/api/`](../src/shared/api/); [`src/shared/preload-contract.ts`](../src/shared/preload-contract.ts); re-exports in [`src/shared/index.ts`](../src/shared/index.ts). |

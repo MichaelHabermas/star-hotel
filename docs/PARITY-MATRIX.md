@@ -3,9 +3,9 @@
 Authoritative legacy references: [PRE-SEARCH.md](./PRE-SEARCH.md), [ROUTE-MAP.md](./ROUTE-MAP.md), [DECISIONS.md](./DECISIONS.md) (T2, T4, T5).
 
 | Legacy (VB6 / Access) | Modern (React route / API) | Parity notes |
-|----------------------|----------------------------|--------------|
-| `frmLogin` / `tbl_user` | `/login`, `POST /api/auth/login`, Argon2 verification | Default operator `admin` / `changeme` seeded on empty DB ([seed-default-user](../src/server/dev/seed-default-user.ts)); change password flow deferred. |
-| Main / hub menu | `/` (Operations hub), shell nav | Reservations, Rooms, Guests linked; Reports placeholder until E9. |
+| ---------------------- | ---------------------------- | -------------- |
+| `frmLogin` / `tbl_user` | `/login`, `POST /api/auth/login`, Argon2 verification | Passwords verified with Argon2 only (no legacy plaintext); default operator `admin` / `changeme` seeded on empty DB per T4 clean install ([seed-default-user](../src/server/dev/seed-default-user.ts)). Session exposes **username + role** in the shell after login. |
+| Main / hub menu | `/` (Operations hub), shell nav | **Star Hotel** brand links to hub; Reservations, Rooms, Guests in header; Reports placeholder until E9. |
 | Reservation / check-in workflow | `/reservations`, `/reservations/new`, `/reservations/:id` | Full CRUD; totals via [reservation-pricing](../src/domain/reservation-pricing.ts); overlap via half-open ranges in [reservation-repository](../src/server/reservations/reservation-repository.ts). |
 | Rooms | `/rooms`, `/rooms/new`, `/rooms/:id` | CRUD + status; delete blocked when reservations reference room (`ROOM_IN_USE`). |
 | Guests | `/guests`, `/guests/new`, `/guests/:id` | CRUD; delete blocked when reservations reference guest (`GUEST_IN_USE`). |

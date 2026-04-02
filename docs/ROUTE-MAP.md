@@ -5,7 +5,7 @@ Authoritative mapping from VB6 assets (see [PRE-SEARCH.md](./PRE-SEARCH.md)) to 
 **Decisions:** [DECISIONS.md](./DECISIONS.md).
 
 | Legacy asset (typical path) | Purpose | Key logic / modules | Planned React route | Primary epic |
-|----------------------------|---------|---------------------|---------------------|--------------|
+| ---------------------------- | --------- | --------------------- | --------------------- | -------------- |
 | `Form/frmLogin.frm` (or equivalent) | Operator authentication | `tbl_user`, password upgrade (Argon2) | `/login` | E8 (US8.1) |
 | `Form/frmMain.frm` | Hub / navigation shell | Menu → form dispatch | `/` (dashboard hub) | E8 (US8.2) |
 | `Form/frmRoom.frm` (or `Room.frm`) | Room CRUD, status, rates | `tbl_room` | `/rooms`, `/rooms/:id` | E8 (US8.3); candidate **E5** MVP |

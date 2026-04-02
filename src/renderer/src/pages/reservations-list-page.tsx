@@ -156,13 +156,14 @@ export function ReservationsListPage(): JSX.Element {
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-5">
+        <div className="border-l-4 border-l-primary pl-4">
           <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">
             Reservations
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Create and manage stays — primary front-desk workflow (Epic E8).
+          <p className="text-muted-foreground mt-1 text-sm">
+            Front-desk stays: guest, room, dates, and totals — same rules as the legacy check-in
+            flow.
           </p>
         </div>
         <Button type="button" asChild>
@@ -182,7 +183,7 @@ export function ReservationsListPage(): JSX.Element {
         </div>
       ) : null}
 
-      <Card>
+      <Card className="border-border/80 shadow-sm">
         <CardHeader>
           <CardTitle>Reservation list</CardTitle>
           <CardDescription>

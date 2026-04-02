@@ -132,4 +132,52 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     await request(app).delete(`/api/rooms/${newRoomId}`).expect(204);
     await request(app).delete(`/api/guests/${newGuestId}`).expect(204);
   });
+
+  it('rejects room delete when a reservation references the room', async () => {
+    persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    await persistence.isReady();
+    const { roomId, guestId } = seedSampleData(persistence.getDatabase());
+    const app = createTestApp(persistence);
+
+    await request(app)
+      .post('/api/reservations')
+      .send({
+        roomId,
+        guestId,
+        checkInDate: '2026-08-01',
+        checkOutDate: '2026-08-03',
+      })
+      .expect(201);
+
+    await request(app)
+      .delete(`/api/rooms/${roomId}`)
+      .expect(409)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('ROOM_IN_USE');
+      });
+  });
+
+  it('rejects guest delete when a reservation references the guest', async () => {
+    persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    await persistence.isReady();
+    const { roomId, guestId } = seedSampleData(persistence.getDatabase());
+    const app = createTestApp(persistence);
+
+    await request(app)
+      .post('/api/reservations')
+      .send({
+        roomId,
+        guestId,
+        checkInDate: '2026-09-01',
+        checkOutDate: '2026-09-02',
+      })
+      .expect(201);
+
+    await request(app)
+      .delete(`/api/guests/${guestId}`)
+      .expect(409)
+      .expect((res) => {
+        expect(res.body.error.code).toBe('GUEST_IN_USE');
+      });
+  });
 });
