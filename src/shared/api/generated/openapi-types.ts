@@ -4,790 +4,929 @@
  */
 
 export interface paths {
-  '/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Liveness after SQLite is ready */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': {
-              /** @example true */
-              ok: boolean;
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liveness after SQLite is ready */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
             };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/login': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Login (Argon2 password verification) */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': {
-            username: string;
-            password: string;
-          };
-        };
-      };
-      responses: {
-        /** @description Session token */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': {
-              token: string;
-              user: {
-                id: number;
-                username: string;
-                role: string;
-              };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example true */
+                            ok: boolean;
+                        };
+                    };
+                };
             };
-          };
         };
-        /** @description Invalid credentials */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Logout (invalidate server session) */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description No content */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Current user (requires Bearer token) */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': {
-              user: {
-                id: number;
-                username: string;
-                role: string;
-              };
+        get?: never;
+        put?: never;
+        /** Login (Argon2 password verification) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
             };
-          };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        username: string;
+                        password: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Session token */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            token: string;
+                            user: {
+                                id: number;
+                                username: string;
+                                role: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Invalid credentials */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-        /** @description Not authenticated */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/guests': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout (invalidate server session) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List guests (picker) */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Guest array */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Guest'][];
-          };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        /** Current user (requires Bearer token) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            user: {
+                                id: number;
+                                username: string;
+                                role: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    /** Create guest */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['GuestCreate'];
+    "/api/guests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Guest'];
-          };
+        /** List guests (picker) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Guest array */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Guest"][];
+                    };
+                };
+            };
         };
-        /** @description Validation */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        put?: never;
+        /** Create guest */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuestCreate"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Guest"];
+                    };
+                };
+                /** @description Validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/guests/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/guests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get guest by id */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["GuestId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Guest */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Guest"];
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Delete guest (blocked when reservations reference them) */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["GuestId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                404: components["responses"]["NotFound"];
+                /** @description Guest has reservations */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update guest (partial body) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["GuestId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuestPatch"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Guest"];
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        trace?: never;
     };
-    /** Get guest by id */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['GuestId'];
+    "/api/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Guest */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Guest'];
-          };
+        /** List rooms (optional status filter) */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filter by tbl_room.Status */
+                    status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Room array */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"][];
+                    };
+                };
+            };
         };
-        404: components['responses']['NotFound'];
-      };
+        put?: never;
+        /** Create room */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RoomCreate"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"];
+                    };
+                };
+                /** @description Validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    /** Delete guest (blocked when reservations reference them) */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['GuestId'];
+    "/api/rooms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description No content */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        /** Get room by id */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["RoomId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Room */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"];
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
         };
-        404: components['responses']['NotFound'];
-        /** @description Guest has reservations */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        put?: never;
+        post?: never;
+        /** Delete room (blocked when reservations reference it) */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["RoomId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                404: components["responses"]["NotFound"];
+                /** @description Room has reservations */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        options?: never;
+        head?: never;
+        /** Update room (partial body) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["RoomId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RoomPatch"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"];
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        trace?: never;
     };
-    options?: never;
-    head?: never;
-    /** Update guest (partial body) */
-    patch: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['GuestId'];
+    "/api/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['GuestPatch'];
+        /** List reservations */
+        get: {
+            parameters: {
+                query?: {
+                    roomId?: number;
+                    guestId?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Reservation array */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Reservation"][];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Guest'];
-          };
+        put?: never;
+        /** Create reservation (total computed server-side) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReservationCreate"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Reservation"];
+                    };
+                };
+                /** @description Validation or DB constraint */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Room or guest not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Overlapping stay for same room */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-        404: components['responses']['NotFound'];
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    trace?: never;
-  };
-  '/api/rooms': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/reservations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get reservation */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["ReservationId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Reservation"];
+                    };
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Delete reservation */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["ReservationId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                404: components["responses"]["NotFound"];
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update reservation (partial body) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: components["parameters"]["ReservationId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReservationPatch"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Reservation"];
+                    };
+                };
+                /** @description Validation or DB constraint */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Overlap */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
     };
-    /** List rooms (optional status filter) */
-    get: {
-      parameters: {
-        query?: {
-          /** @description Filter by tbl_room.Status */
-          status?: string;
+    "/api/reports/folio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Room array */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Room'][];
-          };
+        /** Guest folio / receipt for one reservation */
+        get: {
+            parameters: {
+                query: {
+                    reservationId: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Folio payload for print view */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FolioReport"];
+                    };
+                };
+                /** @description Validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                404: components["responses"]["NotFound"];
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    /** Create room */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['RoomCreate'];
+    "/api/reports/day-sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Room'];
-          };
+        /** Operational day sheet (occupancy on a calendar date) */
+        get: {
+            parameters: {
+                query: {
+                    date: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Day sheet lines and occupancy counts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DaySheetReport"];
+                    };
+                };
+                /** @description Validation */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-        /** @description Validation */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/rooms/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get room by id */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['RoomId'];
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Room */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Room'];
-          };
-        };
-        404: components['responses']['NotFound'];
-      };
-    };
-    put?: never;
-    post?: never;
-    /** Delete room (blocked when reservations reference it) */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['RoomId'];
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description No content */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        404: components['responses']['NotFound'];
-        /** @description Room has reservations */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    /** Update room (partial body) */
-    patch: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['RoomId'];
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['RoomPatch'];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Room'];
-          };
-        };
-        404: components['responses']['NotFound'];
-      };
-    };
-    trace?: never;
-  };
-  '/api/reservations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List reservations */
-    get: {
-      parameters: {
-        query?: {
-          roomId?: number;
-          guestId?: number;
-        };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Reservation array */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Reservation'][];
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Create reservation (total computed server-side) */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['ReservationCreate'];
-        };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Reservation'];
-          };
-        };
-        /** @description Validation or DB constraint */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Room or guest not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Overlapping stay for same room */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/reservations/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get reservation */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['ReservationId'];
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Reservation'];
-          };
-        };
-        404: components['responses']['NotFound'];
-      };
-    };
-    put?: never;
-    post?: never;
-    /** Delete reservation */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['ReservationId'];
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description No content */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        404: components['responses']['NotFound'];
-      };
-    };
-    options?: never;
-    head?: never;
-    /** Update reservation (partial body) */
-    patch: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: components['parameters']['ReservationId'];
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['ReservationPatch'];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Reservation'];
-          };
-        };
-        /** @description Validation or DB constraint */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Overlap */
-        409: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    Guest: {
-      id: number;
-      name: string;
-      idNumber: string | null;
-      contact: string | null;
-    };
-    GuestCreate: {
-      name: string;
-      idNumber?: string | null;
-      contact?: string | null;
-    };
-    GuestPatch: {
-      name?: string;
-      idNumber?: string | null;
-      contact?: string | null;
-    };
-    Room: {
-      id: number;
-      roomType: string;
-      price: number;
-      status: string;
-    };
-    RoomCreate: {
-      roomType: string;
-      price: number;
-      status: string;
-    };
-    RoomPatch: {
-      roomType?: string;
-      price?: number;
-      status?: string;
-    };
-    Reservation: {
-      id: number;
-      roomId: number;
-      guestId: number;
-      /**
-       * Format: date
-       * @example 2026-06-01
-       */
-      checkInDate: string;
-      /**
-       * Format: date
-       * @example 2026-06-04
-       */
-      checkOutDate: string;
-      totalAmount: number;
-    };
-    ReservationCreate: {
-      roomId: number;
-      guestId: number;
-      checkInDate: string;
-      checkOutDate: string;
-    };
-    ReservationPatch: {
-      roomId?: number;
-      guestId?: number;
-      checkInDate?: string;
-      checkOutDate?: string;
-    };
-  };
-  responses: {
-    /** @description Not found */
-    NotFound: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        'application/json': {
-          error?: {
-            code?: string;
-            message?: string;
-          };
+    schemas: {
+        Guest: {
+            id: number;
+            name: string;
+            idNumber: string | null;
+            contact: string | null;
         };
-      };
+        GuestCreate: {
+            name: string;
+            idNumber?: string | null;
+            contact?: string | null;
+        };
+        GuestPatch: {
+            name?: string;
+            idNumber?: string | null;
+            contact?: string | null;
+        };
+        Room: {
+            id: number;
+            roomType: string;
+            price: number;
+            status: string;
+        };
+        RoomCreate: {
+            roomType: string;
+            price: number;
+            status: string;
+        };
+        RoomPatch: {
+            roomType?: string;
+            price?: number;
+            status?: string;
+        };
+        Reservation: {
+            id: number;
+            roomId: number;
+            guestId: number;
+            /**
+             * Format: date
+             * @example 2026-06-01
+             */
+            checkInDate: string;
+            /**
+             * Format: date
+             * @example 2026-06-04
+             */
+            checkOutDate: string;
+            totalAmount: number;
+        };
+        ReservationCreate: {
+            roomId: number;
+            guestId: number;
+            checkInDate: string;
+            checkOutDate: string;
+        };
+        ReservationPatch: {
+            roomId?: number;
+            guestId?: number;
+            checkInDate?: string;
+            checkOutDate?: string;
+        };
+        FolioReport: {
+            /** Format: date-time */
+            generatedAt: string;
+            reservation: components["schemas"]["FolioReservationDetail"];
+            guest: components["schemas"]["FolioGuest"];
+            room: components["schemas"]["FolioRoom"];
+        };
+        FolioReservationDetail: {
+            id: number;
+            roomId: number;
+            guestId: number;
+            /** Format: date */
+            checkInDate: string;
+            /** Format: date */
+            checkOutDate: string;
+            totalAmount: number;
+            nights: number;
+        };
+        FolioGuest: {
+            id: number;
+            name: string;
+            idNumber: string | null;
+            contact: string | null;
+        };
+        FolioRoom: {
+            id: number;
+            roomType: string;
+            price: number;
+            status: string;
+        };
+        DaySheetReport: {
+            /** Format: date */
+            date: string;
+            totalRooms: number;
+            occupancyCount: number;
+            occupancyRate: number;
+            lines: components["schemas"]["DaySheetLine"][];
+        };
+        DaySheetLine: {
+            reservationId: number;
+            roomId: number;
+            roomType: string;
+            guestName: string;
+            /** Format: date */
+            checkInDate: string;
+            /** Format: date */
+            checkOutDate: string;
+        };
     };
-  };
-  parameters: {
-    GuestId: number;
-    RoomId: number;
-    ReservationId: number;
-  };
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: {
+        /** @description Not found */
+        NotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    error?: {
+                        code?: string;
+                        message?: string;
+                    };
+                };
+            };
+        };
+    };
+    parameters: {
+        GuestId: number;
+        RoomId: number;
+        ReservationId: number;
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

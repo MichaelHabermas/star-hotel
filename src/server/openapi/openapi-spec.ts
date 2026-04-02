@@ -20,6 +20,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
     { name: 'guests' },
     { name: 'rooms' },
     { name: 'reservations' },
+    { name: 'reports' },
   ],
   paths: {
     '/health': {
@@ -409,6 +410,53 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
+    '/api/reports/folio': {
+      get: {
+        tags: ['reports'],
+        summary: 'Guest folio / receipt for one reservation',
+        parameters: [
+          {
+            name: 'reservationId',
+            in: 'query',
+            required: true,
+            schema: { type: 'integer', minimum: 1 },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Folio payload for print view',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/FolioReport' } },
+            },
+          },
+          '400': { description: 'Validation' },
+          '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+    },
+    '/api/reports/day-sheet': {
+      get: {
+        tags: ['reports'],
+        summary: 'Operational day sheet (occupancy on a calendar date)',
+        parameters: [
+          {
+            name: 'date',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', format: 'date', example: '2026-06-01' },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Day sheet lines and occupancy counts',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/DaySheetReport' } },
+            },
+          },
+          '400': { description: 'Validation' },
+        },
+      },
+    },
   },
   components: {
     parameters: {
@@ -521,6 +569,90 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
           guestId: { type: 'integer', minimum: 1 },
           checkInDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
           checkOutDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+        },
+      },
+      FolioReport: {
+        type: 'object',
+        required: ['generatedAt', 'reservation', 'guest', 'room'],
+        properties: {
+          generatedAt: { type: 'string', format: 'date-time' },
+          reservation: { $ref: '#/components/schemas/FolioReservationDetail' },
+          guest: { $ref: '#/components/schemas/FolioGuest' },
+          room: { $ref: '#/components/schemas/FolioRoom' },
+        },
+      },
+      FolioReservationDetail: {
+        type: 'object',
+        required: [
+          'id',
+          'roomId',
+          'guestId',
+          'checkInDate',
+          'checkOutDate',
+          'totalAmount',
+          'nights',
+        ],
+        properties: {
+          id: { type: 'integer' },
+          roomId: { type: 'integer' },
+          guestId: { type: 'integer' },
+          checkInDate: { type: 'string', format: 'date' },
+          checkOutDate: { type: 'string', format: 'date' },
+          totalAmount: { type: 'number' },
+          nights: { type: 'integer', minimum: 0 },
+        },
+      },
+      FolioGuest: {
+        type: 'object',
+        required: ['id', 'name', 'idNumber', 'contact'],
+        properties: {
+          id: { type: 'integer' },
+          name: { type: 'string' },
+          idNumber: { type: 'string', nullable: true },
+          contact: { type: 'string', nullable: true },
+        },
+      },
+      FolioRoom: {
+        type: 'object',
+        required: ['id', 'roomType', 'price', 'status'],
+        properties: {
+          id: { type: 'integer' },
+          roomType: { type: 'string' },
+          price: { type: 'number' },
+          status: { type: 'string' },
+        },
+      },
+      DaySheetReport: {
+        type: 'object',
+        required: ['date', 'totalRooms', 'occupancyCount', 'occupancyRate', 'lines'],
+        properties: {
+          date: { type: 'string', format: 'date' },
+          totalRooms: { type: 'integer', minimum: 0 },
+          occupancyCount: { type: 'integer', minimum: 0 },
+          occupancyRate: { type: 'number' },
+          lines: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/DaySheetLine' },
+          },
+        },
+      },
+      DaySheetLine: {
+        type: 'object',
+        required: [
+          'reservationId',
+          'roomId',
+          'roomType',
+          'guestName',
+          'checkInDate',
+          'checkOutDate',
+        ],
+        properties: {
+          reservationId: { type: 'integer' },
+          roomId: { type: 'integer' },
+          roomType: { type: 'string' },
+          guestName: { type: 'string' },
+          checkInDate: { type: 'string', format: 'date' },
+          checkOutDate: { type: 'string', format: 'date' },
         },
       },
     },

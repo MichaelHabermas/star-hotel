@@ -101,12 +101,17 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
-      <div className="mb-6 flex items-center gap-4">
+      <div className="mb-6 flex flex-wrap items-center gap-4">
         <Button type="button" variant="ghost" size="sm" asChild>
           <Link to="/reservations" aria-label="Back to reservations list">
             ← Reservations
           </Link>
         </Button>
+        {mode === 'edit' && editIdValid ? (
+          <Button type="button" variant="outline" size="sm" asChild>
+            <Link to={`/reports/folio/${editId}`}>Guest folio</Link>
+          </Button>
+        ) : null}
       </div>
 
       <Card className="border-border/80 border-l-4 border-l-primary shadow-sm">

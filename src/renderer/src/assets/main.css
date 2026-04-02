@@ -97,3 +97,13 @@
     font-family: var(--font-ui);
   }
 }
+
+/* E9 print views: hide app chrome when printing report routes (see data-print-report on pages). */
+@media print {
+  body:has([data-print-report]) header {
+    display: none !important;
+  }
+  body:has([data-print-report]) {
+    background: white !important;
+  }
+}

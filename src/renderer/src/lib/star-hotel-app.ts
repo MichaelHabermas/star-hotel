@@ -5,6 +5,7 @@ import {
   normalizeEmbeddedApiBaseUrl,
 } from '@shared/api/embedded-http';
 import { createGuestsHttpClient, type GuestsHttpClient } from '@shared/api/guests-http-client';
+import { createReportsHttpClient, type ReportsHttpClient } from '@shared/api/reports-http-client';
 import {
   createReservationsHttpClient,
   type ReservationsHttpClient,
@@ -29,6 +30,7 @@ export type StarHotelApp = {
     readonly reservations: ReservationsHttpClient;
     readonly guests: GuestsHttpClient;
     readonly rooms: RoomsHttpClient;
+    readonly reports: ReportsHttpClient;
   };
   /** Stable user-visible copy from API/network errors (E5+ UI patterns). */
   formatEmbeddedApiUserMessage(error: unknown): string;
@@ -95,6 +97,7 @@ export function createStarHotelApp(deps: {
     reservations: createReservationsHttpClient({ baseUrl, fetch: fetchFn }),
     guests: createGuestsHttpClient({ baseUrl, fetch: fetchFn }),
     rooms: createRoomsHttpClient({ baseUrl, fetch: fetchFn }),
+    reports: createReportsHttpClient({ baseUrl, fetch: fetchFn }),
   } as const;
 
   return {

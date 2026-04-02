@@ -1,5 +1,7 @@
 import { AppShell } from '@renderer/layout/app-shell';
 import { AuthRoot } from '@renderer/lib/auth-context';
+import { DaySheetReportPage } from '@renderer/pages/day-sheet-report-page';
+import { FolioReportPage } from '@renderer/pages/folio-report-page';
 import { GuestFormPage } from '@renderer/pages/guest-form-page';
 import { GuestsListPage } from '@renderer/pages/guests-list-page';
 import { HomePage } from '@renderer/pages/home-page';
@@ -52,6 +54,8 @@ export function App(): JSX.Element {
               <Route path="/guests" element={<GuestsListPage />} />
               <Route path="/guests/new" element={<GuestFormPage mode="create" />} />
               <Route path="/guests/:guestId" element={<GuestFormPage mode="edit" />} />
+              <Route path="/reports/folio/:reservationId" element={<FolioReportPage />} />
+              <Route path="/reports/day-sheet" element={<DaySheetReportPage />} />
               {isDevRoutesEnabled
                 ? devRouteDefinitions.map(({ path, Page }) => (
                     <Route key={path} path={path} element={<Page />} />
