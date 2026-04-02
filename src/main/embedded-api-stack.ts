@@ -2,7 +2,7 @@ import { buildApiBaseUrl, resolveApiPortFromEnv } from '@shared/embedded-api-con
 import type { App } from 'electron';
 import type http from 'node:http';
 import { resolveDatabaseFilePath } from '../server/db/database-path';
-import { createMvpSqliteApiComposition } from '../server/mvp-sqlite-api-composition';
+import { mountMvpSqliteEmbeddedApi } from '../server/mvp-sqlite-api-composition';
 import { createSqlitePersistencePort as defaultCreateSqlitePersistencePort } from '../server/persistence/sqlite-persistence';
 import type { PersistencePort } from '../server/ports/persistence';
 import { registerEmbeddedApiShutdownHandlers } from './embedded-api-shutdown';
@@ -56,7 +56,7 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
       embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
         persistence: sqlite,
         registerApiRoutes: (app) => {
-          createMvpSqliteApiComposition(sqlite).mount(app);
+          mountMvpSqliteEmbeddedApi(app, sqlite);
         },
       });
     }

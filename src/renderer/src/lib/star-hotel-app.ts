@@ -1,19 +1,16 @@
-import { createAuthHttpClient, type AuthHttpClient } from '@shared/api/auth-http-client';
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import {
   formatEmbeddedApiUserMessage as formatEmbeddedApiUserMessageShared,
   normalizeEmbeddedApiBaseUrl,
 } from '@shared/api/embedded-http';
-import { createGuestsHttpClient, type GuestsHttpClient } from '@shared/api/guests-http-client';
-import { createReportsHttpClient, type ReportsHttpClient } from '@shared/api/reports-http-client';
-import {
-  createReservationsHttpClient,
-  type ReservationsHttpClient,
-} from '@shared/api/reservations-http-client';
-import { createRoomsHttpClient, type RoomsHttpClient } from '@shared/api/rooms-http-client';
 import type { IpcChannel } from '@shared/ipc/channels';
 import { invokeIpcPing } from '@shared/ipc/typed-invoke';
 import type { StarHotelPreloadAPI } from '@shared/preload-contract';
+import {
+  createEmbeddedApiHttpClients,
+  type EmbeddedApiHttpClients,
+} from './embedded-api-http-clients';
+import type { EmbeddedApiSessionPort } from './embedded-api-session-port';
 
 /** Renderer port: preload bridge + embedded API (dependency inversion — avoid `window` in features). */
 export type StarHotelApp = {
@@ -25,13 +22,7 @@ export type StarHotelApp = {
   /** Main process IPC bridge responds (native/Electron seam). */
   pingIpc(): Promise<{ ok: true }>;
   /** Typed HTTP clients for the embedded Express API (localhost); all domain reads/writes go here. */
-  readonly api: {
-    readonly auth: AuthHttpClient;
-    readonly reservations: ReservationsHttpClient;
-    readonly guests: GuestsHttpClient;
-    readonly rooms: RoomsHttpClient;
-    readonly reports: ReportsHttpClient;
-  };
+  readonly api: EmbeddedApiHttpClients;
   /** Stable user-visible copy from API/network errors (E5+ UI patterns). */
   formatEmbeddedApiUserMessage(error: unknown): string;
 };
@@ -68,7 +59,9 @@ function wrapFetchWithOptionalBearer(
       url = input.url;
     }
     const needsBearer =
-      url.startsWith(normalized) && !url.includes('/api/auth/login') && !url.includes('/health');
+      url.startsWith(normalized) &&
+      !url.includes(EMBEDDED_API_PATHS.authLogin) &&
+      !url.includes(EMBEDDED_API_PATHS.health);
     const headers = headersForFetchMerge(input, init);
     if (needsBearer) {
       const t = getToken();
@@ -80,25 +73,19 @@ function wrapFetchWithOptionalBearer(
   };
 }
 
-export function createStarHotelApp(deps: {
-  fetch: typeof fetch;
-  starHotel: StarHotelPreloadAPI;
-  /** When set, adds `Authorization: Bearer` for embedded API calls (except login + health). */
-  getAuthToken?: () => string | null | undefined;
-}): StarHotelApp {
+export function createStarHotelApp(
+  deps: {
+    fetch: typeof fetch;
+    starHotel: StarHotelPreloadAPI;
+  } & EmbeddedApiSessionPort,
+): StarHotelApp {
   const baseUrl = deps.starHotel.apiBaseUrl;
   const rawFetch = deps.fetch;
   const fetchFn = deps.getAuthToken
     ? wrapFetchWithOptionalBearer(rawFetch, baseUrl, deps.getAuthToken)
     : rawFetch;
 
-  const api = {
-    auth: createAuthHttpClient({ baseUrl, fetch: fetchFn }),
-    reservations: createReservationsHttpClient({ baseUrl, fetch: fetchFn }),
-    guests: createGuestsHttpClient({ baseUrl, fetch: fetchFn }),
-    rooms: createRoomsHttpClient({ baseUrl, fetch: fetchFn }),
-    reports: createReportsHttpClient({ baseUrl, fetch: fetchFn }),
-  } as const;
+  const api = createEmbeddedApiHttpClients({ baseUrl, fetch: fetchFn });
 
   return {
     getEnvironment() {

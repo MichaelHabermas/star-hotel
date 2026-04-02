@@ -6,7 +6,7 @@ import {
   createSqlitePersistencePort,
   type SqlitePersistencePort,
 } from './persistence/sqlite-persistence';
-import { registerSqliteReportRoutes } from './reports/register-sqlite-report-routes';
+import { createReportRouter } from './reports/report-router';
 
 type SqliteDb = ReturnType<SqlitePersistencePort['getDatabase']>;
 
@@ -48,7 +48,7 @@ describe('createServerApp — reports API (E9)', () => {
     const app = createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
-        registerSqliteReportRoutes(expressApp, kit);
+        expressApp.use('/api/reports', createReportRouter(kit));
       },
     });
 
@@ -82,7 +82,7 @@ describe('createServerApp — reports API (E9)', () => {
     const app = createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
-        registerSqliteReportRoutes(expressApp, kit);
+        expressApp.use('/api/reports', createReportRouter(kit));
       },
     });
 

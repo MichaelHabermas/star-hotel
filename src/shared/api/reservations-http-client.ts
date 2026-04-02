@@ -10,6 +10,7 @@ import {
   type ReservationUpdateBody,
 } from '../schemas/reservation';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
+import { EMBEDDED_API_PATHS, EMBEDDED_API_PATH_TEMPLATES } from './embedded-api-paths';
 import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 export { EmbeddedApiHttpError as ReservationsHttpError } from './embedded-http';
@@ -49,14 +50,14 @@ export function createReservationsHttpClient(deps: {
   return {
     async list(query) {
       const q = listQueryParams(query);
-      const r = await client.GET('/api/reservations', {
+      const r = await client.GET(EMBEDDED_API_PATHS.reservations, {
         params: q ? { query: q } : {},
       });
       return parseOpenApiOkData(r, z.array(reservationResponseSchema));
     },
 
     async get(id) {
-      const r = await client.GET('/api/reservations/{id}', {
+      const r = await client.GET(EMBEDDED_API_PATH_TEMPLATES.reservationById, {
         params: { path: { id } },
       });
       return parseOpenApiOkData(r, reservationResponseSchema);
@@ -64,7 +65,7 @@ export function createReservationsHttpClient(deps: {
 
     async create(body) {
       const payload = reservationCreateBodySchema.parse(body);
-      const r = await client.POST('/api/reservations', {
+      const r = await client.POST(EMBEDDED_API_PATHS.reservations, {
         body: payload,
       });
       return parseOpenApiOkData(r, reservationResponseSchema);
@@ -72,7 +73,7 @@ export function createReservationsHttpClient(deps: {
 
     async update(id, body) {
       const payload = reservationUpdateBodySchema.parse(body);
-      const r = await client.PATCH('/api/reservations/{id}', {
+      const r = await client.PATCH(EMBEDDED_API_PATH_TEMPLATES.reservationById, {
         params: { path: { id } },
         body: payload,
       });
@@ -80,7 +81,7 @@ export function createReservationsHttpClient(deps: {
     },
 
     async delete(id) {
-      const r = await client.DELETE('/api/reservations/{id}', {
+      const r = await client.DELETE(EMBEDDED_API_PATH_TEMPLATES.reservationById, {
         params: { path: { id } },
       });
       assertOpenApiNoContentOrThrow(r);

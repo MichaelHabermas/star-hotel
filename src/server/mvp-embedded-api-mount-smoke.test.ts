@@ -1,0 +1,42 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
+import request from 'supertest';
+import { afterEach, beforeEach, describe, it, vi } from 'vitest';
+import { createServerApp } from './create-app';
+import { mountMvpSqliteEmbeddedApi } from './mvp-sqlite-api-composition';
+import {
+  createSqlitePersistencePort,
+  type SqlitePersistencePort,
+} from './persistence/sqlite-persistence';
+
+/**
+ * Integration smoke: same mount entry as production (`embedded-api-stack`) on an in-memory DB.
+ * Vitest sets `STAR_HOTEL_SKIP_AUTH=1` globally — stub it off here to assert real Bearer behavior.
+ */
+describe('mountMvpSqliteEmbeddedApi (smoke)', () => {
+  let persistence: SqlitePersistencePort;
+
+  beforeEach(() => {
+    vi.stubEnv('STAR_HOTEL_SKIP_AUTH', '');
+  });
+
+  afterEach(async () => {
+    vi.unstubAllEnvs();
+    await persistence.close();
+  });
+
+  it('serves health and rejects unauthenticated domain API', async () => {
+    persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    await persistence.isReady();
+
+    const app = createServerApp({
+      persistence,
+      registerApiRoutes: (expressApp) => {
+        mountMvpSqliteEmbeddedApi(expressApp, persistence);
+      },
+    });
+
+    await request(app).get(EMBEDDED_API_PATHS.health).expect(200).expect({ ok: true });
+
+    await request(app).get(EMBEDDED_API_PATHS.guests).expect(401);
+  });
+});

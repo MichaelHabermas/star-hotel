@@ -10,6 +10,7 @@ import {
   type RoomUpdateBody,
 } from '../schemas/room';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
+import { EMBEDDED_API_PATHS, EMBEDDED_API_PATH_TEMPLATES } from './embedded-api-paths';
 import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 function listQueryParams(query: RoomListQuery): { status?: string } | undefined {
@@ -37,14 +38,14 @@ export function createRoomsHttpClient(deps: {
   return {
     async list(query = {}) {
       const q = listQueryParams(query);
-      const r = await client.GET('/api/rooms', {
+      const r = await client.GET(EMBEDDED_API_PATHS.rooms, {
         params: q ? { query: q } : {},
       });
       return parseOpenApiOkData(r, z.array(roomResponseSchema));
     },
 
     async get(id) {
-      const r = await client.GET('/api/rooms/{id}', {
+      const r = await client.GET(EMBEDDED_API_PATH_TEMPLATES.roomById, {
         params: { path: { id } },
       });
       return parseOpenApiOkData(r, roomResponseSchema);
@@ -52,7 +53,7 @@ export function createRoomsHttpClient(deps: {
 
     async create(body) {
       const payload = roomCreateBodySchema.parse(body);
-      const r = await client.POST('/api/rooms', {
+      const r = await client.POST(EMBEDDED_API_PATHS.rooms, {
         body: payload,
       });
       return parseOpenApiOkData(r, roomResponseSchema);
@@ -60,7 +61,7 @@ export function createRoomsHttpClient(deps: {
 
     async update(id, body) {
       const payload = roomUpdateBodySchema.parse(body);
-      const r = await client.PATCH('/api/rooms/{id}', {
+      const r = await client.PATCH(EMBEDDED_API_PATH_TEMPLATES.roomById, {
         params: { path: { id } },
         body: payload,
       });
@@ -68,7 +69,7 @@ export function createRoomsHttpClient(deps: {
     },
 
     async delete(id) {
-      const r = await client.DELETE('/api/rooms/{id}', {
+      const r = await client.DELETE(EMBEDDED_API_PATH_TEMPLATES.roomById, {
         params: { path: { id } },
       });
       assertOpenApiNoContentOrThrow(r);

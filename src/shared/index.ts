@@ -1,3 +1,4 @@
+/** Curated barrel: shared imports for main/preload/renderer—prefer explicit `@shared/...` subpaths in new code when only one module is needed. */
 export * from './api/embedded-api-paths';
 export * from './api/embedded-http';
 export * from './api/guests-http-client';

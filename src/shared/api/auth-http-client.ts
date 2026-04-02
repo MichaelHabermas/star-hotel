@@ -6,6 +6,7 @@ import {
   type LoginResponse,
 } from '../schemas/auth';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
+import { EMBEDDED_API_PATHS } from './embedded-api-paths';
 import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 const meResponseSchema = z.object({
@@ -31,19 +32,19 @@ export function createAuthHttpClient(deps: {
   return {
     async login(body) {
       const payload = loginBodySchema.parse(body);
-      const r = await client.POST('/api/auth/login', {
+      const r = await client.POST(EMBEDDED_API_PATHS.authLogin, {
         body: payload,
       });
       return parseOpenApiOkData(r, loginResponseSchema);
     },
 
     async logout() {
-      const r = await client.POST('/api/auth/logout', {});
+      const r = await client.POST(EMBEDDED_API_PATHS.authLogout, {});
       assertOpenApiNoContentOrThrow(r);
     },
 
     async me() {
-      const r = await client.GET('/api/auth/me', {});
+      const r = await client.GET(EMBEDDED_API_PATHS.authMe, {});
       return parseOpenApiOkData(r, meResponseSchema);
     },
   };

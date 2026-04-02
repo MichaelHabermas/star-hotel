@@ -10,17 +10,33 @@ export type MvpSqliteApiComposition = {
 };
 
 /**
- * Façade for the default embedded-API path: one {@link SqliteHttpAdapterKit}, auth + domain REST.
+ * Single entry for the default embedded API domain stack (SQLite + Express).
+ *
+ * Middleware order (do not reorder without updating auth tests):
+ * 1. `registerAuthRoutes` — `/api/auth/*` (login unauthenticated; logout/me use Bearer when present)
+ * 2. `embeddedApiAuthMiddleware` — requires valid Bearer JWT for other `/api/*` routes
+ * 3. `registerMvpSqliteApiRoutes` — guests, rooms, reservations, reports
+ */
+export function mountMvpSqliteEmbeddedApi(
+  app: Express,
+  persistence: HotelSqlitePersistencePort,
+): void {
+  const kit = createSqliteHttpAdapterKit(persistence);
+  registerAuthRoutes(app, kit);
+  app.use(embeddedApiAuthMiddleware);
+  registerMvpSqliteApiRoutes(app, kit);
+}
+
+/**
+ * Façade that pairs persistence with {@link mountMvpSqliteEmbeddedApi} for call sites that
+ * hold persistence and mount later (e.g. embedded API startup).
  */
 export function createMvpSqliteApiComposition(
   persistence: HotelSqlitePersistencePort,
 ): MvpSqliteApiComposition {
   return {
     mount(app: Express): void {
-      const kit = createSqliteHttpAdapterKit(persistence);
-      registerAuthRoutes(app, kit);
-      app.use(embeddedApiAuthMiddleware);
-      registerMvpSqliteApiRoutes(app, kit);
+      mountMvpSqliteEmbeddedApi(app, persistence);
     },
   };
 }

@@ -10,6 +10,7 @@ import {
   type GuestUpdateBody,
 } from '../schemas/guest';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
+import { EMBEDDED_API_PATHS, EMBEDDED_API_PATH_TEMPLATES } from './embedded-api-paths';
 import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 export type GuestsHttpClient = {
@@ -29,12 +30,12 @@ export function createGuestsHttpClient(deps: {
   return {
     async list(query = {}) {
       guestListQuerySchema.parse(query);
-      const r = await client.GET('/api/guests', {});
+      const r = await client.GET(EMBEDDED_API_PATHS.guests, {});
       return parseOpenApiOkData(r, z.array(guestResponseSchema));
     },
 
     async get(id) {
-      const r = await client.GET('/api/guests/{id}', {
+      const r = await client.GET(EMBEDDED_API_PATH_TEMPLATES.guestById, {
         params: { path: { id } },
       });
       return parseOpenApiOkData(r, guestResponseSchema);
@@ -42,7 +43,7 @@ export function createGuestsHttpClient(deps: {
 
     async create(body) {
       const payload = guestCreateBodySchema.parse(body);
-      const r = await client.POST('/api/guests', {
+      const r = await client.POST(EMBEDDED_API_PATHS.guests, {
         body: payload,
       });
       return parseOpenApiOkData(r, guestResponseSchema);
@@ -50,7 +51,7 @@ export function createGuestsHttpClient(deps: {
 
     async update(id, body) {
       const payload = guestUpdateBodySchema.parse(body);
-      const r = await client.PATCH('/api/guests/{id}', {
+      const r = await client.PATCH(EMBEDDED_API_PATH_TEMPLATES.guestById, {
         params: { path: { id } },
         body: payload,
       });
@@ -58,7 +59,7 @@ export function createGuestsHttpClient(deps: {
     },
 
     async delete(id) {
-      const r = await client.DELETE('/api/guests/{id}', {
+      const r = await client.DELETE(EMBEDDED_API_PATH_TEMPLATES.guestById, {
         params: { path: { id } },
       });
       assertOpenApiNoContentOrThrow(r);

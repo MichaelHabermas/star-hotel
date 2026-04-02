@@ -1,6 +1,9 @@
 /**
- * Port for persisted hotel data (SQLite via better-sqlite3 in main, WAL mode).
- * Production wiring will inject a real implementation; tests use {@link noopPersistencePort}.
+ * Narrow lifecycle port: readiness + shutdown. Used anywhere that only needs to wait for the DB
+ * (IPC ping, `/health`) without touching SQL.
+ *
+ * For Express REST + repositories, use {@link HotelSqlitePersistencePort} instead — it extends
+ * this type with `getDatabase()`.
  */
 export type PersistencePort = {
   /** Resolve when the backing store is safe to read (future: migrations done). */

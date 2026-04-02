@@ -1,3 +1,4 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import { loginBodySchema } from '@shared/schemas/auth';
 import type { Express } from 'express';
 import {
@@ -46,5 +47,5 @@ export function registerAuthRoutes(app: Express, kit: SqliteHttpAdapterKit): voi
     }),
   );
 
-  app.use('/api/auth', router);
+  app.use(EMBEDDED_API_PATHS.auth, router);
 }

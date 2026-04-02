@@ -1,11 +1,14 @@
+import {
+  EMBEDDED_API_PATHS,
+  EMBEDDED_API_PATH_TEMPLATES,
+} from '../../shared/api/embedded-api-paths';
 import { getStarHotelZodOpenApiComponents } from './zod-component-registry';
 
 /**
  * OpenAPI 3 description of the loopback embedded API (see README — default port 45123).
  * Served at GET /api/openapi.json; Swagger UI at GET /api/docs.
  *
- * **`paths` keys** must match `EMBEDDED_OPENAPI_DOCUMENTED_PATHS` in `@shared/api/embedded-api-paths`
- * (see `openapi-documented-paths.test.ts`).
+ * **`paths` keys** are taken from `EMBEDDED_API_PATHS` / `EMBEDDED_API_PATH_TEMPLATES` (see `embedded-api-paths.ts`).
  *
  * DTO `components.schemas` are generated from Zod in `@shared/schemas` via `zod-component-registry.ts`.
  */
@@ -29,7 +32,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
     { name: 'reports' },
   ],
   paths: {
-    '/health': {
+    [EMBEDDED_API_PATHS.health]: {
       get: {
         tags: ['health'],
         summary: 'Liveness after SQLite is ready',
@@ -49,7 +52,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/auth/login': {
+    [EMBEDDED_API_PATHS.authLogin]: {
       post: {
         tags: ['auth'],
         summary: 'Login (Argon2 password verification)',
@@ -97,7 +100,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/auth/logout': {
+    [EMBEDDED_API_PATHS.authLogout]: {
       post: {
         tags: ['auth'],
         summary: 'Logout (invalidate server session)',
@@ -106,7 +109,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/auth/me': {
+    [EMBEDDED_API_PATHS.authMe]: {
       get: {
         tags: ['auth'],
         summary: 'Current user (requires Bearer token)',
@@ -137,7 +140,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/guests': {
+    [EMBEDDED_API_PATHS.guests]: {
       get: {
         tags: ['guests'],
         summary: 'List guests (picker)',
@@ -176,7 +179,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/guests/{id}': {
+    [EMBEDDED_API_PATH_TEMPLATES.guestById]: {
       get: {
         tags: ['guests'],
         summary: 'Get guest by id',
@@ -222,7 +225,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/rooms': {
+    [EMBEDDED_API_PATHS.rooms]: {
       get: {
         tags: ['rooms'],
         summary: 'List rooms (optional status filter)',
@@ -269,7 +272,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/rooms/{id}': {
+    [EMBEDDED_API_PATH_TEMPLATES.roomById]: {
       get: {
         tags: ['rooms'],
         summary: 'Get room by id',
@@ -315,7 +318,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/reservations': {
+    [EMBEDDED_API_PATHS.reservations]: {
       get: {
         tags: ['reservations'],
         summary: 'List reservations',
@@ -369,7 +372,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/reservations/{id}': {
+    [EMBEDDED_API_PATH_TEMPLATES.reservationById]: {
       get: {
         tags: ['reservations'],
         summary: 'Get reservation',
@@ -416,7 +419,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/reports/folio': {
+    [EMBEDDED_API_PATHS.reportsFolio]: {
       get: {
         tags: ['reports'],
         summary: 'Guest folio / receipt for one reservation',
@@ -440,7 +443,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
-    '/api/reports/day-sheet': {
+    [EMBEDDED_API_PATHS.reportsDaySheet]: {
       get: {
         tags: ['reports'],
         summary: 'Operational day sheet (occupancy on a calendar date)',
