@@ -1,4 +1,5 @@
 import type http from 'node:http'
+import { promisify } from 'node:util'
 import type { App } from 'electron'
 import type { PersistencePort } from '../server/ports/persistence'
 
@@ -25,15 +26,7 @@ export function registerEmbeddedApiShutdownHandlers(app: App, deps: EmbeddedApiS
         const serverPromise = deps.getEmbeddedApiServerPromise()
         if (serverPromise) {
           const server = await serverPromise
-          await new Promise<void>((resolve, reject) => {
-            server.close((err) => {
-              if (err) {
-                reject(err)
-              } else {
-                resolve()
-              }
-            })
-          })
+          await promisify(server.close.bind(server))()
         }
         const persistence = deps.getPersistence()
         if (persistence) {

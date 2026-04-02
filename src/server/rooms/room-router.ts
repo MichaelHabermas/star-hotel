@@ -12,27 +12,19 @@ export function createRoomRouter(kit: SqliteHttpAdapterKit): Router {
 
   router.get(
     '/',
-    kit.asyncHandler(async (req, res, next) => {
-      try {
-        const q = roomListQuerySchema.parse(req.query)
-        const svc = await getRoomService()
-        res.status(200).json(svc.list(q))
-      } catch (err) {
-        next(err)
-      }
+    kit.asyncHandler(async (req, res) => {
+      const q = roomListQuerySchema.parse(req.query)
+      const svc = await getRoomService()
+      res.status(200).json(svc.list(q))
     }),
   )
 
   router.get(
     '/:id',
-    kit.asyncHandler(async (req, res, next) => {
-      try {
-        const { id } = roomIdParamsSchema.parse(req.params)
-        const svc = await getRoomService()
-        res.status(200).json(svc.get(id))
-      } catch (err) {
-        next(err)
-      }
+    kit.asyncHandler(async (req, res) => {
+      const { id } = roomIdParamsSchema.parse(req.params)
+      const svc = await getRoomService()
+      res.status(200).json(svc.get(id))
     }),
   )
 

@@ -23,13 +23,13 @@ export function mapUnknownErrorToHttpPayload(err: unknown): MappedHttpError {
     }
   }
   if (isHttpMappableError(err)) {
-    return {
-      kind: 'response',
+    const base = {
+      kind: 'response' as const,
       status: err.httpStatus,
       code: err.errorCode,
       message: err.message,
-      ...(err.details !== undefined ? { details: err.details } : {}),
     }
+    return err.details === undefined ? base : { ...base, details: err.details }
   }
   return { kind: 'unhandled', cause: err }
 }

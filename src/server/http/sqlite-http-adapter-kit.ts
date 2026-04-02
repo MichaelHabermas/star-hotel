@@ -22,13 +22,8 @@ export function createSqliteHttpAdapterKit(persistence: HotelSqlitePersistencePo
     }
   }
 
-  const ensurePersistenceReady: RequestHandler = async (_req, _res, next) => {
-    try {
-      await persistence.isReady()
-      next()
-    } catch (err) {
-      next(err)
-    }
+  const ensurePersistenceReady: RequestHandler = (_req, _res, next) => {
+    void persistence.isReady().then(() => next(), next)
   }
 
   function createLazySqliteService<T>(factory: (db: SqliteDb) => T): () => Promise<T> {

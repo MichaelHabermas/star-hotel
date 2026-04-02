@@ -1,6 +1,4 @@
 import { z } from 'zod'
-import { throwIfOpenApiError } from './embedded-http'
-import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
 import {
   reservationCreateBodySchema,
   reservationListQuerySchema,
@@ -11,12 +9,19 @@ import {
   type ReservationResponse,
   type ReservationUpdateBody,
 } from '../schemas/reservation'
+import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
+import { throwIfOpenApiError } from './embedded-http'
 
 export { EmbeddedApiHttpError as ReservationsHttpError } from './embedded-http'
 export type { EmbeddedApiErrorBody as ApiErrorBody } from './embedded-http'
 
-function listQueryParams(query: ReservationListQuery): { roomId?: number; guestId?: number } {
+function listQueryParams(
+  query: ReservationListQuery,
+): { roomId?: number; guestId?: number } | undefined {
   const parsed = reservationListQuerySchema.parse(query)
+  if (parsed.roomId === undefined && parsed.guestId === undefined) {
+    return undefined
+  }
   const out: { roomId?: number; guestId?: number } = {}
   if (parsed.roomId !== undefined) {
     out.roomId = parsed.roomId
@@ -45,7 +50,7 @@ export function createReservationsHttpClient(deps: {
     async list(query) {
       const q = listQueryParams(query)
       const r = await client.GET('/api/reservations', {
-        params: Object.keys(q).length > 0 ? { query: q } : {},
+        params: q ? { query: q } : {},
       })
       throwIfOpenApiError(r)
       return z.array(reservationResponseSchema).parse(r.data)

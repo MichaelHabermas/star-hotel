@@ -7,6 +7,8 @@ type SqliteDatabase = InstanceType<typeof DatabaseType>
 /** Target count for unpackaged dev seed (plan: 30–50, fixed for deterministic tests). */
 export const DEV_FAKE_RESERVATION_COUNT = 40
 
+const SEED_GUEST_ROW_COUNT = 45
+
 const ANCHOR_CHECK_IN = '2025-06-01'
 const SEED_ROOM_ROWS: readonly { type: string; price: number; status: string }[] = [
   { type: 'Standard', price: 99, status: 'Available' },
@@ -117,12 +119,11 @@ function ensureSeedGuests(db: SqliteDatabase): void {
   if (Number(row.c) > 0) {
     return
   }
-  const guestCount = 45
   const ins = db.prepare(
     'INSERT INTO tbl_guest (Name, ID_Number, Contact) VALUES (@name, @id, @contact)',
   )
   const run = db.transaction(() => {
-    for (let i = 0; i < guestCount; i += 1) {
+    for (let i = 0; i < SEED_GUEST_ROW_COUNT; i += 1) {
       const fn = FIRST_NAMES[i % FIRST_NAMES.length]
       const ln = LAST_NAMES[Math.floor(i / FIRST_NAMES.length) % LAST_NAMES.length]
       const name = `${fn} ${ln} ${i + 1}`
