@@ -1,21 +1,19 @@
 import { z } from 'zod'
-import { EMBEDDED_API_PATHS } from './embedded-api-paths'
-import { normalizeEmbeddedApiBaseUrl, parseEmbeddedJsonOk } from './embedded-http'
 import {
   roomListQuerySchema,
   roomResponseSchema,
   type RoomListQuery,
   type RoomResponse,
 } from '../schemas/room'
+import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
+import { throwIfOpenApiError } from './embedded-http'
 
-function listQueryString(query: RoomListQuery): string {
+function listQueryParams(query: RoomListQuery): { status?: string } | undefined {
   const parsed = roomListQuerySchema.parse(query)
-  const p = new URLSearchParams()
-  if (parsed.status !== undefined) {
-    p.set('status', parsed.status)
+  if (parsed.status === undefined) {
+    return undefined
   }
-  const s = p.toString()
-  return s === '' ? '' : `?${s}`
+  return { status: parsed.status }
 }
 
 export type RoomsHttpClient = {
@@ -27,19 +25,24 @@ export function createRoomsHttpClient(deps: {
   readonly baseUrl: string
   readonly fetch: typeof fetch
 }): RoomsHttpClient {
-  const base = normalizeEmbeddedApiBaseUrl(deps.baseUrl)
-  const { fetch: fetchFn } = deps
+  const client = createEmbeddedOpenApiClient(deps)
 
   return {
     async list(query = {}) {
-      const qs = listQueryString(query)
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.rooms}${qs}`)
-      return parseEmbeddedJsonOk(res, z.array(roomResponseSchema))
+      const q = listQueryParams(query)
+      const r = await client.GET('/api/rooms', {
+        params: q ? { query: q } : {},
+      })
+      throwIfOpenApiError(r)
+      return z.array(roomResponseSchema).parse(r.data)
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.roomById(id)}`)
-      return parseEmbeddedJsonOk(res, roomResponseSchema)
+      const r = await client.GET('/api/rooms/{id}', {
+        params: { path: { id } },
+      })
+      throwIfOpenApiError(r)
+      return roomResponseSchema.parse(r.data)
     },
   }
 }

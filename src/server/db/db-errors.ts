@@ -8,6 +8,8 @@ export type DbConstraintKind = 'FOREIGN_KEY' | 'UNIQUE' | 'CHECK' | 'NOT_NULL' |
 export class DbConstraintError extends Error {
   readonly kind: DbConstraintKind
   readonly sqliteCode: string | undefined
+  readonly httpStatus = 400 as const
+  readonly errorCode = 'DB_CONSTRAINT' as const
 
   constructor(
     message: string,
@@ -22,6 +24,10 @@ export class DbConstraintError extends Error {
     if (cause !== undefined) {
       ;(this as Error & { cause?: unknown }).cause = cause
     }
+  }
+
+  get details(): unknown {
+    return { kind: this.kind }
   }
 }
 

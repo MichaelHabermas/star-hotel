@@ -6,8 +6,8 @@ export type StarHotelMainDeps = {
   readonly app: Pick<App, 'whenReady' | 'quit'>
   readonly appStartMs: number
   readonly apiBaseUrl: string
-  readonly ensureEmbeddedApiServer: () => Promise<http.Server>
-  readonly registerIpcHandlers: () => void
+  /** Starts embedded Express + SQLite and registers IPC (idempotent). */
+  readonly ensureEmbeddedApiAndIpc: () => Promise<http.Server>
   readonly registerWindowAllClosed: () => void
   readonly registerActivateHandler: (createWindow: () => void) => void
   readonly createMainWindow: (deps: MainWindowDeps) => unknown
@@ -16,7 +16,7 @@ export type StarHotelMainDeps = {
 }
 
 /**
- * Main-process startup: embedded API, IPC, first window, then macOS activate handler.
+ * Main-process startup: embedded API + IPC, first window, then macOS activate handler.
  * Dependencies are injected for unit tests.
  */
 export async function startStarHotelMain(d: StarHotelMainDeps): Promise<void> {
@@ -28,7 +28,7 @@ export async function startStarHotelMain(d: StarHotelMainDeps): Promise<void> {
   d.logger.log(`[star-hotel] app.whenReady() + ${readyMs}ms from process start (see docs/PERF.md)`)
 
   try {
-    await d.ensureEmbeddedApiServer()
+    await d.ensureEmbeddedApiAndIpc()
     d.logger.log(`[star-hotel] API ${d.apiBaseUrl} (see docs/PERF.md)`)
     d.logger.log(`[star-hotel] Swagger UI ${d.apiBaseUrl}/api/docs`)
   } catch (err) {
@@ -36,8 +36,6 @@ export async function startStarHotelMain(d: StarHotelMainDeps): Promise<void> {
     d.app.quit()
     return
   }
-
-  d.registerIpcHandlers()
 
   d.createMainWindow(d.mainWindowParams())
 

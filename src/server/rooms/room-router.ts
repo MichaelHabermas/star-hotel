@@ -2,8 +2,8 @@ import { roomIdParamsSchema, roomListQuerySchema } from '@shared/schemas/room'
 import type { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
-import { RoomNotFoundError } from '../reservations/reservation-errors'
 import { RoomRepository } from './room-repository'
+import { RoomService } from './room-service'
 
 function asyncHandler(
   fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
@@ -13,21 +13,23 @@ function asyncHandler(
   }
 }
 
-function rowToJson(row: { RoomID: number; RoomType: string; Price: number; Status: string }) {
-  return {
-    id: row.RoomID,
-    roomType: row.RoomType,
-    price: row.Price,
-    status: row.Status,
-  }
-}
-
 export function createRoomRouter(persistence: HotelSqlitePersistencePort): Router {
   const router = Router()
 
-  router.use(async (req, res, next) => {
+  let serviceInit: Promise<RoomService> | null = null
+  function getRoomService(): Promise<RoomService> {
+    if (!serviceInit) {
+      serviceInit = (async () => {
+        await persistence.isReady()
+        return new RoomService(new RoomRepository(persistence.getDatabase()))
+      })()
+    }
+    return serviceInit
+  }
+
+  router.use(async (_req, _res, next) => {
     try {
-      await persistence.isReady()
+      await getRoomService()
       next()
     } catch (err) {
       next(err)
@@ -39,8 +41,8 @@ export function createRoomRouter(persistence: HotelSqlitePersistencePort): Route
     asyncHandler(async (req, res, next) => {
       try {
         const q = roomListQuerySchema.parse(req.query)
-        const repo = new RoomRepository(persistence.getDatabase())
-        res.status(200).json(repo.list(q).map(rowToJson))
+        const svc = await getRoomService()
+        res.status(200).json(svc.list(q))
       } catch (err) {
         next(err)
       }
@@ -52,12 +54,8 @@ export function createRoomRouter(persistence: HotelSqlitePersistencePort): Route
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = roomIdParamsSchema.parse(req.params)
-        const repo = new RoomRepository(persistence.getDatabase())
-        const row = repo.getById(id)
-        if (row === undefined) {
-          throw new RoomNotFoundError(id)
-        }
-        res.status(200).json(rowToJson(row))
+        const svc = await getRoomService()
+        res.status(200).json(svc.get(id))
       } catch (err) {
         next(err)
       }

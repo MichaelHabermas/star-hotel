@@ -16,6 +16,7 @@ configureAppMenu(isDev)
 const stack = createEmbeddedApiStack({
   getUserDataPath: () => app.getPath('userData'),
   env: process.env,
+  seedDevData: isDev,
 })
 
 stack.registerShutdownHandlers(app)
@@ -38,8 +39,7 @@ void startStarHotelMain({
   app,
   appStartMs,
   apiBaseUrl: stack.apiBaseUrl,
-  ensureEmbeddedApiServer: stack.ensureEmbeddedApiServer,
-  registerIpcHandlers: stack.registerIpcHandlers,
+  ensureEmbeddedApiAndIpc: stack.ensureEmbeddedApiAndIpc,
   registerWindowAllClosed,
   registerActivateHandler,
   createMainWindow,

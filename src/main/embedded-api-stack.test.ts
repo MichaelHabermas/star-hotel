@@ -12,16 +12,7 @@ describe('createEmbeddedApiStack', () => {
     vi.clearAllMocks()
   })
 
-  it('throws when registerIpcHandlers runs before ensureEmbeddedApiServer', () => {
-    const stack = createEmbeddedApiStack({
-      getUserDataPath: () => '/tmp',
-      env: { STAR_HOTEL_API_PORT: '45123' },
-    })
-
-    expect(() => stack.registerIpcHandlers()).toThrow(/IPC registered before embedded API started/)
-  })
-
-  it('calls injected persistence and server factories once; IPC receives persistence', async () => {
+  it('ensureEmbeddedApiAndIpc calls injected persistence and server once; IPC receives persistence', async () => {
     const persistenceClose = vi.fn(async () => {})
     const fakePersistence = {
       isReady: async () => {},
@@ -41,13 +32,13 @@ describe('createEmbeddedApiStack', () => {
 
     const stack = createEmbeddedApiStack({
       getUserDataPath: () => '/fake/user/Data',
-      env: { STAR_HOTEL_API_PORT: '45123' },
+      env: { STAR_HOTEL_PORT: '45123' },
       createSqlitePersistencePort: createPersistence,
       startEmbeddedApiServer: startServer,
     })
 
-    await stack.ensureEmbeddedApiServer()
-    await stack.ensureEmbeddedApiServer()
+    await stack.ensureEmbeddedApiAndIpc()
+    await stack.ensureEmbeddedApiAndIpc()
 
     expect(createPersistence).toHaveBeenCalledTimes(1)
     expect(createPersistence).toHaveBeenCalledWith({
@@ -55,7 +46,7 @@ describe('createEmbeddedApiStack', () => {
     })
     expect(startServer).toHaveBeenCalledTimes(1)
 
-    stack.registerIpcHandlers()
+    expect(registerIpcHandlers).toHaveBeenCalledTimes(1)
     expect(registerIpcHandlers).toHaveBeenCalledWith({
       getPersistence: expect.any(Function),
     })
@@ -83,12 +74,12 @@ describe('createEmbeddedApiStack', () => {
 
     const stack = createEmbeddedApiStack({
       getUserDataPath: () => '/fake/user/Data',
-      env: { STAR_HOTEL_API_PORT: '45123' },
+      env: { STAR_HOTEL_PORT: '45123' },
       createSqlitePersistencePort: createPersistence,
       startEmbeddedApiServer: startServer,
     })
 
-    await stack.ensureEmbeddedApiServer()
+    await stack.ensureEmbeddedApiAndIpc()
 
     let beforeQuit: ((e: { preventDefault: () => void }) => void) | undefined
     const mockApp = {

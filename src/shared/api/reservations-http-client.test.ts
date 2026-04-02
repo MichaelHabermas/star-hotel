@@ -2,6 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { EmbeddedApiHttpError } from './embedded-http'
 import { createReservationsHttpClient } from './reservations-http-client'
 
+function requestUrl(input: RequestInfo | URL): string {
+  return input instanceof Request ? input.url : String(input)
+}
+
 function jsonResponse(data: unknown, init?: ResponseInit): Response {
   return new Response(JSON.stringify(data), {
     status: init?.status ?? 200,
@@ -11,8 +15,8 @@ function jsonResponse(data: unknown, init?: ResponseInit): Response {
 
 describe('createReservationsHttpClient', () => {
   it('lists reservations with query string', async () => {
-    const fetchMock = vi.fn(async (url: string | URL) => {
-      expect(String(url)).toBe('http://127.0.0.1:1/api/reservations?roomId=2')
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/reservations?roomId=2')
       return jsonResponse([
         {
           id: 1,
@@ -70,9 +74,11 @@ describe('createReservationsHttpClient', () => {
       fetch: fetchMock as typeof fetch,
     })
     await expect(client.delete(1)).resolves.toBeUndefined()
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://127.0.0.1:1/api/reservations/1',
-      expect.objectContaining({ method: 'DELETE' }),
-    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const calls = fetchMock.mock.calls as unknown as [[Request]]
+    const req = calls[0][0]
+    expect(req).toBeInstanceOf(Request)
+    expect(req.url).toBe('http://127.0.0.1:1/api/reservations/1')
+    expect(req.method).toBe('DELETE')
   })
 })

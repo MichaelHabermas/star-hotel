@@ -1,17 +1,12 @@
 import { z } from 'zod'
-import { EMBEDDED_API_PATHS } from './embedded-api-paths'
-import { normalizeEmbeddedApiBaseUrl, parseEmbeddedJsonOk } from './embedded-http'
 import {
   guestListQuerySchema,
   guestResponseSchema,
   type GuestListQuery,
   type GuestResponse,
 } from '../schemas/guest'
-
-function listQueryString(query: GuestListQuery): string {
-  guestListQuerySchema.parse(query)
-  return ''
-}
+import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
+import { throwIfOpenApiError } from './embedded-http'
 
 export type GuestsHttpClient = {
   list(query?: GuestListQuery): Promise<GuestResponse[]>
@@ -22,19 +17,22 @@ export function createGuestsHttpClient(deps: {
   readonly baseUrl: string
   readonly fetch: typeof fetch
 }): GuestsHttpClient {
-  const base = normalizeEmbeddedApiBaseUrl(deps.baseUrl)
-  const { fetch: fetchFn } = deps
+  const client = createEmbeddedOpenApiClient(deps)
 
   return {
     async list(query = {}) {
-      const qs = listQueryString(query)
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.guests}${qs}`)
-      return parseEmbeddedJsonOk(res, z.array(guestResponseSchema))
+      guestListQuerySchema.parse(query)
+      const r = await client.GET('/api/guests', {})
+      throwIfOpenApiError(r)
+      return z.array(guestResponseSchema).parse(r.data)
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.guestById(id)}`)
-      return parseEmbeddedJsonOk(res, guestResponseSchema)
+      const r = await client.GET('/api/guests/{id}', {
+        params: { path: { id } },
+      })
+      throwIfOpenApiError(r)
+      return guestResponseSchema.parse(r.data)
     },
   }
 }

@@ -73,7 +73,10 @@ describe('createStarHotelApp', () => {
     })
     expect(app.api.reservations).toBeDefined()
     await app.api.reservations.list({})
-    expect(fetchMock).toHaveBeenCalledWith(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`)
+    expect(fetchMock).toHaveBeenCalled()
+    const [req] = fetchMock.mock.calls[0]
+    expect(req).toBeInstanceOf(Request)
+    expect((req as Request).url).toBe(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`)
   })
 
   it('formatEmbeddedApiUserMessage delegates to shared helper', () => {

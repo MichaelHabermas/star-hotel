@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createGuestsHttpClient } from './guests-http-client'
 
+function requestUrl(input: RequestInfo | URL): string {
+  return input instanceof Request ? input.url : String(input)
+}
+
 function jsonResponse(data: unknown, init?: ResponseInit): Response {
   return new Response(JSON.stringify(data), {
     status: init?.status ?? 200,
@@ -10,8 +14,8 @@ function jsonResponse(data: unknown, init?: ResponseInit): Response {
 
 describe('createGuestsHttpClient', () => {
   it('lists guests', async () => {
-    const fetchMock = vi.fn(async (url: string | URL) => {
-      expect(String(url)).toBe('http://127.0.0.1:1/api/guests')
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/guests')
       return jsonResponse([
         { id: 1, name: 'Ada', idNumber: null, contact: null },
       ])
@@ -28,8 +32,8 @@ describe('createGuestsHttpClient', () => {
   })
 
   it('gets guest by id', async () => {
-    const fetchMock = vi.fn(async (url: string | URL) => {
-      expect(String(url)).toBe('http://127.0.0.1:1/api/guests/2')
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/guests/2')
       return jsonResponse({ id: 2, name: 'Bob', idNumber: 'X', contact: 'c@x' })
     })
 

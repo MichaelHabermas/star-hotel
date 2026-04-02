@@ -1,11 +1,17 @@
 /**
  * Pure pricing helpers for reservations (legacy: modLogic.bas / PRE-SEARCH).
  * Totals use night count × room nightly rate; dates are ISO 8601 calendar dates (YYYY-MM-DD).
+ *
+ * **Partial-day / hourly billing:** Not in this module. PRE-SEARCH flags “partial days or early check-outs”
+ * for legacy; MVP uses **calendar nights** only (see `docs/E5-FORM-PARITY-MAP.md` — Domain pricing).
  */
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/
 
 export class InvalidIsoDateError extends Error {
+  readonly httpStatus = 400 as const
+  readonly errorCode = 'INVALID_DATE' as const
+
   constructor(message: string) {
     super(message)
     this.name = 'InvalidIsoDateError'

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { startStarHotelMain } from './bootstrap'
 
 describe('startStarHotelMain', () => {
-  it('runs embedded API, then IPC registration, then first window', async () => {
+  it('runs embedded API + IPC, then first window', async () => {
     const order: string[] = []
 
     const registerWindowAllClosed = vi.fn(() => {
@@ -17,13 +17,9 @@ describe('startStarHotelMain', () => {
       quit: vi.fn(),
     }
 
-    const ensureEmbeddedApiServer = vi.fn(async () => {
-      order.push('api')
+    const ensureEmbeddedApiAndIpc = vi.fn(async () => {
+      order.push('apiAndIpc')
       return {} as http.Server
-    })
-
-    const registerIpcHandlers = vi.fn(() => {
-      order.push('ipc')
     })
 
     const createMainWindow = vi.fn(() => {
@@ -38,8 +34,7 @@ describe('startStarHotelMain', () => {
       app,
       appStartMs: Date.now(),
       apiBaseUrl: 'http://127.0.0.1:45123',
-      ensureEmbeddedApiServer,
-      registerIpcHandlers,
+      ensureEmbeddedApiAndIpc,
       registerWindowAllClosed,
       registerActivateHandler,
       createMainWindow,
@@ -51,12 +46,12 @@ describe('startStarHotelMain', () => {
       logger: { log: vi.fn(), error: vi.fn() },
     })
 
-    expect(order).toEqual(['windowAllClosed', 'api', 'ipc', 'window', 'activate'])
+    expect(order).toEqual(['windowAllClosed', 'apiAndIpc', 'window', 'activate'])
     expect(whenReady).toHaveBeenCalledTimes(1)
+    expect(ensureEmbeddedApiAndIpc).toHaveBeenCalledTimes(1)
   })
 
-  it('quits and skips IPC when embedded API fails', async () => {
-    const registerIpcHandlers = vi.fn()
+  it('quits and skips window when embedded API fails', async () => {
     const createMainWindow = vi.fn()
     const quit = vi.fn()
 
@@ -67,10 +62,9 @@ describe('startStarHotelMain', () => {
       },
       appStartMs: Date.now(),
       apiBaseUrl: 'http://127.0.0.1:45123',
-      ensureEmbeddedApiServer: vi.fn(async () => {
+      ensureEmbeddedApiAndIpc: vi.fn(async () => {
         throw new Error('bind failed')
       }),
-      registerIpcHandlers,
       registerWindowAllClosed: vi.fn(),
       registerActivateHandler: vi.fn(),
       createMainWindow,
@@ -83,7 +77,6 @@ describe('startStarHotelMain', () => {
     })
 
     expect(quit).toHaveBeenCalledTimes(1)
-    expect(registerIpcHandlers).not.toHaveBeenCalled()
     expect(createMainWindow).not.toHaveBeenCalled()
   })
 })

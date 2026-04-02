@@ -11,6 +11,8 @@ import { registerIpcHandlers as registerIpcHandlersImpl } from './ipc-handlers'
 export type CreateEmbeddedApiStackOptions = {
   readonly getUserDataPath: () => string
   readonly env: NodeJS.ProcessEnv
+  /** Unpackaged dev: seed fake reservations when the DB has none. */
+  readonly seedDevData?: boolean
   /** Defaults to production SQLite adapter; inject for tests. */
   readonly createSqlitePersistencePort?: typeof defaultCreateSqlitePersistencePort
   /** Defaults to real HTTP listener; inject to avoid binding ports in tests. */
@@ -20,8 +22,11 @@ export type CreateEmbeddedApiStackOptions = {
 export type EmbeddedApiStack = {
   readonly apiPort: number
   readonly apiBaseUrl: string
-  ensureEmbeddedApiServer(): Promise<http.Server>
-  registerIpcHandlers(): void
+  /**
+   * Starts the embedded Express + SQLite stack (once) and registers IPC handlers (once).
+   * Safe to call multiple times; subsequent calls return the same server promise.
+   */
+  ensureEmbeddedApiAndIpc(): Promise<http.Server>
   registerShutdownHandlers(app: App): void
 }
 
@@ -37,12 +42,16 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
 
   let persistence: PersistencePort | null = null
   let embeddedApiServerPromise: Promise<http.Server> | null = null
+  let ipcRegistered = false
   let shutdownStarted = false
 
   function ensureEmbeddedApiServer(): Promise<http.Server> {
     if (!embeddedApiServerPromise) {
       const dbFilePath = resolveDatabaseFilePath(options.getUserDataPath())
-      const sqlite = createSqlitePersistencePort({ dbFilePath })
+      const sqlite = createSqlitePersistencePort({
+        dbFilePath,
+        ...(options.seedDevData ? { seedDevData: true } : {}),
+      })
       persistence = sqlite
       embeddedApiServerPromise = startEmbeddedApiServer(apiPort, {
         persistence: sqlite,
@@ -54,14 +63,24 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
     return embeddedApiServerPromise
   }
 
-  function registerIpcHandlers(): void {
+  function registerIpcOnce(): void {
+    if (ipcRegistered) {
+      return
+    }
     if (!persistence) {
       throw new Error('[star-hotel] IPC registered before embedded API started')
     }
+    ipcRegistered = true
     const activePersistence = persistence
     registerIpcHandlersImpl({
       getPersistence: () => activePersistence,
     })
+  }
+
+  async function ensureEmbeddedApiAndIpc(): Promise<http.Server> {
+    const server = await ensureEmbeddedApiServer()
+    registerIpcOnce()
+    return server
   }
 
   function registerShutdownHandlers(app: App): void {
@@ -100,8 +119,7 @@ export function createEmbeddedApiStack(options: CreateEmbeddedApiStackOptions): 
   return {
     apiPort,
     apiBaseUrl,
-    ensureEmbeddedApiServer,
-    registerIpcHandlers,
+    ensureEmbeddedApiAndIpc,
     registerShutdownHandlers,
   }
 }

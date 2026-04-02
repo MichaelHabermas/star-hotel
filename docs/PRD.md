@@ -204,7 +204,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [x] **E3** — Backend API (Express in main)
 - [x] **E4** — IPC contract (preload / contextBridge)
 - [x] **E5** — MVP form + full CRUD path
-- [ ] **E6** — Testing & quality gates
+- [x] **E6** — Testing & quality gates
 
 **MVP milestone (marked here on the timeline):** When **E3**, **E4**, **E5**, and **E6** are all checked, you are at the **single** MVP checkpoint—**complete**, **demo-able**, and **shipable** mean the same thing ([§1 — MVP milestone](#mvp-milestone-one-bar-complete--demo-able--shipable)). Anything below this line is **after** MVP.
 
@@ -378,21 +378,21 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD:** ≥5 Vitest tests on **extracted** business logic (MVP); RTL coverage on critical MVP component(s); ESLint + Prettier pass in CI or pre-commit; roadmap toward spec evaluation **50-case** matrix documented (happy / edge / concurrency).
 
-- [ ] **US6.1 — Business logic unit tests**  
+- [x] **US6.1 — Business logic unit tests**  
   - **Feature F6.1.1:** Rate calculation, date boundaries, totals.  
-    - [ ] **T6.1.1.1:** Cases: leap years, zero-night edge, partial stay if in legacy.  
-    - [ ] **DoD:** ≥5 tests green; each maps to a named legacy behavior or explicit gap.
+    - [x] **T6.1.1.1:** Cases: leap years, zero-night edge, partial stay if in legacy.  
+    - [x] **DoD:** ≥5 tests green; each maps to a named legacy behavior or explicit gap.
 
-- [ ] **US6.2 — Component tests**  
+- [x] **US6.2 — Component tests**  
   - **Feature F6.2.1:** MVP form validation and submit flow.  
-    - [ ] **T6.2.1.1:** Error states asserted with RTL.  
+    - [x] **T6.2.1.1:** Error states asserted with RTL.  
     - **DoD:** `pnpm test` passes in clean checkout.
 
-- [ ] **US6.3 — IPC / integration (stretch)**  
+- [x] **US6.3 — IPC / integration (stretch)**  
   - **Feature F6.3.1:** Supertest against Express or electron-mock harness.  
     - **DoD:** If not implemented, document reason and substitute with manual test script until E10.
 
-- [ ] **US6.4 — Golden / migration verification (T3, blocked on T4)**  
+- [x] **US6.4 — Golden / migration verification (T3, blocked on T4)**  
   - **Feature F6.4.1:** If import path: diff legacy export vs SQLite invariants.  
     - **DoD:** T4 decision = clean slate → mark N/A with rationale.
 

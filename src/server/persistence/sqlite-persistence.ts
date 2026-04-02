@@ -1,10 +1,13 @@
 import Database from 'better-sqlite3'
 import { runMigrations } from '../db/run-migrations'
+import { seedDevReservationsIfNeeded } from '../dev/seed-dev-reservations'
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
 import type { PersistencePort } from '../ports/persistence'
 
 export type SqlitePersistenceOptions = {
   readonly dbFilePath: string
+  /** When true (unpackaged Electron), seed fake reservations if DB has none. */
+  readonly seedDevData?: boolean
 }
 
 type SqliteDatabase = InstanceType<typeof Database>
@@ -34,6 +37,9 @@ export function createSqlitePersistencePort(
       database.pragma('journal_mode = WAL')
       database.pragma('foreign_keys = ON')
       runMigrations(database)
+      if (options.seedDevData) {
+        seedDevReservationsIfNeeded(database)
+      }
       db = database
     },
     async close() {

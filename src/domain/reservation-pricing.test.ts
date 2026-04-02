@@ -1,3 +1,7 @@
+/**
+ * Maps to legacy `modLogic.bas` / `DateDiff("d", CheckIn, CheckOut) * Price` (see `docs/E5-FORM-PARITY-MAP.md`).
+ * Each case names a legacy behavior or an explicit MVP gap (partial-day billing is out of scope).
+ */
 import { describe, expect, it } from 'vitest'
 import {
   InvalidIsoDateError,

@@ -1,14 +1,9 @@
 import type { Response } from 'express'
+import type { ApiErrorBody } from '@shared/schemas/api-error'
 import { logApiError } from './logger'
 import { mapUnknownErrorToHttpPayload } from './map-error-to-http-payload'
 
-export type ApiErrorBody = {
-  error: {
-    code: string
-    message: string
-    details?: unknown
-  }
-}
+export type { ApiErrorBody } from '@shared/schemas/api-error'
 
 export function sendJsonError(
   res: Response,

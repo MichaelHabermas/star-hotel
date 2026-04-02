@@ -4,7 +4,7 @@ Authoritative epic text: [PRD.md § Epic E3](./PRD.md). This matrix maps PRD use
 
 | PRD item | Requirement | Implementation |
 |----------|---------------|----------------|
-| **US3.1** | Server bootstrap in main; lifecycle tied to app ready/quit | [`startStarHotelMain`](../src/main/bootstrap.ts) awaits `ensureEmbeddedApiServer()` after `whenReady`; quit on listen failure. Shutdown: [`createEmbeddedApiStack`](../src/main/embedded-api-stack.ts) `before-quit` closes HTTP server then SQLite. |
+| **US3.1** | Server bootstrap in main; lifecycle tied to app ready/quit | [`startStarHotelMain`](../src/main/bootstrap.ts) awaits `ensureEmbeddedApiAndIpc()` after `whenReady` (Express + SQLite + IPC); quit on listen failure. Shutdown: [`createEmbeddedApiStack`](../src/main/embedded-api-stack.ts) `before-quit` closes HTTP server then SQLite. |
 | **T3.1.1.1** | Port selection / conflict handling documented | [README § Embedded Express API](../README.md#embedded-express-api-epic-e3): `STAR_HOTEL_PORT`, `--star-hotel-api-base=`, `EADDRINUSE` (no auto port bump). |
 | **US3.1 DoD** | Health returns 200 | [`GET /health`](../src/server/create-app.ts) after `persistence.isReady()`. |
 | **US3.2** | MVP REST CRUD; stable 4xx/5xx JSON | [`/api/reservations`](../src/server/reservations/reservation-router.ts); [`mapErrorToHttp`](../src/server/http/json-error.ts) + [`mapUnknownErrorToHttpPayload`](../src/server/http/map-error-to-http-payload.ts). Integration: [`create-app.reservations.test.ts`](../src/server/create-app.reservations.test.ts). |

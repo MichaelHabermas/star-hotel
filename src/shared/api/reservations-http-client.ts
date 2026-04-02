@@ -1,11 +1,6 @@
 import { z } from 'zod'
-import { EMBEDDED_API_PATHS } from './embedded-api-paths'
-import {
-  normalizeEmbeddedApiBaseUrl,
-  parseEmbeddedJsonOk,
-  readEmbeddedApiErrorBody,
-  EmbeddedApiHttpError,
-} from './embedded-http'
+import { throwIfOpenApiError } from './embedded-http'
+import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
 import {
   reservationCreateBodySchema,
   reservationListQuerySchema,
@@ -20,17 +15,16 @@ import {
 export { EmbeddedApiHttpError as ReservationsHttpError } from './embedded-http'
 export type { EmbeddedApiErrorBody as ApiErrorBody } from './embedded-http'
 
-function listQueryString(query: ReservationListQuery): string {
+function listQueryParams(query: ReservationListQuery): { roomId?: number; guestId?: number } {
   const parsed = reservationListQuerySchema.parse(query)
-  const p = new URLSearchParams()
+  const out: { roomId?: number; guestId?: number } = {}
   if (parsed.roomId !== undefined) {
-    p.set('roomId', String(parsed.roomId))
+    out.roomId = parsed.roomId
   }
   if (parsed.guestId !== undefined) {
-    p.set('guestId', String(parsed.guestId))
+    out.guestId = parsed.guestId
   }
-  const s = p.toString()
-  return s === '' ? '' : `?${s}`
+  return out
 }
 
 export type ReservationsHttpClient = {
@@ -45,51 +39,53 @@ export function createReservationsHttpClient(deps: {
   readonly baseUrl: string
   readonly fetch: typeof fetch
 }): ReservationsHttpClient {
-  const base = normalizeEmbeddedApiBaseUrl(deps.baseUrl)
-  const { fetch: fetchFn } = deps
+  const client = createEmbeddedOpenApiClient(deps)
 
   return {
     async list(query) {
-      const qs = listQueryString(query)
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservations}${qs}`)
-      return parseEmbeddedJsonOk(res, z.array(reservationResponseSchema))
+      const q = listQueryParams(query)
+      const r = await client.GET('/api/reservations', {
+        params: Object.keys(q).length > 0 ? { query: q } : {},
+      })
+      throwIfOpenApiError(r)
+      return z.array(reservationResponseSchema).parse(r.data)
     },
 
     async get(id) {
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`)
-      return parseEmbeddedJsonOk(res, reservationResponseSchema)
+      const r = await client.GET('/api/reservations/{id}', {
+        params: { path: { id } },
+      })
+      throwIfOpenApiError(r)
+      return reservationResponseSchema.parse(r.data)
     },
 
     async create(body) {
       const payload = reservationCreateBodySchema.parse(body)
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservations}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const r = await client.POST('/api/reservations', {
+        body: payload,
       })
-      return parseEmbeddedJsonOk(res, reservationResponseSchema)
+      throwIfOpenApiError(r)
+      return reservationResponseSchema.parse(r.data)
     },
 
     async update(id, body) {
       const payload = reservationUpdateBodySchema.parse(body)
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const r = await client.PATCH('/api/reservations/{id}', {
+        params: { path: { id } },
+        body: payload,
       })
-      return parseEmbeddedJsonOk(res, reservationResponseSchema)
+      throwIfOpenApiError(r)
+      return reservationResponseSchema.parse(r.data)
     },
 
     async delete(id) {
-      const res = await fetchFn(`${base}${EMBEDDED_API_PATHS.reservationById(id)}`, { method: 'DELETE' })
-      if (res.status === 204) {
+      const r = await client.DELETE('/api/reservations/{id}', {
+        params: { path: { id } },
+      })
+      if (r.response.status === 204) {
         return
       }
-      const err = await readEmbeddedApiErrorBody(res)
-      if (err) {
-        throw new EmbeddedApiHttpError(res.status, err)
-      }
-      throw new Error(`HTTP ${res.status}`)
+      throwIfOpenApiError(r)
     },
   }
 }

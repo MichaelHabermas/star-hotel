@@ -5,12 +5,10 @@ import type {
   ReservationResponse,
   ReservationUpdateBody,
 } from '@shared/schemas/reservation'
+import { GuestNotFoundError } from '../guests/guest-errors'
+import { RoomNotFoundError } from '../rooms/room-errors'
 import { mapSqliteConstraintError } from '../db/db-errors'
-import {
-  GuestNotFoundError,
-  ReservationNotFoundError,
-  RoomNotFoundError,
-} from './reservation-errors'
+import { ReservationNotFoundError } from './reservation-errors'
 import type { ReservationRepositoryPort } from './reservation-repository-port'
 import type { ReservationRow } from './reservation-repository'
 

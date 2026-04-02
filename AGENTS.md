@@ -16,6 +16,7 @@
 - Static HTML under `style-test/` may be checked by HTML validation tooling (DOCTYPE style, void elements); when editing those files, keep markup aligned with those rules rather than toggling patterns that re-trigger the same diagnostics.
 - `.cursor/hooks/state/` is gitignored (Cursor hook / continual-learning machine state); keep it local—do not commit—while still writing `continual-learning-index.json` there when running the incremental transcript index flow so local hooks work.
 - The embedded Express API serves OpenAPI at `{apiBaseUrl}/api/openapi.json` and Swagger UI at `{apiBaseUrl}/api/docs` (loopback only); `pnpm dev` logs the Swagger URL next to the API base line in main (`bootstrap.ts`).
+- `.pnpm-store/` (project-local pnpm store), `.idea/` (JetBrains), and `release/` (electron-builder output) belong in `.gitignore` and should not be committed—same class of artifact as `node_modules`.
 
 ## Knowledge management (repo-local, portable)
 

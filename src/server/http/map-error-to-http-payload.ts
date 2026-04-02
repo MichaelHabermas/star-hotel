@@ -1,12 +1,5 @@
 import { ZodError } from 'zod'
-import { InvalidIsoDateError } from '../../domain/reservation-pricing'
-import { DbConstraintError } from '../db/db-errors'
-import {
-  GuestNotFoundError,
-  ReservationConflictError,
-  ReservationNotFoundError,
-  RoomNotFoundError,
-} from '../reservations/reservation-errors'
+import { isHttpMappableError } from './http-mappable'
 
 /** Pure mapping from thrown values to HTTP fields; unhandled errors are surfaced for logging. */
 export type MappedHttpError =
@@ -29,45 +22,13 @@ export function mapUnknownErrorToHttpPayload(err: unknown): MappedHttpError {
       details: err.flatten(),
     }
   }
-  if (err instanceof InvalidIsoDateError) {
+  if (isHttpMappableError(err)) {
     return {
       kind: 'response',
-      status: 400,
-      code: 'INVALID_DATE',
+      status: err.httpStatus,
+      code: err.errorCode,
       message: err.message,
-    }
-  }
-  if (err instanceof ReservationNotFoundError) {
-    return {
-      kind: 'response',
-      status: 404,
-      code: err.code,
-      message: err.message,
-    }
-  }
-  if (err instanceof RoomNotFoundError || err instanceof GuestNotFoundError) {
-    return {
-      kind: 'response',
-      status: 404,
-      code: err.code,
-      message: err.message,
-    }
-  }
-  if (err instanceof ReservationConflictError) {
-    return {
-      kind: 'response',
-      status: 409,
-      code: err.code,
-      message: err.message,
-    }
-  }
-  if (err instanceof DbConstraintError) {
-    return {
-      kind: 'response',
-      status: 400,
-      code: 'DB_CONSTRAINT',
-      message: err.message,
-      details: { kind: err.kind },
+      ...(err.details !== undefined ? { details: err.details } : {}),
     }
   }
   return { kind: 'unhandled', cause: err }

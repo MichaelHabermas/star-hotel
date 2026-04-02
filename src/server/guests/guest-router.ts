@@ -2,8 +2,8 @@ import { guestIdParamsSchema, guestListQuerySchema } from '@shared/schemas/guest
 import type { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
-import { GuestNotFoundError } from '../reservations/reservation-errors'
 import { GuestRepository } from './guest-repository'
+import { GuestService } from './guest-service'
 
 function asyncHandler(
   fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
@@ -13,21 +13,23 @@ function asyncHandler(
   }
 }
 
-function rowToJson(row: { GuestID: number; Name: string; ID_Number: string | null; Contact: string | null }) {
-  return {
-    id: row.GuestID,
-    name: row.Name,
-    idNumber: row.ID_Number,
-    contact: row.Contact,
-  }
-}
-
 export function createGuestRouter(persistence: HotelSqlitePersistencePort): Router {
   const router = Router()
 
-  router.use(async (req, res, next) => {
+  let serviceInit: Promise<GuestService> | null = null
+  function getGuestService(): Promise<GuestService> {
+    if (!serviceInit) {
+      serviceInit = (async () => {
+        await persistence.isReady()
+        return new GuestService(new GuestRepository(persistence.getDatabase()))
+      })()
+    }
+    return serviceInit
+  }
+
+  router.use(async (_req, _res, next) => {
     try {
-      await persistence.isReady()
+      await getGuestService()
       next()
     } catch (err) {
       next(err)
@@ -39,8 +41,8 @@ export function createGuestRouter(persistence: HotelSqlitePersistencePort): Rout
     asyncHandler(async (req, res, next) => {
       try {
         guestListQuerySchema.parse(req.query)
-        const repo = new GuestRepository(persistence.getDatabase())
-        res.status(200).json(repo.list().map(rowToJson))
+        const svc = await getGuestService()
+        res.status(200).json(svc.list())
       } catch (err) {
         next(err)
       }
@@ -52,12 +54,8 @@ export function createGuestRouter(persistence: HotelSqlitePersistencePort): Rout
     asyncHandler(async (req, res, next) => {
       try {
         const { id } = guestIdParamsSchema.parse(req.params)
-        const repo = new GuestRepository(persistence.getDatabase())
-        const row = repo.getById(id)
-        if (row === undefined) {
-          throw new GuestNotFoundError(id)
-        }
-        res.status(200).json(rowToJson(row))
+        const svc = await getGuestService()
+        res.status(200).json(svc.get(id))
       } catch (err) {
         next(err)
       }

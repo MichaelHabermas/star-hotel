@@ -4,6 +4,7 @@ import {
   EmbeddedApiHttpError,
   formatEmbeddedApiUserMessage,
   parseEmbeddedJsonOk,
+  throwIfOpenApiError,
 } from './embedded-http'
 
 describe('formatEmbeddedApiUserMessage', () => {
@@ -64,5 +65,25 @@ describe('parseEmbeddedJsonOk', () => {
     await expect(parseEmbeddedJsonOk(res, z.object({}))).rejects.toThrow(
       'Invalid JSON response (HTTP 200)',
     )
+  })
+})
+
+describe('throwIfOpenApiError', () => {
+  it('no-ops when response is ok', () => {
+    expect(() =>
+      throwIfOpenApiError({
+        response: new Response(null, { status: 200 }),
+        error: undefined,
+      }),
+    ).not.toThrow()
+  })
+
+  it('throws EmbeddedApiHttpError when error matches API body shape', () => {
+    expect(() =>
+      throwIfOpenApiError({
+        response: new Response(null, { status: 404 }),
+        error: { error: { code: 'NOT_FOUND', message: 'missing' } },
+      }),
+    ).toThrow(EmbeddedApiHttpError)
   })
 })

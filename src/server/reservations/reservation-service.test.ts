@@ -3,12 +3,9 @@ import type { ReservationListQuery } from '@shared/schemas/reservation'
 import { ReservationService } from './reservation-service'
 import type { ReservationRepositoryPort } from './reservation-repository-port'
 import type { ReservationRow, ReservationWrite } from './reservation-repository'
-import {
-  GuestNotFoundError,
-  ReservationConflictError,
-  ReservationNotFoundError,
-  RoomNotFoundError,
-} from './reservation-errors'
+import { GuestNotFoundError } from '../guests/guest-errors'
+import { RoomNotFoundError } from '../rooms/room-errors'
+import { ReservationConflictError, ReservationNotFoundError } from './reservation-errors'
 
 /** Minimal in-memory repo for unit tests (mirrors overlap semantics of SQL layer). */
 class InMemoryReservationRepository implements ReservationRepositoryPort {

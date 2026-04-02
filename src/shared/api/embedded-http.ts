@@ -1,15 +1,13 @@
 import { z } from 'zod'
+import {
+  apiErrorBodySchema,
+  type ApiErrorBody,
+} from '../schemas/api-error'
 
-/** Matches server `sendJsonError` / `ApiErrorBody` in `src/server/http/json-error.ts`. */
-export const embeddedApiErrorBodySchema = z.object({
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.unknown().optional(),
-  }),
-})
+/** @deprecated Use `apiErrorBodySchema` from `@shared/schemas/api-error`. */
+export const embeddedApiErrorBodySchema = apiErrorBodySchema
 
-export type EmbeddedApiErrorBody = z.infer<typeof embeddedApiErrorBodySchema>
+export type EmbeddedApiErrorBody = ApiErrorBody
 
 export class EmbeddedApiHttpError extends Error {
   readonly name = 'EmbeddedApiHttpError'
@@ -46,6 +44,24 @@ export async function readEmbeddedApiErrorBody(
 ): Promise<EmbeddedApiErrorBody | undefined> {
   const text = await res.text()
   return parseEmbeddedApiErrorBodyFromText(text)
+}
+
+/**
+ * openapi-fetch consumes the response body; use `data` / `error` from its result instead of
+ * {@link parseEmbeddedJsonOk} on `response`.
+ */
+export function throwIfOpenApiError(result: {
+  readonly response: Response
+  readonly error?: unknown
+}): void {
+  if (result.response.ok) {
+    return
+  }
+  const parsed = embeddedApiErrorBodySchema.safeParse(result.error)
+  if (parsed.success) {
+    throw new EmbeddedApiHttpError(result.response.status, parsed.data)
+  }
+  throw new Error(`HTTP ${result.response.status}`)
 }
 
 export async function parseEmbeddedJsonOk<T>(

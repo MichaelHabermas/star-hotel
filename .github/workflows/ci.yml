@@ -28,6 +28,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: OpenAPI codegen (committed artifacts must match)
+        run: pnpm codegen:api && git diff --exit-code -- src/server/openapi/openapi-spec.json src/shared/api/generated/openapi-types.ts
+
       - name: Lint
         run: pnpm lint
 
