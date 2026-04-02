@@ -24,70 +24,43 @@ import {
   DialogTitle,
 } from '@renderer/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@renderer/components/ui/table'
-import { useGuestRoomCatalog } from '@renderer/features/reservations/use-guest-room-catalog'
-import { useReservationsList } from '@renderer/features/reservations/use-reservations-list'
+import { useGuestsList } from '@renderer/features/guests/use-guests-list'
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
 import type { GuestResponse } from '@shared/schemas/guest'
-import type { ReservationResponse } from '@shared/schemas/reservation'
-import type { RoomResponse } from '@shared/schemas/room'
 
-function guestLabel(g: GuestResponse): string {
-  return g.name
-}
-
-function roomLabel(r: RoomResponse): string {
-  return `#${r.id} · ${r.roomType} (${r.status})`
-}
-
-const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' })
-
-export function ReservationsListPage(): JSX.Element {
+export function GuestsListPage(): JSX.Element {
   const starHotel = useStarHotelApp()
-  const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } =
-    useGuestRoomCatalog(starHotel)
-  const { list, reload } = useReservationsList(starHotel)
-  const [deleteTarget, setDeleteTarget] = useState<ReservationResponse | null>(null)
+  const { list, reload } = useGuestsList(starHotel)
+  const [deleteTarget, setDeleteTarget] = useState<GuestResponse | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteErr, setDeleteErr] = useState<string | null>(null)
 
-  const guestById = useMemo(() => new Map(guests.map((g) => [g.id, g])), [guests])
-  const roomById = useMemo(() => new Map(rooms.map((r) => [r.id, r])), [rooms])
-
-  const columns = useMemo<ColumnDef<ReservationResponse>[]>(
+  const columns = useMemo<ColumnDef<GuestResponse>[]>(
     () => [
       {
         accessorKey: 'id',
-        header: 'Res. ID',
+        header: 'ID',
         cell: ({ getValue }) => <span className="font-mono tabular-nums">{String(getValue())}</span>,
       },
       {
-        id: 'guest',
-        header: 'Guest',
-        cell: ({ row }) => {
-          const g = guestById.get(row.original.guestId)
-          return g ? guestLabel(g) : `Guest #${row.original.guestId}`
+        accessorKey: 'name',
+        header: 'Name',
+      },
+      {
+        accessorKey: 'idNumber',
+        header: 'ID / Ref',
+        cell: ({ getValue }) => {
+          const v = getValue() as string | null
+          return v ?? '—'
         },
       },
       {
-        id: 'room',
-        header: 'Room',
-        cell: ({ row }) => {
-          const r = roomById.get(row.original.roomId)
-          return r ? roomLabel(r) : `Room #${row.original.roomId}`
+        accessorKey: 'contact',
+        header: 'Contact',
+        cell: ({ getValue }) => {
+          const v = getValue() as string | null
+          return v ?? '—'
         },
-      },
-      {
-        accessorKey: 'checkInDate',
-        header: 'Check-in',
-      },
-      {
-        accessorKey: 'checkOutDate',
-        header: 'Check-out',
-      },
-      {
-        accessorKey: 'totalAmount',
-        header: 'Total',
-        cell: ({ getValue }) => money.format(Number(getValue())),
       },
       {
         id: 'actions',
@@ -95,7 +68,7 @@ export function ReservationsListPage(): JSX.Element {
         cell: ({ row }) => (
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" size="sm" asChild>
-              <Link to={`/reservations/${row.original.id}`} aria-label={`Edit reservation ${row.original.id}`}>
+              <Link to={`/guests/${row.original.id}`} aria-label={`Edit guest ${row.original.id}`}>
                 Edit
               </Link>
             </Button>
@@ -103,7 +76,7 @@ export function ReservationsListPage(): JSX.Element {
               type="button"
               variant="destructive"
               size="sm"
-              aria-label={`Delete reservation ${row.original.id}`}
+              aria-label={`Delete guest ${row.original.id}`}
               onClick={() => {
                 setDeleteErr(null)
                 setDeleteTarget(row.original)
@@ -115,7 +88,7 @@ export function ReservationsListPage(): JSX.Element {
         ),
       },
     ],
-    [guestById, roomById],
+    [],
   )
 
   const rows = list.kind === 'ok' ? list.rows : []
@@ -132,7 +105,7 @@ export function ReservationsListPage(): JSX.Element {
     setDeleting(true)
     setDeleteErr(null)
     try {
-      await starHotel.api.reservations.delete(deleteTarget.id)
+      await starHotel.api.guests.delete(deleteTarget.id)
       setDeleteTarget(null)
       await reload()
     } catch (err) {
@@ -146,39 +119,23 @@ export function ReservationsListPage(): JSX.Element {
     <div className="mx-auto max-w-5xl p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Reservations</h1>
-          <p className="text-muted-foreground text-sm">
-            Create and manage stays — primary front-desk workflow (Epic E8).
-          </p>
+          <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Guests</h1>
+          <p className="text-muted-foreground text-sm">Guest records (tbl_guest).</p>
         </div>
         <Button type="button" asChild>
-          <Link to="/reservations/new">New reservation</Link>
+          <Link to="/guests/new">New guest</Link>
         </Button>
       </div>
 
-      {refsErr ? (
-        <div
-          className="mb-4 flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
-          role="alert"
-        >
-          <p className="text-destructive text-sm">Could not load guest or room lists: {refsErr}</p>
-          <Button type="button" variant="outline" size="sm" onClick={() => void reloadCatalog()}>
-            Retry catalog
-          </Button>
-        </div>
-      ) : null}
-
       <Card>
         <CardHeader>
-          <CardTitle>Reservation list</CardTitle>
-          <CardDescription>
-            {refsLoading ? 'Loading reference data…' : `${guests.length} guests, ${rooms.length} rooms in catalog.`}
-          </CardDescription>
+          <CardTitle>Guest directory</CardTitle>
+          <CardDescription>Used by reservations and front-desk lookup.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {list.kind === 'loading' ? (
             <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
-              Loading reservations…
+              Loading guests…
             </p>
           ) : null}
           {list.kind === 'err' ? (
@@ -191,11 +148,11 @@ export function ReservationsListPage(): JSX.Element {
           ) : null}
           {list.kind === 'ok' && list.rows.length === 0 ? (
             <p className="text-muted-foreground text-sm" role="status">
-              No reservations yet. Use <span className="font-medium">New reservation</span> to add one.
+              No guests yet. Use <span className="font-medium">New guest</span> to add one.
             </p>
           ) : null}
           {list.kind === 'ok' && list.rows.length > 0 ? (
-            <Table aria-label="Reservations">
+            <Table aria-label="Guests">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
@@ -234,12 +191,12 @@ export function ReservationsListPage(): JSX.Element {
           }
         }}
       >
-        <DialogContent aria-describedby="delete-reservation-desc">
+        <DialogContent aria-describedby="delete-guest-desc">
           <DialogHeader>
-            <DialogTitle>Delete reservation?</DialogTitle>
-            <DialogDescription id="delete-reservation-desc">
+            <DialogTitle>Delete guest?</DialogTitle>
+            <DialogDescription id="delete-guest-desc">
               {deleteTarget
-                ? `This will permanently remove reservation #${deleteTarget.id} (${deleteTarget.checkInDate} → ${deleteTarget.checkOutDate}).`
+                ? `Remove ${deleteTarget.name}? You cannot delete a guest who still has reservations.`
                 : null}
             </DialogDescription>
           </DialogHeader>

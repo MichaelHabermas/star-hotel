@@ -43,7 +43,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
   const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0
 
   const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate })
-  const { catalog, setDeleteErr } = editor
+  const { catalog, setDeleteErr, createPreview } = editor
   const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog
 
   if (mode === 'edit' && !editIdValid) {
@@ -90,7 +90,7 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
   const title = mode === 'create' ? 'New reservation' : `Edit reservation #${editId}`
   const description =
     mode === 'create'
-      ? 'Select guest, room, and stay dates. Total is calculated on the server.'
+      ? 'Select guest, room, and stay dates. Estimated total uses the same nightly rate and night count as the server.'
       : 'Update stay details. Total is recalculated when dates or room change.'
 
   return (
@@ -211,6 +211,33 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                 />
               </div>
             </div>
+
+            {mode === 'create' && createPreview.hint ? (
+              <p className="text-muted-foreground text-sm" role="status">
+                {createPreview.hint}
+              </p>
+            ) : null}
+            {mode === 'create' &&
+            createPreview.nights !== null &&
+            createPreview.total !== null &&
+            !createPreview.hint ? (
+              <div
+                className="border-border bg-muted/30 rounded-lg border px-4 py-3 text-sm"
+                role="status"
+                aria-live="polite"
+              >
+                <p className="text-muted-foreground">
+                  Estimated stay:{' '}
+                  <span className="text-foreground font-medium">{createPreview.nights} night(s)</span>
+                </p>
+                <p className="text-muted-foreground mt-1">
+                  Estimated total:{' '}
+                  <span className="text-foreground font-semibold tabular-nums">
+                    {money.format(createPreview.total)}
+                  </span>
+                </p>
+              </div>
+            ) : null}
 
             {mode === 'edit' && editor.totalAmount !== null ? (
               <p className="text-muted-foreground text-sm">

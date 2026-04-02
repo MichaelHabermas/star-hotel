@@ -1,6 +1,9 @@
 import type { JSX } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
+import { Button } from '@renderer/components/ui/button'
 import { GlobalErrorBoundary } from '@renderer/components/global-error-boundary'
+import { useAuth } from '@renderer/lib/auth-context'
 import { cn } from '@renderer/lib/utils'
 import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
 
@@ -16,6 +19,7 @@ function navClass({ isActive }: { isActive: boolean }): string {
 }
 
 export function AppShell(): JSX.Element {
+  const { logout } = useAuth()
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <header className="bg-card border-border shadow-xs border-b">
@@ -30,6 +34,12 @@ export function AppShell(): JSX.Element {
             <NavLink to="/reservations" className={navClass}>
               Reservations
             </NavLink>
+            <NavLink to="/rooms" className={navClass}>
+              Rooms
+            </NavLink>
+            <NavLink to="/guests" className={navClass}>
+              Guests
+            </NavLink>
             {isDevRoutesEnabled
               ? devRouteDefinitions.map(({ path, label }) => (
                   <NavLink key={path} to={path} className={navClass}>
@@ -38,6 +48,16 @@ export function AppShell(): JSX.Element {
                 ))
               : null}
           </nav>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground shrink-0 gap-1.5"
+            onClick={() => void logout()}
+          >
+            <LogOut className="size-4" aria-hidden />
+            Sign out
+          </Button>
         </div>
       </header>
       <main className="flex-1">

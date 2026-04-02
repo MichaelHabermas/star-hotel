@@ -1,17 +1,19 @@
 import type { JSX } from 'react'
 import { useEffect } from 'react'
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry'
+import { AuthRoot } from '@renderer/lib/auth-context'
 import { AppShell } from '@renderer/layout/app-shell'
-import { createStarHotelApp } from '@renderer/lib/star-hotel-app'
-import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider'
+import { GuestFormPage } from '@renderer/pages/guest-form-page'
+import { GuestsListPage } from '@renderer/pages/guests-list-page'
 import { HomePage } from '@renderer/pages/home-page'
+import { LoginPage } from '@renderer/pages/login-page'
 import { ReservationFormPage } from '@renderer/pages/reservation-form-page'
 import { ReservationsListPage } from '@renderer/pages/reservations-list-page'
+import { RoomFormPage } from '@renderer/pages/room-form-page'
+import { RoomsListPage } from '@renderer/pages/rooms-list-page'
+import { RequireAuth, RequireGuest } from '@renderer/routes/require-auth'
 import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes'
-import { DEFAULT_API_PORT } from '@shared/constants'
-import { buildApiBaseUrl } from '@shared/embedded-api-config'
-import type { StarHotelPreloadAPI } from '@shared/preload-contract'
+import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry'
 
 function PostHogRouteListener(): null {
   const loc = useLocation()
@@ -21,56 +23,41 @@ function PostHogRouteListener(): null {
   return null
 }
 
-const BRIDGE_MISSING_ERROR =
-  '[star-hotel] preload bridge missing: window.starHotel is undefined. Ensure the app is running via Electron and preload loaded correctly.'
-
-const FALLBACK_STAR_HOTEL_BRIDGE: StarHotelPreloadAPI = {
-  platform: 'unknown',
-  apiBaseUrl: buildApiBaseUrl(DEFAULT_API_PORT),
-  invoke: async (): Promise<never> => {
-    throw new Error(
-      'Preload bridge unavailable: open the app with Electron (pnpm dev), not the Vite URL alone.',
-    )
-  },
-}
-
-function resolveStarHotelBridge(): StarHotelPreloadAPI {
-  const bridge = window.starHotel
-  console.info('[renderer] starHotel bridge present', Boolean(bridge))
-  if (bridge) {
-    return bridge
-  }
-
-  // Keep renderer usable even when preload failed to inject.
-  // This prevents a hard crash and surfaces an explicit console hint.
-  console.error(BRIDGE_MISSING_ERROR)
-  return FALLBACK_STAR_HOTEL_BRIDGE
-}
-
-const starHotelApp = createStarHotelApp({
-  fetch: window.fetch.bind(window),
-  starHotel: resolveStarHotelBridge(),
-})
-
 export function App(): JSX.Element {
   return (
-    <StarHotelAppProvider app={starHotelApp}>
+    <AuthRoot>
       <HashRouter>
         <PostHogRouteListener />
         <Routes>
-          <Route element={<AppShell />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/reservations" element={<ReservationsListPage />} />
-            <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
-            <Route path="/reservations/:reservationId" element={<ReservationFormPage mode="edit" />} />
-            {isDevRoutesEnabled
-              ? devRouteDefinitions.map(({ path, Page }) => (
-                  <Route key={path} path={path} element={<Page />} />
-                ))
-              : null}
+          <Route
+            path="/login"
+            element={
+              <RequireGuest>
+                <LoginPage />
+              </RequireGuest>
+            }
+          />
+          <Route element={<RequireAuth />}>
+            <Route element={<AppShell />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/reservations" element={<ReservationsListPage />} />
+              <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
+              <Route path="/reservations/:reservationId" element={<ReservationFormPage mode="edit" />} />
+              <Route path="/rooms" element={<RoomsListPage />} />
+              <Route path="/rooms/new" element={<RoomFormPage mode="create" />} />
+              <Route path="/rooms/:roomId" element={<RoomFormPage mode="edit" />} />
+              <Route path="/guests" element={<GuestsListPage />} />
+              <Route path="/guests/new" element={<GuestFormPage mode="create" />} />
+              <Route path="/guests/:guestId" element={<GuestFormPage mode="edit" />} />
+              {isDevRoutesEnabled
+                ? devRouteDefinitions.map(({ path, Page }) => (
+                    <Route key={path} path={path} element={<Page />} />
+                  ))
+                : null}
+            </Route>
           </Route>
         </Routes>
       </HashRouter>
-    </StarHotelAppProvider>
+    </AuthRoot>
   )
 }

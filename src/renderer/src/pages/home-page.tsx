@@ -1,7 +1,7 @@
 import type { JSX } from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Hotel } from 'lucide-react'
+import { Building2, CalendarRange, FileText, Hotel, Users } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import {
   Card,
@@ -13,6 +13,38 @@ import {
 import { runPerfSmoke, type PerfSmokeResult } from '@renderer/lib/perf-measurements'
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
 import { capturePostHogWorkflow } from '@renderer/telemetry/renderer-telemetry'
+
+const hubCards: readonly {
+  readonly title: string
+  readonly description: string
+  readonly to: string | null
+  readonly icon: typeof Hotel
+}[] = [
+  {
+    title: 'Reservations',
+    description: 'Stays, check-in dates, and totals — primary front-desk flow.',
+    to: '/reservations',
+    icon: CalendarRange,
+  },
+  {
+    title: 'Rooms',
+    description: 'Inventory, nightly rates, and room status.',
+    to: '/rooms',
+    icon: Building2,
+  },
+  {
+    title: 'Guests',
+    description: 'Guest directory and contact details.',
+    to: '/guests',
+    icon: Users,
+  },
+  {
+    title: 'Reports',
+    description: 'Folio and operational print views (Epic E9 — not wired yet).',
+    to: null,
+    icon: FileText,
+  },
+]
 
 export function HomePage(): JSX.Element {
   const starHotel = useStarHotelApp()
@@ -30,27 +62,52 @@ export function HomePage(): JSX.Element {
   >({ kind: 'idle' })
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-6 p-6">
-      <div className="flex items-center gap-2">
-        <Hotel className="size-8 text-primary" aria-hidden />
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Star Hotel</h1>
-          <p className="text-muted-foreground text-sm">
-            Desktop shell — open{' '}
-            <Link to="/reservations" className="text-primary font-medium underline-offset-4 hover:underline">
-              Reservations
-            </Link>{' '}
-            for Epic E5 CRUD.
-          </p>
+    <div className="mx-auto max-w-5xl flex-col gap-8 p-4 md:p-6">
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex items-center gap-3">
+          <Hotel className="text-primary size-10 shrink-0" aria-hidden />
+          <div>
+            <h1 className="font-display text-foreground text-2xl font-semibold tracking-tight">Operations hub</h1>
+            <p className="text-muted-foreground text-sm">
+              Front desk, inventory, and guests — same surface as the legacy main menu, rebuilt for speed.
+            </p>
+          </div>
         </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {hubCards.map(({ title, description, to, icon: Icon }) => (
+          <Card key={title} className="border-border/80 transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-start gap-3 space-y-0 pb-2">
+              <div className="bg-muted/60 rounded-md p-2">
+                <Icon className="text-primary size-5" aria-hidden />
+              </div>
+              <div className="min-w-0 flex-1">
+                <CardTitle className="font-ui text-base">{title}</CardTitle>
+                <CardDescription className="mt-1">{description}</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {to ? (
+                <Button type="button" variant="secondary" size="sm" asChild>
+                  <Link to={to}>Open</Link>
+                </Button>
+              ) : (
+                <Button type="button" variant="outline" size="sm" disabled>
+                  Coming in E9
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Developer experience</CardTitle>
           <CardDescription>
-            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui baseline. Embedded Express API is
-            reached only through <span className="font-mono">StarHotelApp.api</span> (Epic E4).
+            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui. Embedded Express API is reached only through{' '}
+            <span className="font-mono">StarHotelApp.api</span> (Epic E4).
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
@@ -63,8 +120,8 @@ export function HomePage(): JSX.Element {
           </p>
           {starHotel.getEnvironment().platform === 'unknown' ? (
             <p className="text-muted-foreground text-xs">
-              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>). API
-              health still works if the embedded server is running.
+              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>). API health
+              still works if the embedded server is running.
             </p>
           ) : null}
           <div className="flex flex-wrap gap-2">

@@ -6,10 +6,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "electron-rebuild -f -w better-sqlite3 && electron-vite dev",
-    "build": "electron-rebuild -f -w better-sqlite3 && electron-vite build",
-    "preview": "electron-rebuild -f -w better-sqlite3 && electron-vite preview",
-    "test": "pnpm rebuild better-sqlite3 && vitest run",
+    "dev": "electron-rebuild -f -w better-sqlite3,argon2 && electron-vite dev",
+    "build": "electron-rebuild -f -w better-sqlite3,argon2 && electron-vite build",
+    "preview": "electron-rebuild -f -w better-sqlite3,argon2 && electron-vite preview",
+    "test": "pnpm rebuild better-sqlite3 && pnpm rebuild argon2 && vitest run",
+    "posttest": "electron-rebuild -f -w better-sqlite3,argon2",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -18,14 +19,15 @@
     "codegen:api": "tsx scripts/export-openapi.ts && openapi-typescript src/server/openapi/openapi-spec.json -o src/shared/api/generated/openapi-types.ts",
     "codegen:api:check": "pnpm codegen:api && git diff --exit-code -- src/server/openapi/openapi-spec.json src/shared/api/generated/openapi-types.ts",
     "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck",
-    "postinstall": "electron-rebuild -f -w better-sqlite3",
-    "rebuild:native": "electron-rebuild -f -w better-sqlite3"
+    "postinstall": "electron-rebuild -f -w better-sqlite3,argon2",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3,argon2"
   },
   "engines": {
     "node": ">=20"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "argon2",
       "better-sqlite3",
       "electron",
       "esbuild"
@@ -39,6 +41,7 @@
     "@sentry/electron": "^7.10.0",
     "@sentry/react": "10.42.0",
     "@tanstack/react-table": "^8.21.3",
+    "argon2": "^0.44.0",
     "better-sqlite3": "^12.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

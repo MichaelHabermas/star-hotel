@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { runMigrations } from '../db/run-migrations'
+import { seedDefaultUserIfNeeded } from '../dev/seed-default-user'
 import { seedDevReservationsIfNeeded } from '../dev/seed-dev-reservations'
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port'
 import type { PersistencePort } from '../ports/persistence'
@@ -37,6 +38,7 @@ export function createSqlitePersistencePort(
       database.pragma('journal_mode = WAL')
       database.pragma('foreign_keys = ON')
       runMigrations(database)
+      seedDefaultUserIfNeeded(database)
       if (options.seedDevData) {
         seedDevReservationsIfNeeded(database)
       }

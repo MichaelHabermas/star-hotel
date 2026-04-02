@@ -1,9 +1,13 @@
 import { z } from 'zod'
 import {
+  guestCreateBodySchema,
   guestListQuerySchema,
   guestResponseSchema,
+  guestUpdateBodySchema,
+  type GuestCreateBody,
   type GuestListQuery,
   type GuestResponse,
+  type GuestUpdateBody,
 } from '../schemas/guest'
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
 import { throwIfOpenApiError } from './embedded-http'
@@ -11,6 +15,9 @@ import { throwIfOpenApiError } from './embedded-http'
 export type GuestsHttpClient = {
   list(query?: GuestListQuery): Promise<GuestResponse[]>
   get(id: number): Promise<GuestResponse>
+  create(body: GuestCreateBody): Promise<GuestResponse>
+  update(id: number, body: GuestUpdateBody): Promise<GuestResponse>
+  delete(id: number): Promise<void>
 }
 
 export function createGuestsHttpClient(deps: {
@@ -33,6 +40,35 @@ export function createGuestsHttpClient(deps: {
       })
       throwIfOpenApiError(r)
       return guestResponseSchema.parse(r.data)
+    },
+
+    async create(body) {
+      const payload = guestCreateBodySchema.parse(body)
+      const r = await client.POST('/api/guests', {
+        body: payload,
+      })
+      throwIfOpenApiError(r)
+      return guestResponseSchema.parse(r.data)
+    },
+
+    async update(id, body) {
+      const payload = guestUpdateBodySchema.parse(body)
+      const r = await client.PATCH('/api/guests/{id}', {
+        params: { path: { id } },
+        body: payload,
+      })
+      throwIfOpenApiError(r)
+      return guestResponseSchema.parse(r.data)
+    },
+
+    async delete(id) {
+      const r = await client.DELETE('/api/guests/{id}', {
+        params: { path: { id } },
+      })
+      if (r.response.status === 204) {
+        return
+      }
+      throwIfOpenApiError(r)
     },
   }
 }

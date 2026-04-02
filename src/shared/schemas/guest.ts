@@ -17,3 +17,23 @@ export const guestResponseSchema = z.object({
 })
 
 export type GuestResponse = z.infer<typeof guestResponseSchema>
+
+export const guestCreateBodySchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    idNumber: z.string().nullable().optional(),
+    contact: z.string().nullable().optional(),
+  })
+  .strict()
+
+export type GuestCreateBody = z.infer<typeof guestCreateBodySchema>
+
+export const guestUpdateBodySchema = z
+  .object({
+    name: z.string().min(1).optional(),
+    idNumber: z.string().nullable().optional(),
+    contact: z.string().nullable().optional(),
+  })
+  .strict()
+
+export type GuestUpdateBody = z.infer<typeof guestUpdateBodySchema>

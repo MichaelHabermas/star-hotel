@@ -1,9 +1,13 @@
 import { z } from 'zod'
 import {
+  roomCreateBodySchema,
   roomListQuerySchema,
   roomResponseSchema,
+  roomUpdateBodySchema,
+  type RoomCreateBody,
   type RoomListQuery,
   type RoomResponse,
+  type RoomUpdateBody,
 } from '../schemas/room'
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client'
 import { throwIfOpenApiError } from './embedded-http'
@@ -19,6 +23,9 @@ function listQueryParams(query: RoomListQuery): { status?: string } | undefined 
 export type RoomsHttpClient = {
   list(query?: RoomListQuery): Promise<RoomResponse[]>
   get(id: number): Promise<RoomResponse>
+  create(body: RoomCreateBody): Promise<RoomResponse>
+  update(id: number, body: RoomUpdateBody): Promise<RoomResponse>
+  delete(id: number): Promise<void>
 }
 
 export function createRoomsHttpClient(deps: {
@@ -43,6 +50,35 @@ export function createRoomsHttpClient(deps: {
       })
       throwIfOpenApiError(r)
       return roomResponseSchema.parse(r.data)
+    },
+
+    async create(body) {
+      const payload = roomCreateBodySchema.parse(body)
+      const r = await client.POST('/api/rooms', {
+        body: payload,
+      })
+      throwIfOpenApiError(r)
+      return roomResponseSchema.parse(r.data)
+    },
+
+    async update(id, body) {
+      const payload = roomUpdateBodySchema.parse(body)
+      const r = await client.PATCH('/api/rooms/{id}', {
+        params: { path: { id } },
+        body: payload,
+      })
+      throwIfOpenApiError(r)
+      return roomResponseSchema.parse(r.data)
+    },
+
+    async delete(id) {
+      const r = await client.DELETE('/api/rooms/{id}', {
+        params: { path: { id } },
+      })
+      if (r.response.status === 204) {
+        return
+      }
+      throwIfOpenApiError(r)
     },
   }
 }

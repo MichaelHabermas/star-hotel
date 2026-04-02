@@ -1,4 +1,9 @@
-import { roomIdParamsSchema, roomListQuerySchema } from '@shared/schemas/room'
+import {
+  roomCreateBodySchema,
+  roomIdParamsSchema,
+  roomListQuerySchema,
+  roomUpdateBodySchema,
+} from '@shared/schemas/room'
 import { Router } from 'express'
 import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit'
 import { RoomRepository } from './room-repository'
@@ -25,6 +30,35 @@ export function createRoomRouter(kit: SqliteHttpAdapterKit): Router {
       const { id } = roomIdParamsSchema.parse(req.params)
       const svc = await getRoomService()
       res.status(200).json(svc.get(id))
+    }),
+  )
+
+  router.post(
+    '/',
+    kit.asyncHandler(async (req, res) => {
+      const body = roomCreateBodySchema.parse(req.body)
+      const svc = await getRoomService()
+      res.status(201).json(svc.create(body))
+    }),
+  )
+
+  router.patch(
+    '/:id',
+    kit.asyncHandler(async (req, res) => {
+      const { id } = roomIdParamsSchema.parse(req.params)
+      const body = roomUpdateBodySchema.parse(req.body)
+      const svc = await getRoomService()
+      res.status(200).json(svc.update(id, body))
+    }),
+  )
+
+  router.delete(
+    '/:id',
+    kit.asyncHandler(async (req, res) => {
+      const { id } = roomIdParamsSchema.parse(req.params)
+      const svc = await getRoomService()
+      svc.delete(id)
+      res.status(204).send()
     }),
   )
 

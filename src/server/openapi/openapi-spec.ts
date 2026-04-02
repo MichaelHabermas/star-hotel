@@ -16,6 +16,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
   servers: [{ url: '/' }],
   tags: [
     { name: 'health' },
+    { name: 'auth' },
     { name: 'guests' },
     { name: 'rooms' },
     { name: 'reservations' },
@@ -41,6 +42,94 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
+    '/api/auth/login': {
+      post: {
+        tags: ['auth'],
+        summary: 'Login (Argon2 password verification)',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['username', 'password'],
+                additionalProperties: false,
+                properties: {
+                  username: { type: 'string' },
+                  password: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Session token',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['token', 'user'],
+                  properties: {
+                    token: { type: 'string' },
+                    user: {
+                      type: 'object',
+                      required: ['id', 'username', 'role'],
+                      properties: {
+                        id: { type: 'integer' },
+                        username: { type: 'string' },
+                        role: { type: 'string' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Invalid credentials' },
+        },
+      },
+    },
+    '/api/auth/logout': {
+      post: {
+        tags: ['auth'],
+        summary: 'Logout (invalidate server session)',
+        responses: {
+          '204': { description: 'No content' },
+        },
+      },
+    },
+    '/api/auth/me': {
+      get: {
+        tags: ['auth'],
+        summary: 'Current user (requires Bearer token)',
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['user'],
+                  properties: {
+                    user: {
+                      type: 'object',
+                      required: ['id', 'username', 'role'],
+                      properties: {
+                        id: { type: 'integer' },
+                        username: { type: 'string' },
+                        role: { type: 'string' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Not authenticated' },
+        },
+      },
+    },
     '/api/guests': {
       get: {
         tags: ['guests'],
@@ -60,6 +149,25 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
           },
         },
       },
+      post: {
+        tags: ['guests'],
+        summary: 'Create guest',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/GuestCreate' } },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Created',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/Guest' } },
+            },
+          },
+          '400': { description: 'Validation' },
+        },
+      },
     },
     '/api/guests/{id}': {
       get: {
@@ -74,6 +182,36 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
             },
           },
           '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+      patch: {
+        tags: ['guests'],
+        summary: 'Update guest (partial body)',
+        parameters: [{ $ref: '#/components/parameters/GuestId' }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/GuestPatch' } },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/Guest' } },
+            },
+          },
+          '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+      delete: {
+        tags: ['guests'],
+        summary: 'Delete guest (blocked when reservations reference them)',
+        parameters: [{ $ref: '#/components/parameters/GuestId' }],
+        responses: {
+          '204': { description: 'No content' },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '409': { description: 'Guest has reservations' },
         },
       },
     },
@@ -104,6 +242,25 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
           },
         },
       },
+      post: {
+        tags: ['rooms'],
+        summary: 'Create room',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/RoomCreate' } },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Created',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/Room' } },
+            },
+          },
+          '400': { description: 'Validation' },
+        },
+      },
     },
     '/api/rooms/{id}': {
       get: {
@@ -118,6 +275,36 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
             },
           },
           '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+      patch: {
+        tags: ['rooms'],
+        summary: 'Update room (partial body)',
+        parameters: [{ $ref: '#/components/parameters/RoomId' }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/RoomPatch' } },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/Room' } },
+            },
+          },
+          '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+      delete: {
+        tags: ['rooms'],
+        summary: 'Delete room (blocked when reservations reference it)',
+        parameters: [{ $ref: '#/components/parameters/RoomId' }],
+        responses: {
+          '204': { description: 'No content' },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '409': { description: 'Room has reservations' },
         },
       },
     },
@@ -255,6 +442,25 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
           contact: { type: 'string', nullable: true },
         },
       },
+      GuestCreate: {
+        type: 'object',
+        required: ['name'],
+        additionalProperties: false,
+        properties: {
+          name: { type: 'string' },
+          idNumber: { type: 'string', nullable: true },
+          contact: { type: 'string', nullable: true },
+        },
+      },
+      GuestPatch: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          name: { type: 'string' },
+          idNumber: { type: 'string', nullable: true },
+          contact: { type: 'string', nullable: true },
+        },
+      },
       Room: {
         type: 'object',
         required: ['id', 'roomType', 'price', 'status'],
@@ -262,6 +468,25 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
           id: { type: 'integer' },
           roomType: { type: 'string' },
           price: { type: 'number' },
+          status: { type: 'string' },
+        },
+      },
+      RoomCreate: {
+        type: 'object',
+        required: ['roomType', 'price', 'status'],
+        additionalProperties: false,
+        properties: {
+          roomType: { type: 'string' },
+          price: { type: 'number', minimum: 0 },
+          status: { type: 'string' },
+        },
+      },
+      RoomPatch: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          roomType: { type: 'string' },
+          price: { type: 'number', minimum: 0 },
           status: { type: 'string' },
         },
       },

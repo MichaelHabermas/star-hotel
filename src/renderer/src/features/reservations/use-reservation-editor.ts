@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
+import { computeReservationTotal, countStayNights } from '@domain/reservation-pricing'
 import type { StarHotelApp } from '@renderer/lib/star-hotel-app'
 import { reservationCreateBodySchema, reservationUpdateBodySchema } from '@shared/schemas/reservation'
 import { useGuestRoomCatalog } from './use-guest-room-catalog'
@@ -15,6 +16,7 @@ export type ReservationEditorOptions = {
 export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorOptions) {
   const { mode, editId, editIdValid, navigate } = opts
   const catalog = useGuestRoomCatalog(app)
+  const { rooms } = catalog
 
   const [guestId, setGuestId] = useState<string>('')
   const [roomId, setRoomId] = useState<string>('')
@@ -158,6 +160,34 @@ export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorO
     }
   }, [editIdValid, editId, app, navigate])
 
+  const createPreview = useMemo(() => {
+    if (mode !== 'create') {
+      return { nights: null as number | null, total: null as number | null, hint: null as string | null }
+    }
+    if (roomId === '' || checkInDate === '' || checkOutDate === '') {
+      return { nights: null, total: null, hint: null }
+    }
+    const rid = Number.parseInt(roomId, 10)
+    const room = rooms.find((r) => r.id === rid)
+    if (!room) {
+      return { nights: null, total: null, hint: null }
+    }
+    try {
+      const nights = countStayNights(checkInDate, checkOutDate)
+      if (nights === 0) {
+        return {
+          nights: 0,
+          total: 0,
+          hint: 'Same check-in and check-out: 0 nights (total $0.00 until you extend the stay).',
+        }
+      }
+      const total = computeReservationTotal(nights, room.price)
+      return { nights, total, hint: null }
+    } catch {
+      return { nights: null, total: null, hint: 'Enter valid check-in and check-out dates (check-out after check-in).' }
+    }
+  }, [mode, roomId, checkInDate, checkOutDate, rooms])
+
   return {
     catalog,
     guestId,
@@ -182,5 +212,6 @@ export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorO
     deleteErr,
     setDeleteErr,
     confirmDelete,
+    createPreview,
   }
 }

@@ -31,4 +31,29 @@ export class RoomRepository {
       .prepare(`SELECT RoomID, RoomType, Price, Status FROM tbl_room WHERE RoomID = ?`)
       .get(roomId) as RoomRow | undefined
   }
+
+  countReservationsForRoom(roomId: number): number {
+    const row = this.db
+      .prepare(`SELECT COUNT(*) AS c FROM tbl_reservation WHERE RoomID = ?`)
+      .get(roomId) as { c: number }
+    return row.c
+  }
+
+  insert(row: Omit<RoomRow, 'RoomID'>): number {
+    const result = this.db
+      .prepare(`INSERT INTO tbl_room (RoomType, Price, Status) VALUES (?, ?, ?)`)
+      .run(row.RoomType, row.Price, row.Status)
+    return Number(result.lastInsertRowid)
+  }
+
+  update(roomId: number, row: Omit<RoomRow, 'RoomID'>): void {
+    this.db
+      .prepare(`UPDATE tbl_room SET RoomType = ?, Price = ?, Status = ? WHERE RoomID = ?`)
+      .run(row.RoomType, row.Price, row.Status, roomId)
+  }
+
+  delete(roomId: number): boolean {
+    const result = this.db.prepare(`DELETE FROM tbl_room WHERE RoomID = ?`).run(roomId)
+    return result.changes > 0
+  }
 }

@@ -16,6 +16,11 @@ function createListApp(overrides?: {
 }): StarHotelApp {
   return {
     api: {
+      auth: {
+        login: vi.fn(),
+        logout: vi.fn(),
+        me: vi.fn(),
+      },
       guests: {
         list: vi.fn(overrides?.guestsList ?? (() => Promise.resolve([guest]))),
       },

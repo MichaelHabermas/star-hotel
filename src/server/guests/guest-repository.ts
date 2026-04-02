@@ -25,4 +25,29 @@ export class GuestRepository {
       .prepare(`SELECT GuestID, Name, ID_Number, Contact FROM tbl_guest WHERE GuestID = ?`)
       .get(guestId) as GuestRow | undefined
   }
+
+  countReservationsForGuest(guestId: number): number {
+    const row = this.db
+      .prepare(`SELECT COUNT(*) AS c FROM tbl_reservation WHERE GuestID = ?`)
+      .get(guestId) as { c: number }
+    return row.c
+  }
+
+  insert(row: Omit<GuestRow, 'GuestID'>): number {
+    const result = this.db
+      .prepare(`INSERT INTO tbl_guest (Name, ID_Number, Contact) VALUES (?, ?, ?)`)
+      .run(row.Name, row.ID_Number, row.Contact)
+    return Number(result.lastInsertRowid)
+  }
+
+  update(guestId: number, row: Omit<GuestRow, 'GuestID'>): void {
+    this.db
+      .prepare(`UPDATE tbl_guest SET Name = ?, ID_Number = ?, Contact = ? WHERE GuestID = ?`)
+      .run(row.Name, row.ID_Number, row.Contact, guestId)
+  }
+
+  delete(guestId: number): boolean {
+    const result = this.db.prepare(`DELETE FROM tbl_guest WHERE GuestID = ?`).run(guestId)
+    return result.changes > 0
+  }
 }

@@ -87,5 +87,37 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     })
 
     await request(app).get('/api/guests?unexpected=1').expect(400)
+
+    const createdRoom = await request(app)
+      .post('/api/rooms')
+      .send({ roomType: 'Penthouse', price: 300, status: 'Available' })
+      .expect(201)
+    const newRoomId = createdRoom.body.id as number
+    expect(newRoomId).toBeGreaterThan(0)
+
+    await request(app)
+      .patch(`/api/rooms/${newRoomId}`)
+      .send({ price: 310 })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.price).toBe(310)
+      })
+
+    const createdGuest = await request(app)
+      .post('/api/guests')
+      .send({ name: 'API Guest', idNumber: 'X1', contact: 'a@b.c' })
+      .expect(201)
+    const newGuestId = createdGuest.body.id as number
+
+    await request(app)
+      .patch(`/api/guests/${newGuestId}`)
+      .send({ contact: 'z@b.c' })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.contact).toBe('z@b.c')
+      })
+
+    await request(app).delete(`/api/rooms/${newRoomId}`).expect(204)
+    await request(app).delete(`/api/guests/${newGuestId}`).expect(204)
   })
 })

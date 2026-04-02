@@ -5,6 +5,7 @@ import { resolve } from 'node:path'
 
 const sharedAlias = {
   '@shared': resolve(__dirname, 'src/shared'),
+  '@domain': resolve(__dirname, 'src/domain'),
 } as const
 
 export default defineConfig({
