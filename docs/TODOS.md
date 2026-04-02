@@ -12,5 +12,5 @@ Items below were explicitly deferred or cherry-pick candidates. Ordered by depen
 | T4 | **Decide: clean install vs day-one import** | Was open in PRE-SEARCH / Design | Before schema freeze | [DECISIONS.md](./DECISIONS.md) (T4) |
 | T5 | **Report scope contract** (receipt-only vs grouped financial) | Was open question | Before report sprint | [DECISIONS.md](./DECISIONS.md) (T5) |
 | T6 | **Packaging smoke CI** (Windows installer + native module) | Post-MVP per design doc order | After first end-to-end run | — |
-| T7 | **Telemetry PII policy** (redaction, env gating, replay opt-in) | Codex flagged over-broad logging | Before Sentry/PostHog wire | — |
+| T7 | **Telemetry PII policy** (redaction, env gating, replay opt-in) | Codex flagged over-broad logging | Before Sentry/PostHog wire | [T7-TELEMETRY-PII.md](./T7-TELEMETRY-PII.md) (Epic E7) |
 | T8 | **Competitive one-pager** (why not SaaS PMS) | Not required for grade; helps narrative | Optional before demo video | — |

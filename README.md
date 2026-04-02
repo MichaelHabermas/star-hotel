@@ -42,6 +42,18 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
+## Observability (Epic E7)
+
+Telemetry is **env-gated** (see [.env.example](.env.example)). **T7 PII policy:** [docs/T7-TELEMETRY-PII.md](docs/T7-TELEMETRY-PII.md).
+
+| Topic | Doc / location |
+|-------|----------------|
+| Structured logging (Express + main) | `STAR_HOTEL_LOG_LEVEL`; JSON access lines — [T7 sample](docs/T7-TELEMETRY-PII.md#sample-structured-log-line-express-access) |
+| Sentry (main + renderer) | `SENTRY_DSN`, `VITE_SENTRY_DSN`; source maps — [docs/SENTRY-SOURCE-MAPS.md](docs/SENTRY-SOURCE-MAPS.md) |
+| PostHog | `VITE_POSTHOG_KEY`, optional `VITE_POSTHOG_HOST` |
+| Crashpad | [docs/CRASH-REPORTING.md](docs/CRASH-REPORTING.md), optional `SENTRY_MINIDUMP_URL` |
+| Perf smoke (IPC / HTTP / list query) | Home → **Perf smoke (E7)**; methodology [docs/PERF.md](docs/PERF.md) |
+
 ## Embedded Express API (Epic E3)
 
 The main process runs an HTTP server on **loopback only** (`127.0.0.1`), not on the LAN.

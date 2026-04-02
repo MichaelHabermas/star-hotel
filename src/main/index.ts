@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 import { app } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,11 +8,15 @@ import { startStarHotelMain } from './bootstrap'
 import { registerActivateHandler, registerWindowAllClosed } from './lifecycle'
 import { configureAppMenu } from './menu'
 import { createMainWindow } from './window'
+import { initMainTelemetry } from './telemetry-main'
+import { mainProcessLogger } from '../server/logging/structured-logger'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const appStartMs = Date.now()
+
+initMainTelemetry()
 
 const isDev = !app.isPackaged
-const appStartMs = Date.now()
 configureAppMenu(isDev)
 
 const stack = createEmbeddedApiStack({
@@ -44,5 +50,5 @@ void startStarHotelMain({
   registerActivateHandler,
   createMainWindow,
   mainWindowParams,
-  logger: console,
+  logger: mainProcessLogger,
 })

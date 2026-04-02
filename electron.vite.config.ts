@@ -11,11 +11,15 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     resolve: { alias: { ...sharedAlias } },
+    build: {
+      sourcemap: true,
+    },
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
     resolve: { alias: { ...sharedAlias } },
     build: {
+      sourcemap: true,
       rollupOptions: {
         output: {
           format: 'cjs',
@@ -32,6 +36,9 @@ export default defineConfig({
         '@renderer': resolve(__dirname, 'src/renderer/src'),
         ...sharedAlias,
       },
+    },
+    build: {
+      sourcemap: true,
     },
   },
 })

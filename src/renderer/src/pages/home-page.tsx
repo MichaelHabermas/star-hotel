@@ -10,10 +10,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@renderer/components/ui/card'
+import { runPerfSmoke, type PerfSmokeResult } from '@renderer/lib/perf-measurements'
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app'
+import { capturePostHogWorkflow } from '@renderer/telemetry/renderer-telemetry'
 
 export function HomePage(): JSX.Element {
   const starHotel = useStarHotelApp()
+  const [perfSmoke, setPerfSmoke] = useState<
+    | { kind: 'idle' }
+    | { kind: 'loading' }
+    | { kind: 'ok'; result: PerfSmokeResult }
+    | { kind: 'err'; message: string }
+  >({ kind: 'idle' })
   const [reservationSmoke, setReservationSmoke] = useState<
     | { kind: 'idle' }
     | { kind: 'loading' }
@@ -90,6 +98,25 @@ export function HomePage(): JSX.Element {
             </Button>
             <Button
               type="button"
+              variant="secondary"
+              disabled={perfSmoke.kind === 'loading'}
+              onClick={async () => {
+                setPerfSmoke({ kind: 'loading' })
+                try {
+                  const result = await runPerfSmoke(starHotel)
+                  setPerfSmoke({ kind: 'ok', result })
+                } catch (err) {
+                  setPerfSmoke({
+                    kind: 'err',
+                    message: err instanceof Error ? err.message : String(err),
+                  })
+                }
+              }}
+            >
+              Perf smoke (E7)
+            </Button>
+            <Button
+              type="button"
               variant="default"
               disabled={reservationSmoke.kind === 'loading'}
               onClick={async () => {
@@ -97,6 +124,7 @@ export function HomePage(): JSX.Element {
                 try {
                   const rows = await starHotel.api.reservations.list({})
                   setReservationSmoke({ kind: 'ok', count: rows.length })
+                  capturePostHogWorkflow('workflow_list_reservations', { count: rows.length })
                 } catch (err) {
                   setReservationSmoke({
                     kind: 'err',
@@ -116,6 +144,17 @@ export function HomePage(): JSX.Element {
           {reservationSmoke.kind === 'err' ? (
             <p className="text-destructive text-sm" role="alert">
               {reservationSmoke.message}
+            </p>
+          ) : null}
+          {perfSmoke.kind === 'ok' ? (
+            <p className="text-muted-foreground text-xs font-mono" role="status">
+              Perf: HTTP health {perfSmoke.result.embeddedApiRttMs} ms · IPC {perfSmoke.result.ipcRttMs} ms · GET
+              /api/reservations {perfSmoke.result.reservationListMs} ms (see docs/PERF.md)
+            </p>
+          ) : null}
+          {perfSmoke.kind === 'err' ? (
+            <p className="text-destructive text-sm" role="alert">
+              {perfSmoke.message}
             </p>
           ) : null}
         </CardContent>

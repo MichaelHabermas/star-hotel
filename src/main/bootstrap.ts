@@ -12,7 +12,7 @@ export type StarHotelMainDeps = {
   readonly registerActivateHandler: (createWindow: () => void) => void
   readonly createMainWindow: (deps: MainWindowDeps) => unknown
   readonly mainWindowParams: () => MainWindowDeps
-  readonly logger: Pick<Console, 'log' | 'error'>
+  readonly logger: Pick<Console, 'info' | 'error'>
 }
 
 /**
@@ -25,12 +25,14 @@ export async function startStarHotelMain(d: StarHotelMainDeps): Promise<void> {
   await d.app.whenReady()
 
   const readyMs = Date.now() - d.appStartMs
-  d.logger.log(`[star-hotel] app.whenReady() + ${readyMs}ms from process start (see docs/PERF.md)`)
+  d.logger.info(
+    `[star-hotel] app.whenReady() + ${readyMs}ms from process start (see docs/PERF.md)`,
+  )
 
   try {
     await d.ensureEmbeddedApiAndIpc()
-    d.logger.log(`[star-hotel] API ${d.apiBaseUrl} (see docs/PERF.md)`)
-    d.logger.log(`[star-hotel] Swagger UI ${d.apiBaseUrl}/api/docs`)
+    d.logger.info(`[star-hotel] API ${d.apiBaseUrl} (see docs/PERF.md)`)
+    d.logger.info(`[star-hotel] Swagger UI ${d.apiBaseUrl}/api/docs`)
   } catch (err) {
     d.logger.error('[star-hotel] embedded API server failed to start', err)
     d.app.quit()

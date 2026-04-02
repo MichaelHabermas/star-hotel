@@ -1,5 +1,7 @@
 import type { JSX } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { HashRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry'
 import { AppShell } from '@renderer/layout/app-shell'
 import { createStarHotelApp } from '@renderer/lib/star-hotel-app'
 import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider'
@@ -10,6 +12,14 @@ import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-ro
 import { DEFAULT_API_PORT } from '@shared/constants'
 import { buildApiBaseUrl } from '@shared/embedded-api-config'
 import type { StarHotelPreloadAPI } from '@shared/preload-contract'
+
+function PostHogRouteListener(): null {
+  const loc = useLocation()
+  useEffect(() => {
+    capturePostHogNavigation(loc.pathname)
+  }, [loc.pathname])
+  return null
+}
 
 const BRIDGE_MISSING_ERROR =
   '[star-hotel] preload bridge missing: window.starHotel is undefined. Ensure the app is running via Electron and preload loaded correctly.'
@@ -46,6 +56,7 @@ export function App(): JSX.Element {
   return (
     <StarHotelAppProvider app={starHotelApp}>
       <HashRouter>
+        <PostHogRouteListener />
         <Routes>
           <Route element={<AppShell />}>
             <Route path="/" element={<HomePage />} />

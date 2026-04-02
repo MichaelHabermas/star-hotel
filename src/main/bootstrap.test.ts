@@ -43,7 +43,7 @@ describe('startStarHotelMain', () => {
         isDev: false,
         apiBaseUrl: 'http://127.0.0.1:45123',
       }),
-      logger: { log: vi.fn(), error: vi.fn() },
+      logger: { info: vi.fn(), error: vi.fn() },
     })
 
     expect(order).toEqual(['windowAllClosed', 'apiAndIpc', 'window', 'activate'])
@@ -73,7 +73,7 @@ describe('startStarHotelMain', () => {
         isDev: false,
         apiBaseUrl: 'http://127.0.0.1:45123',
       }),
-      logger: { log: vi.fn(), error: vi.fn() },
+      logger: { info: vi.fn(), error: vi.fn() },
     })
 
     expect(quit).toHaveBeenCalledTimes(1)

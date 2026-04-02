@@ -1,28 +1,46 @@
 # Performance notes
 
-## Cold start (Epic E1)
+## PRD targets (reference)
 
-**Target (PRD):** application UI **interactive** within **≤2000 ms** from launch ([PRD §1](../PRD.md)).
+| Metric | Target | Notes |
+|--------|--------|--------|
+| Cold start | ≤2000 ms | UI interactive ([PRD §1](../PRD.md)) |
+| IPC round-trip | ≤15 ms | Dev-measured harness |
+| Critical DB ops | ≤50 ms | Local WAL |
+| Primary view transition | ≤100 ms | Perceived |
 
-### Recorded measurement (today)
+## Cold start
+
+**Target (PRD):** application UI **interactive** within **≤2000 ms** from launch.
 
 | Metric | What it covers | How to read it |
 |--------|----------------|----------------|
-| Main-process readiness | Process start → `app.whenReady()` | Log: `[star-hotel] app.whenReady() + Nms from process start` ([`src/main/bootstrap.ts`](../src/main/bootstrap.ts)) |
+| Main-process readiness | Process start → `app.whenReady()` | JSON log from [`mainProcessLogger`](../src/server/logging/structured-logger.ts) / line: `[star-hotel] app.whenReady() + Nms from process start` ([`src/main/bootstrap.ts`](../src/main/bootstrap.ts)) |
 
-**Procedure (dev, informal):**
+**Procedure (dev):**
 
-1. Start `pnpm dev` from a warm machine.
-2. Note the log line above in the terminal.
-3. Optionally note when the window first shows meaningful content (not yet automated).
+1. Run `pnpm dev`.
+2. Read the terminal line above (`Nms`).
 
-### Gap vs full PRD target (documented)
+**Gap:** The **≤2000 ms** bar is for **perceived** readiness; we still do not automate first paint / TTI. Compare **`pnpm build` + `pnpm preview`** for a fairer number than dev+HMR.
 
-The **≤2000 ms** PRD target applies to **perceived UI readiness**, not only `app.whenReady()`. Today we **record** the main-process slice only; we do **not** yet have an automated number for **first paint** or **time-to-interactive**. That gap is acceptable for Epic E1 per PRD (“measured and recorded **or** gap documented with remediation plan”).
+## IPC and embedded API round-trip (Epic E7)
 
-**Remediation plan**
+| Metric | What it covers | How to measure |
+|--------|----------------|----------------|
+| Embedded API RTT | Renderer → `GET /health` → main | Home **Perf smoke (E7)** or [`runPerfSmoke`](../src/renderer/src/lib/perf-measurements.ts) (`embeddedApiRttMs`) |
+| IPC RTT | Renderer → `ipcMain.handle('ping')` → SQLite readiness | Same (`ipcRttMs`) |
+| Representative query | `GET /api/reservations` list | Same (`reservationListMs`); also in **structured logs** as `http.access` with `path` and `durationMs` |
 
-- **Epic E7:** add timestamps for IPC round-trip, representative query, and (where feasible) first paint / route transition; document methodology in this file or `README`.
-- **If `app.whenReady()` alone exceeds budget:** defer non-critical main work before `whenReady`, trim renderer entry imports, compare **production** `pnpm build` + `pnpm preview` (fairer than dev+HMR for packaging targets).
+**Procedure:** On Home, click **Perf smoke (E7)**. The UI prints three latencies; copy into this file when recording a baseline.
 
-**Interpretation:** Dev HMR and renderer attach are **out of scope** for this E1 metric; treat them separately when tightening the budget.
+**Interpretation:** IPC and health checks are **not** identical (HTTP vs IPC channel). The PRD **≤15 ms** IPC target applies to the **IPC ping** number in dev on a warm machine.
+
+## Gap list (owners)
+
+| Item | Status |
+|------|--------|
+| First paint / TTI | Not automated |
+| Route transition ≤100 ms | Not automated; use React Profiler + manual spot checks |
+
+**Remediation:** Trim main work before first paint; avoid heavy synchronous imports in renderer entry; profile `pnpm preview` builds.

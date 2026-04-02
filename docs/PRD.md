@@ -208,7 +208,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **MVP milestone (marked here on the timeline):** When **E3**, **E4**, **E5**, and **E6** are all checked, you are at the **single** MVP checkpoint—**complete**, **demo-able**, and **shipable** mean the same thing ([§1 — MVP milestone](#mvp-milestone-one-bar-complete--demo-able--shipable)). Anything below this line is **after** MVP.
 
-- [ ] **E7** — Performance budget & observability
+- [x] **E7** — Performance budget & observability
 - [ ] **E8** — Full parity UI (module breadth per spec)
 - [ ] **E9** — Reports (scope per T5)
 - [ ] **E10** — Packaging & course submission
@@ -402,24 +402,24 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 **Epic DoD (course spec for Early Submission):** Sentry + PostHog integrated; Electron `crashReporter` (Crashpad) configured; structured backend logging; dev harness or logging for startup, IPC RTT, and critical query latency vs spec thresholds; T7 PII redaction policy applied before wide event capture.
 
-- [ ] **US7.1 — Performance instrumentation**  
+- [x] **US7.1 — Performance instrumentation**  
   - **Feature F7.1.1:** Timestamps for cold start, IPC ping, representative query.  
-    - [ ] **T7.1.1.1:** Results recorded in README or `docs/PERF.md`.  
+    - [x] **T7.1.1.1:** Results recorded in README or `docs/PERF.md`.  
     - **DoD:** Meets targets or lists gaps + owners.
 
-- [ ] **US7.2 — Sentry (JS + Electron)**  
+- [x] **US7.2 — Sentry (JS + Electron)**  
   - **Feature F7.2.1:** Renderer + main capture; source maps in prod build story documented.  
     - **DoD:** Test event received in Sentry project (staging OK).
 
-- [ ] **US7.3 — PostHog analytics**  
+- [x] **US7.3 — PostHog analytics**  
   - **Feature F7.3.1:** Core funnel: session, key navigation, workflow completion.  
     - **DoD:** Test event visible in PostHog; env keys not committed.
 
-- [ ] **US7.4 — crashReporter**  
+- [x] **US7.4 — crashReporter**  
   - **Feature F7.4.1:** Native crash capture per spec.  
     - **DoD:** Configuration documented in architecture PDF section.
 
-- [ ] **US7.5 — Structured logging**  
+- [x] **US7.5 — Structured logging**  
   - **Feature F7.5.1:** Request IDs, duration, route, outcome; async where appropriate.  
     - **DoD:** Sample log line in docs; T7 redaction rules referenced.
 
