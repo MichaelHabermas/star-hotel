@@ -1,19 +1,18 @@
 import { loginBodySchema } from '@shared/schemas/auth';
 import type { Express } from 'express';
-import { Router } from 'express';
-import { createSqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit';
-import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port';
+import {
+  createSqliteDomainRouter,
+  type SqliteHttpAdapterKit,
+} from '../http/sqlite-http-adapter-kit';
 import { AuthService } from './auth-service';
 import { UserRepository } from './user-repository';
 
-export function registerAuthRoutes(app: Express, persistence: HotelSqlitePersistencePort): void {
-  const kit = createSqliteHttpAdapterKit(persistence);
+export function registerAuthRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
   const getAuthService = kit.createLazySqliteService(
     (db) => new AuthService(new UserRepository(db)),
   );
 
-  const router = Router();
-  router.use(kit.ensurePersistenceReady);
+  const router = createSqliteDomainRouter(kit);
 
   router.post(
     '/login',

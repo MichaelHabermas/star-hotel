@@ -10,7 +10,7 @@ import {
   type GuestUpdateBody,
 } from '../schemas/guest';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
-import { throwIfOpenApiError } from './embedded-http';
+import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 export type GuestsHttpClient = {
   list(query?: GuestListQuery): Promise<GuestResponse[]>;
@@ -30,16 +30,14 @@ export function createGuestsHttpClient(deps: {
     async list(query = {}) {
       guestListQuerySchema.parse(query);
       const r = await client.GET('/api/guests', {});
-      throwIfOpenApiError(r);
-      return z.array(guestResponseSchema).parse(r.data);
+      return parseOpenApiOkData(r, z.array(guestResponseSchema));
     },
 
     async get(id) {
       const r = await client.GET('/api/guests/{id}', {
         params: { path: { id } },
       });
-      throwIfOpenApiError(r);
-      return guestResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, guestResponseSchema);
     },
 
     async create(body) {
@@ -47,8 +45,7 @@ export function createGuestsHttpClient(deps: {
       const r = await client.POST('/api/guests', {
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return guestResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, guestResponseSchema);
     },
 
     async update(id, body) {
@@ -57,18 +54,14 @@ export function createGuestsHttpClient(deps: {
         params: { path: { id } },
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return guestResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, guestResponseSchema);
     },
 
     async delete(id) {
       const r = await client.DELETE('/api/guests/{id}', {
         params: { path: { id } },
       });
-      if (r.response.status === 204) {
-        return;
-      }
-      throwIfOpenApiError(r);
+      assertOpenApiNoContentOrThrow(r);
     },
   };
 }

@@ -1,16 +1,7 @@
 import { AppShell } from '@renderer/layout/app-shell';
 import { AuthRoot } from '@renderer/lib/auth-context';
-import { DaySheetReportPage } from '@renderer/pages/day-sheet-report-page';
-import { FolioReportPage } from '@renderer/pages/folio-report-page';
-import { GuestFormPage } from '@renderer/pages/guest-form-page';
-import { GuestsListPage } from '@renderer/pages/guests-list-page';
-import { HomePage } from '@renderer/pages/home-page';
 import { LoginPage } from '@renderer/pages/login-page';
-import { ReservationFormPage } from '@renderer/pages/reservation-form-page';
-import { ReservationsListPage } from '@renderer/pages/reservations-list-page';
-import { RoomFormPage } from '@renderer/pages/room-form-page';
-import { RoomsListPage } from '@renderer/pages/rooms-list-page';
-import { devRouteDefinitions, isDevRoutesEnabled } from '@renderer/routes/dev-routes';
+import { AuthenticatedAppShellRoutes } from '@renderer/routes/authenticated-app-routes';
 import { RequireAuth, RequireGuest } from '@renderer/routes/require-auth';
 import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry';
 import type { JSX } from 'react';
@@ -41,26 +32,7 @@ export function App(): JSX.Element {
           />
           <Route element={<RequireAuth />}>
             <Route element={<AppShell />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/reservations" element={<ReservationsListPage />} />
-              <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
-              <Route
-                path="/reservations/:reservationId"
-                element={<ReservationFormPage mode="edit" />}
-              />
-              <Route path="/rooms" element={<RoomsListPage />} />
-              <Route path="/rooms/new" element={<RoomFormPage mode="create" />} />
-              <Route path="/rooms/:roomId" element={<RoomFormPage mode="edit" />} />
-              <Route path="/guests" element={<GuestsListPage />} />
-              <Route path="/guests/new" element={<GuestFormPage mode="create" />} />
-              <Route path="/guests/:guestId" element={<GuestFormPage mode="edit" />} />
-              <Route path="/reports/folio/:reservationId" element={<FolioReportPage />} />
-              <Route path="/reports/day-sheet" element={<DaySheetReportPage />} />
-              {isDevRoutesEnabled
-                ? devRouteDefinitions.map(({ path, Page }) => (
-                    <Route key={path} path={path} element={<Page />} />
-                  ))
-                : null}
+              <AuthenticatedAppShellRoutes />
             </Route>
           </Route>
         </Routes>

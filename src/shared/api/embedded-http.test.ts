@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
+  assertOpenApiNoContentOrThrow,
   EmbeddedApiHttpError,
   formatEmbeddedApiUserMessage,
   parseEmbeddedJsonOk,
+  parseOpenApiOkData,
   throwIfOpenApiError,
 } from './embedded-http';
 
@@ -83,6 +85,54 @@ describe('throwIfOpenApiError', () => {
       throwIfOpenApiError({
         response: new Response(null, { status: 404 }),
         error: { error: { code: 'NOT_FOUND', message: 'missing' } },
+      }),
+    ).toThrow(EmbeddedApiHttpError);
+  });
+});
+
+describe('parseOpenApiOkData', () => {
+  it('parses data when response is ok', () => {
+    const schema = z.object({ id: z.number() });
+    expect(
+      parseOpenApiOkData(
+        {
+          response: new Response(null, { status: 200 }),
+          data: { id: 1 },
+          error: undefined,
+        },
+        schema,
+      ),
+    ).toEqual({ id: 1 });
+  });
+
+  it('throws when response is not ok', () => {
+    expect(() =>
+      parseOpenApiOkData(
+        {
+          response: new Response(null, { status: 500 }),
+          error: undefined,
+        },
+        z.object({}),
+      ),
+    ).toThrow();
+  });
+});
+
+describe('assertOpenApiNoContentOrThrow', () => {
+  it('no-ops on 204', () => {
+    expect(() =>
+      assertOpenApiNoContentOrThrow({
+        response: new Response(null, { status: 204 }),
+        error: undefined,
+      }),
+    ).not.toThrow();
+  });
+
+  it('delegates to throwIfOpenApiError when not 204', () => {
+    expect(() =>
+      assertOpenApiNoContentOrThrow({
+        response: new Response(null, { status: 404 }),
+        error: { error: { code: 'NOT_FOUND', message: 'x' } },
       }),
     ).toThrow(EmbeddedApiHttpError);
   });

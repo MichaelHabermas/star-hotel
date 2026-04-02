@@ -59,6 +59,26 @@ export function throwIfOpenApiError(result: {
   throw new Error(`HTTP ${result.response.status}`);
 }
 
+/** After {@link throwIfOpenApiError}, parse successful `data` with Zod (openapi-fetch result shape). */
+export function parseOpenApiOkData<T>(
+  result: { readonly response: Response; readonly data?: unknown; readonly error?: unknown },
+  schema: z.ZodType<T>,
+): T {
+  throwIfOpenApiError(result);
+  return schema.parse(result.data);
+}
+
+/** DELETE and similar: accept 204 or map errors via openapi-fetch. */
+export function assertOpenApiNoContentOrThrow(result: {
+  readonly response: Response;
+  readonly error?: unknown;
+}): void {
+  if (result.response.status === 204) {
+    return;
+  }
+  throwIfOpenApiError(result);
+}
+
 export async function parseEmbeddedJsonOk<T>(res: Response, schema: z.ZodType<T>): Promise<T> {
   const text = await res.text();
   if (!res.ok) {

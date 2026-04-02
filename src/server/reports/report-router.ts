@@ -1,16 +1,17 @@
 import { daySheetReportQuerySchema, folioReportQuerySchema } from '@shared/schemas/report';
-import { Router } from 'express';
-import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit';
+import type { Router } from 'express';
+import {
+  createSqliteDomainRouter,
+  type SqliteHttpAdapterKit,
+} from '../http/sqlite-http-adapter-kit';
 import { ReportRepository } from './report-repository';
 import { ReportService } from './report-service';
 
 export function createReportRouter(kit: SqliteHttpAdapterKit): Router {
-  const router = Router();
+  const router = createSqliteDomainRouter(kit);
   const getReportService = kit.createLazySqliteService(
     (db) => new ReportService(new ReportRepository(db)),
   );
-
-  router.use(kit.ensurePersistenceReady);
 
   router.get(
     '/folio',

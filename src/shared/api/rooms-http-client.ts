@@ -10,7 +10,7 @@ import {
   type RoomUpdateBody,
 } from '../schemas/room';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
-import { throwIfOpenApiError } from './embedded-http';
+import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 function listQueryParams(query: RoomListQuery): { status?: string } | undefined {
   const parsed = roomListQuerySchema.parse(query);
@@ -40,16 +40,14 @@ export function createRoomsHttpClient(deps: {
       const r = await client.GET('/api/rooms', {
         params: q ? { query: q } : {},
       });
-      throwIfOpenApiError(r);
-      return z.array(roomResponseSchema).parse(r.data);
+      return parseOpenApiOkData(r, z.array(roomResponseSchema));
     },
 
     async get(id) {
       const r = await client.GET('/api/rooms/{id}', {
         params: { path: { id } },
       });
-      throwIfOpenApiError(r);
-      return roomResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, roomResponseSchema);
     },
 
     async create(body) {
@@ -57,8 +55,7 @@ export function createRoomsHttpClient(deps: {
       const r = await client.POST('/api/rooms', {
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return roomResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, roomResponseSchema);
     },
 
     async update(id, body) {
@@ -67,18 +64,14 @@ export function createRoomsHttpClient(deps: {
         params: { path: { id } },
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return roomResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, roomResponseSchema);
     },
 
     async delete(id) {
       const r = await client.DELETE('/api/rooms/{id}', {
         params: { path: { id } },
       });
-      if (r.response.status === 204) {
-        return;
-      }
-      throwIfOpenApiError(r);
+      assertOpenApiNoContentOrThrow(r);
     },
   };
 }

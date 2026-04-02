@@ -2,6 +2,7 @@ import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createServerApp } from './create-app';
+import { createSqliteHttpAdapterKit } from './http/sqlite-http-adapter-kit';
 import {
   createSqlitePersistencePort,
   type SqlitePersistencePort,
@@ -23,10 +24,11 @@ function seedSampleData(db: SqliteDb): { roomId: number; guestId: number } {
 }
 
 function createTestApp(persistence: SqlitePersistencePort) {
+  const kit = createSqliteHttpAdapterKit(persistence);
   return createServerApp({
     persistence,
     registerApiRoutes: (expressApp) => {
-      registerMvpSqliteApiRoutes(expressApp, persistence);
+      registerMvpSqliteApiRoutes(expressApp, kit);
     },
   });
 }

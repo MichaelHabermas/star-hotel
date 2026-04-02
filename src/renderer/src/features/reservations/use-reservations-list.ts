@@ -1,32 +1,15 @@
 import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
+import { useEmbeddedListLoad, type EmbeddedListState } from '@renderer/lib/use-embedded-list-load';
 import type { ReservationResponse } from '@shared/schemas/reservation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
-export type ReservationsListState =
-  | { kind: 'idle' }
-  | { kind: 'loading' }
-  | { kind: 'ok'; rows: ReservationResponse[] }
-  | { kind: 'err'; message: string };
+export type ReservationsListState = EmbeddedListState<ReservationResponse>;
 
 export function useReservationsList(app: StarHotelApp): {
   readonly list: ReservationsListState;
   readonly reload: () => Promise<void>;
 } {
-  const [list, setList] = useState<ReservationsListState>({ kind: 'idle' });
-
-  const reload = useCallback(async () => {
-    setList({ kind: 'loading' });
-    try {
-      const rows = await app.api.reservations.list({});
-      setList({ kind: 'ok', rows });
-    } catch (err) {
-      setList({ kind: 'err', message: app.formatEmbeddedApiUserMessage(err) });
-    }
-  }, [app]);
-
-  useEffect(() => {
-    void reload();
-  }, [reload]);
-
-  return { list, reload };
+  const load = useCallback(() => app.api.reservations.list({}), [app]);
+  const formatError = useCallback((err: unknown) => app.formatEmbeddedApiUserMessage(err), [app]);
+  return useEmbeddedListLoad<ReservationResponse>({ load, formatError });
 }

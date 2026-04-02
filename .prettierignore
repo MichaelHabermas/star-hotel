@@ -5,3 +5,5 @@ dist
 coverage
 docs
 CLAUDE.md
+src/server/openapi/openapi-spec.json
+src/shared/api/generated/openapi-types.ts

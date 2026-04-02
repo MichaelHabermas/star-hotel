@@ -4,18 +4,19 @@ import {
   guestListQuerySchema,
   guestUpdateBodySchema,
 } from '@shared/schemas/guest';
-import { Router } from 'express';
-import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit';
+import type { Router } from 'express';
+import {
+  createSqliteDomainRouter,
+  type SqliteHttpAdapterKit,
+} from '../http/sqlite-http-adapter-kit';
 import { GuestRepository } from './guest-repository';
 import { GuestService } from './guest-service';
 
 export function createGuestRouter(kit: SqliteHttpAdapterKit): Router {
-  const router = Router();
+  const router = createSqliteDomainRouter(kit);
   const getGuestService = kit.createLazySqliteService(
     (db) => new GuestService(new GuestRepository(db)),
   );
-
-  router.use(kit.ensurePersistenceReady);
 
   router.get(
     '/',

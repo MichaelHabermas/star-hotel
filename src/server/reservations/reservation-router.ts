@@ -4,18 +4,19 @@ import {
   reservationListQuerySchema,
   reservationUpdateBodySchema,
 } from '@shared/schemas/reservation';
-import { Router } from 'express';
-import type { SqliteHttpAdapterKit } from '../http/sqlite-http-adapter-kit';
+import type { Router } from 'express';
+import {
+  createSqliteDomainRouter,
+  type SqliteHttpAdapterKit,
+} from '../http/sqlite-http-adapter-kit';
 import { ReservationRepository } from './reservation-repository';
 import { ReservationService } from './reservation-service';
 
 export function createReservationRouter(kit: SqliteHttpAdapterKit): Router {
-  const router = Router();
+  const router = createSqliteDomainRouter(kit);
   const getReservationService = kit.createLazySqliteService(
     (db) => new ReservationService(new ReservationRepository(db)),
   );
-
-  router.use(kit.ensurePersistenceReady);
 
   router.get(
     '/',

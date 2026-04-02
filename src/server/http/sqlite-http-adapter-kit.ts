@@ -1,4 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import { Router } from 'express';
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port';
 
 type SqliteDb = ReturnType<HotelSqlitePersistencePort['getDatabase']>;
@@ -18,6 +19,15 @@ export type SqliteHttpAdapterKit = {
   readonly ensurePersistenceReady: RequestHandler;
   createLazySqliteService<T>(factory: (db: SqliteDb) => T): () => Promise<T>;
 };
+
+/**
+ * Express `Router` with `ensurePersistenceReady` already applied — shared by domain REST routers.
+ */
+export function createSqliteDomainRouter(kit: SqliteHttpAdapterKit): Router {
+  const router = Router();
+  router.use(kit.ensurePersistenceReady);
+  return router;
+}
 
 export function createSqliteHttpAdapterKit(
   persistence: HotelSqlitePersistencePort,

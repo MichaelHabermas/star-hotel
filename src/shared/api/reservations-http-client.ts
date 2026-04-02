@@ -10,7 +10,7 @@ import {
   type ReservationUpdateBody,
 } from '../schemas/reservation';
 import { createEmbeddedOpenApiClient } from './create-embedded-openapi-client';
-import { throwIfOpenApiError } from './embedded-http';
+import { assertOpenApiNoContentOrThrow, parseOpenApiOkData } from './embedded-http';
 
 export { EmbeddedApiHttpError as ReservationsHttpError } from './embedded-http';
 export type { EmbeddedApiErrorBody as ApiErrorBody } from './embedded-http';
@@ -52,16 +52,14 @@ export function createReservationsHttpClient(deps: {
       const r = await client.GET('/api/reservations', {
         params: q ? { query: q } : {},
       });
-      throwIfOpenApiError(r);
-      return z.array(reservationResponseSchema).parse(r.data);
+      return parseOpenApiOkData(r, z.array(reservationResponseSchema));
     },
 
     async get(id) {
       const r = await client.GET('/api/reservations/{id}', {
         params: { path: { id } },
       });
-      throwIfOpenApiError(r);
-      return reservationResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, reservationResponseSchema);
     },
 
     async create(body) {
@@ -69,8 +67,7 @@ export function createReservationsHttpClient(deps: {
       const r = await client.POST('/api/reservations', {
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return reservationResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, reservationResponseSchema);
     },
 
     async update(id, body) {
@@ -79,18 +76,14 @@ export function createReservationsHttpClient(deps: {
         params: { path: { id } },
         body: payload,
       });
-      throwIfOpenApiError(r);
-      return reservationResponseSchema.parse(r.data);
+      return parseOpenApiOkData(r, reservationResponseSchema);
     },
 
     async delete(id) {
       const r = await client.DELETE('/api/reservations/{id}', {
         params: { path: { id } },
       });
-      if (r.response.status === 204) {
-        return;
-      }
-      throwIfOpenApiError(r);
+      assertOpenApiNoContentOrThrow(r);
     },
   };
 }

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
 import { createSqlitePersistencePort } from '../persistence/sqlite-persistence';
-import { createSqliteHttpAdapterKit } from './sqlite-http-adapter-kit';
+import { createSqliteDomainRouter, createSqliteHttpAdapterKit } from './sqlite-http-adapter-kit';
 
 describe('createSqliteHttpAdapterKit', () => {
   it('asyncHandler forwards rejections to next', async () => {
@@ -51,6 +51,16 @@ describe('createSqliteHttpAdapterKit', () => {
     await getSvc();
     await getSvc();
     expect(builds).toBe(1);
+    await persistence.close();
+  });
+
+  it('createSqliteDomainRouter applies ensurePersistenceReady as first middleware', async () => {
+    const persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    const kit = createSqliteHttpAdapterKit(persistence);
+    const router = createSqliteDomainRouter(kit);
+    const stack = router.stack;
+    const first = stack[0];
+    expect(first?.handle).toBe(kit.ensurePersistenceReady);
     await persistence.close();
   });
 
