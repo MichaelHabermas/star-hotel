@@ -1,7 +1,7 @@
 import { AppShell } from '@renderer/layout/app-shell';
 import { AuthRoot } from '@renderer/lib/auth-context';
 import { LoginPage } from '@renderer/pages/login-page';
-import { AuthenticatedAppShellRoutes } from '@renderer/routes/authenticated-app-routes';
+import { authenticatedAppShellRoutes } from '@renderer/routes/authenticated-app-routes';
 import { RequireAuth, RequireGuest } from '@renderer/routes/require-auth';
 import { capturePostHogNavigation } from '@renderer/telemetry/renderer-telemetry';
 import type { JSX } from 'react';
@@ -31,9 +31,7 @@ export function App(): JSX.Element {
             }
           />
           <Route element={<RequireAuth />}>
-            <Route element={<AppShell />}>
-              <AuthenticatedAppShellRoutes />
-            </Route>
+            <Route element={<AppShell />}>{authenticatedAppShellRoutes}</Route>
           </Route>
         </Routes>
       </HashRouter>
