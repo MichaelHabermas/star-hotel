@@ -210,7 +210,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 
 - [x] **E7** — Performance budget & observability
 - [x] **E8** — Full parity UI (module breadth per spec)
-- [ ] **E9** — Reports (scope per T5)
+- [x] **E9** — Reports (scope per T5)
 - [ ] **E10** — Packaging & course submission
 
 ---
@@ -463,17 +463,17 @@ Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay
 
 ## Epic E9 — Reports (Crystal → modern)
 
-**Epic DoD:** Scope per **T5**; output via React print view and/or PDF; data from Express (no renderer SQL); matches agreed parity list.
+**Epic DoD:** Scope per **T5**; output via React print view and/or PDF; data from Express (no renderer SQL); matches agreed parity list ([E9-REPORTS-PARITY.md](./E9-REPORTS-PARITY.md)).
 
-- [ ] **US9.1 — Report data API**  
+- [x] **US9.1 — Report data API**  
   - **Feature F9.1.1:** Queries encapsulated in report service.  
     - **DoD:** Same DRY boundaries as E3.
 
-- [ ] **US9.2 — Guest folio / receipt**  
+- [x] **US9.2 — Guest folio / receipt**  
   - **Feature F9.2.1:** Print-friendly HTML + optional PDF.  
     - **DoD:** Visual parity checklist signed off or gap listed.
 
-- [ ] **US9.3 — Grouped / financial reports (optional per T5)**  
+- [x] **US9.3 — Grouped / financial reports (optional per T5)**  
   - **Feature F9.3.1:** Only if T5 includes; else mark N/A.  
     - **DoD:** Explicit reference to [DECISIONS.md](./DECISIONS.md) section **T5** (grouped financials are out of minimum scope unless stretch time is allocated).
 

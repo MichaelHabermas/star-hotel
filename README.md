@@ -29,16 +29,16 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 
 ## Project layout (modular boundaries)
 
-| Path            | Role                                                                                                                                              |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                       |
-| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                   |
-| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                |
-| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                             |
-| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                              |
-| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                             |
-| `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)) |
-| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                       |
+| Path            | Role                                                                                                                                                                                                                       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                                                                                                |
+| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                                                                                            |
+| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                                                                                         |
+| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                                                                                                      |
+| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                                                                                                       |
+| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                                                                                                      |
+| `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), E9 reports sign-off ([E9-REPORTS-PARITY.md](docs/E9-REPORTS-PARITY.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)) |
+| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                                                                                                |
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
@@ -83,6 +83,10 @@ The main process runs an HTTP server on **loopback only** (`127.0.0.1`), not on 
 - **Dev vs production build:** `electron-vite` externalizes `better-sqlite3` so Node loads the native addon from `node_modules` at runtime. `pnpm build` must succeed on your OS; if a packaged installer fails to load the addon, ensure native modules are unpacked from the ASAR (Epic E10 / Electron Builder configuration).
 - **Migrations:** Forward-only migrations live in [`src/server/db/run-migrations.ts`](src/server/db/run-migrations.ts); WAL and foreign keys are enabled when the DB opens.
 - **Legacy `.mdb` import:** Not in MVP scope — [docs/DECISIONS.md](docs/DECISIONS.md) (T4) clean install + seeds; optional import is post-MVP if scheduled.
+
+## Reports (Epic E9)
+
+Guest **folio / receipt** and **day sheet** (operational summary) are implemented per [DECISIONS.md](docs/DECISIONS.md) **T5**: Express-backed JSON, print-friendly React views, no SQL in the renderer. Scope and parity sign-off: [docs/E9-REPORTS-PARITY.md](docs/E9-REPORTS-PARITY.md). API: `GET /api/reports/folio`, `GET /api/reports/day-sheet` (see OpenAPI/Swagger in [Embedded Express API](#embedded-express-api-epic-e3)).
 
 ## Visual design (Epic E1.5)
 
