@@ -1,6 +1,6 @@
 # Star Hotel
 
-Modernized desktop replacement for the legacy VB6 + Microsoft Access hotel reservation system. **Epics E0–E1** (scaffold), **E1.5** (visual direction locked in [STYLE-GUIDE.md](docs/STYLE-GUIDE.md); static lab in [style-test/](style-test/)), and **E2** (SQLite + WAL + migrations in main) are reflected in [docs/PRD.md](docs/PRD.md): Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
+Modernized desktop replacement for the legacy VB6 + Microsoft Access hotel reservation system. **Epics E0–E9** (through reports) are complete; **E10** (packaging and course submission) is documented below and in [docs/PRD.md](docs/PRD.md). Stack: Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
 
 Authoritative requirements: [docs/PRD.md](docs/PRD.md).
 
@@ -11,34 +11,41 @@ Authoritative requirements: [docs/PRD.md](docs/PRD.md).
 
 ## Commands
 
-| Command             | Description                                |
-| ------------------- | ------------------------------------------ |
-| `pnpm install`      | Install dependencies                       |
-| `pnpm dev`          | Electron + Vite dev (HMR in renderer)      |
-| `pnpm build`        | Production build to `out/`                 |
-| `pnpm preview`      | Preview production build                   |
-| `pnpm test`         | Vitest (unit + RTL)                        |
-| `pnpm lint`         | ESLint                                     |
-| `pnpm format`       | Prettier write                             |
-| `pnpm format:check` | Prettier check only                        |
-| `pnpm typecheck`    | `tsc --noEmit` for main/preload + renderer |
+| Command             | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| `pnpm install`      | Install dependencies                                                     |
+| `pnpm dev`          | Electron + Vite dev (HMR in renderer)                                    |
+| `pnpm build`        | Production build to `out/`                                               |
+| `pnpm preview`      | Preview production build                                                 |
+| `pnpm dist`         | `pnpm build` + Electron Builder installer(s) for current OS → `release/` |
+| `pnpm dist:dir`     | Unpacked app only (quick packaging sanity check) → `release/`            |
+| `pnpm dist:linux`   | Linux portable zip (CI)                                                  |
+| `pnpm dist:mac`     | macOS DMG + zip                                                          |
+| `pnpm dist:win`     | Windows NSIS x64 installer                                               |
+| `pnpm test`         | Vitest (unit + RTL)                                                      |
+| `pnpm lint`         | ESLint                                                                   |
+| `pnpm format`       | Prettier write                                                           |
+| `pnpm format:check` | Prettier check only                                                      |
+| `pnpm typecheck`    | `tsc --noEmit` for main/preload + renderer                               |
+| `pnpm cleanup`      | Format + lint fix + typecheck (pre-commit / ship)                        |
 
 Single test file: `pnpm test -- src/renderer/src/lib/utils.test.ts`
 
-CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typecheck`, `test`, and `build` — see [.github/workflows/ci.yml](.github/workflows/ci.yml).
+CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typecheck`, `test`, `build`, then **packaging smoke** (Linux zip + Windows NSIS artifacts) — see [.github/workflows/ci.yml](.github/workflows/ci.yml) and [docs/PACKAGING.md](docs/PACKAGING.md) (T6).
 
 ## Project layout (modular boundaries)
 
-| Path            | Role                                                                                                                                                                                                                       |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                                                                                                |
-| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                                                                                            |
-| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                                                                                         |
-| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                                                                                                      |
-| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                                                                                                       |
-| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                                                                                                      |
-| `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), E9 reports sign-off ([E9-REPORTS-PARITY.md](docs/E9-REPORTS-PARITY.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)) |
-| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                                                                                                |
+| Path            | Role                                                                                                                                                                                                                                                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                                                                                                                                                                                                                                         |
+| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                                                                                                                                                                                                                                     |
+| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                                                                                                                                                                                                                                  |
+| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                                                                                                                                                                                                                                               |
+| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                                                                                                                                                                                                                                                |
+| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                                                                                                                                                                                                                                               |
+| `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), E9 reports sign-off ([E9-REPORTS-PARITY.md](docs/E9-REPORTS-PARITY.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)), E10 packaging ([PACKAGING.md](docs/PACKAGING.md)), architecture summary ([ARCHITECTURE-SUBMISSION.md](docs/ARCHITECTURE-SUBMISSION.md)) |
+| `release/`      | Electron Builder output (installers; gitignored)                                                                                                                                                                                                                                                                                                                    |
+| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                                                                                                                                                                                                                                         |
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
@@ -93,6 +100,25 @@ Guest **folio / receipt** and **day sheet** (operational summary) are implemente
 **Canonical UI rules:** [docs/STYLE-GUIDE.md](docs/STYLE-GUIDE.md) (Lakeside Console light / Night Audit dark). **Decision index:** [docs/DESIGN-DIRECTION.md](docs/DESIGN-DIRECTION.md), [docs/DECISIONS.md](docs/DECISIONS.md#e15-visual-design-and-style-lab-scope).
 
 **Static style lab** (not in the Electron bundle): open [`style-test/index.html`](style-test/index.html) in a browser (double-click or “Open with…” from the repo). Links to the two variants and the style guide. No `pnpm dev` required.
+
+## Packaging and installers (Epic E10)
+
+- **Produce installers:** `pnpm dist` (current OS), or `pnpm dist:linux` / `pnpm dist:mac` / `pnpm dist:win`. Output lives under **`release/`** (gitignored).
+- **Native modules:** `better-sqlite3` and `argon2` are rebuilt for Electron during packaging. If a **packaged** app fails to load natives, see [docs/PACKAGING.md](docs/PACKAGING.md) and `pnpm rebuild:native` for dev workflows.
+- **CI:** After the standard check job, workflows build **Linux zip** and **Windows NSIS** packages and upload them as artifacts (see [docs/PACKAGING.md](docs/PACKAGING.md) for the T6 “green” definition).
+
+## Course submission bundle (Epic E10)
+
+| Artifact                                           | Location                                                           |
+| -------------------------------------------------- | ------------------------------------------------------------------ |
+| Architecture write-up (print to PDF from Markdown) | [docs/ARCHITECTURE-SUBMISSION.md](docs/ARCHITECTURE-SUBMISSION.md) |
+| Demo video (script + hosting checklist)            | [docs/DEMO-VIDEO.md](docs/DEMO-VIDEO.md)                           |
+| Migration ROI                                      | [docs/ROI-REPORT.md](docs/ROI-REPORT.md)                           |
+| OSS / contribution note                            | [docs/OSS-CONTRIBUTION.md](docs/OSS-CONTRIBUTION.md)               |
+| Social post draft                                  | [docs/SOCIAL-POST-DRAFT.md](docs/SOCIAL-POST-DRAFT.md)             |
+| Public repo checklist                              | [docs/PUBLIC-GITHUB-CHECKLIST.md](docs/PUBLIC-GITHUB-CHECKLIST.md) |
+
+Replace placeholder links (e.g. demo video URL) in those docs when you publish.
 
 ## Dev-only error boundary check
 

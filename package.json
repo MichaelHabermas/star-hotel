@@ -2,6 +2,7 @@
   "name": "star-hotel",
   "version": "0.1.0",
   "description": "Star Hotel — VB6/Access modernization (Electron + React + SQLite)",
+  "author": "Star Hotel (course project)",
   "main": "out/main/index.js",
   "type": "module",
   "private": true,
@@ -20,7 +21,12 @@
     "codegen:api:check": "pnpm codegen:api && git diff --exit-code -- src/server/openapi/openapi-spec.json src/shared/api/generated/openapi-types.ts",
     "cleanup": "pnpm format && pnpm lint:fix && pnpm typecheck",
     "postinstall": "electron-rebuild -f -w better-sqlite3,argon2",
-    "rebuild:native": "electron-rebuild -f -w better-sqlite3,argon2"
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3,argon2",
+    "dist": "pnpm build && electron-builder",
+    "dist:dir": "pnpm build && electron-builder --dir",
+    "dist:linux": "pnpm build && electron-builder --linux --x64",
+    "dist:mac": "pnpm build && electron-builder --mac",
+    "dist:win": "pnpm build && electron-builder --win"
   },
   "engines": {
     "node": ">=20"
@@ -30,6 +36,7 @@
       "argon2",
       "better-sqlite3",
       "electron",
+      "electron-winstaller",
       "esbuild"
     ]
   },
@@ -74,6 +81,7 @@
     "@types/swagger-ui-express": "^4.1.8",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^34.3.0",
+    "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -90,5 +98,55 @@
     "typescript-eslint": "^8.26.0",
     "vite": "^6.2.2",
     "vitest": "^3.0.9"
+  },
+  "build": {
+    "appId": "com.starhotel.desktop",
+    "productName": "Star Hotel",
+    "copyright": "Copyright © 2026 Star Hotel modernization",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/node_modules/better-sqlite3/**/*",
+      "**/node_modules/argon2/**/*"
+    ],
+    "compression": "normal",
+    "npmRebuild": true,
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "zip"
+      ],
+      "category": "Office"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

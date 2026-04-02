@@ -211,7 +211,7 @@ Do not check an epic until its **Epic DoD** is satisfied (all child user stories
 - [x] **E7** — Performance budget & observability
 - [x] **E8** — Full parity UI (module breadth per spec)
 - [x] **E9** — Reports (scope per T5)
-- [ ] **E10** — Packaging & course submission
+- [x] **E10** — Packaging & course submission
 
 ---
 
@@ -483,28 +483,28 @@ Minimum module mapping (adjust labels to legacy forms); story **IDs** below stay
 
 **Epic DoD:** Electron Builder (or equivalent) produces installer; **T6** packaging smoke path defined; README complete; 1–2 page architecture **PDF**; 3–5 min demo video; migration **ROI** report; **OSS contribution** artifact; social post draft; public GitHub ready.
 
-- [ ] **US10.1 — Electron Builder**  
+- [x] **US10.1 — Electron Builder**  
   - **Feature F10.1.1:** Targets agreed (e.g., win x64 first).  
-    - [ ] **T10.1.1.1:** Native module included in artifact.  
+    - [x] **T10.1.1.1:** Native module included in artifact.  
     - **DoD:** Fresh machine install smoke test passed.
 
-- [ ] **US10.2 — CI packaging smoke (T6)**  
+- [x] **US10.2 — CI packaging smoke (T6)**  
   - **Feature F10.2.1:** Workflow builds artifact on tag or main.  
     - **DoD:** Green run recorded; artifacts retained.
 
-- [ ] **US10.3 — Documentation bundle**  
+- [x] **US10.3 — Documentation bundle**  
   - **Feature F10.3.1:** README (dev, test, build); architecture PDF with IPC, Zod, perf numbers, test summary.  
     - **DoD:** PDF linked from README.
 
-- [ ] **US10.4 — Demo video & narrative**  
+- [x] **US10.4 — Demo video & narrative**  
   - **Feature F10.4.1:** Legacy vs modern split screen per spec.  
     - **DoD:** Video linked from README.
 
-- [ ] **US10.5 — ROI & OSS contribution**  
+- [x] **US10.5 — ROI & OSS contribution**  
   - **Feature F10.5.1:** Cost analysis doc; OSS artifact URL (tooling, template, or blog).  
     - **DoD:** Links in README.
 
-- [ ] **US10.6 — Social post**  
+- [x] **US10.6 — Social post**  
   - **Feature F10.6.1:** One technical hurdle story.  
     - **DoD:** Draft in `docs/` or linked.
 
