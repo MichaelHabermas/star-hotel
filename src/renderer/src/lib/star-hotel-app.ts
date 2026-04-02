@@ -31,6 +31,22 @@ export type StarHotelApp = {
   formatEmbeddedApiUserMessage(error: unknown): string
 }
 
+/**
+ * Build Headers for `fetch(input, init)` when merging optional Bearer auth.
+ * openapi-fetch calls `fetch(request, requestInitExt)` with `init` often undefined; if we only
+ * use `new Headers(init?.headers)` we drop the Request's headers (including `Content-Type`),
+ * so `express.json()` never runs and login bodies fail validation (400).
+ */
+function headersForFetchMerge(input: RequestInfo | URL, init: RequestInit | undefined): Headers {
+  if (init?.headers !== undefined) {
+    return new Headers(init.headers)
+  }
+  if (input instanceof Request) {
+    return new Headers(input.headers)
+  }
+  return new Headers()
+}
+
 function wrapFetchWithOptionalBearer(
   baseFetch: typeof fetch,
   baseUrl: string,
@@ -50,7 +66,7 @@ function wrapFetchWithOptionalBearer(
       url.startsWith(normalized) &&
       !url.includes('/api/auth/login') &&
       !url.includes('/health')
-    const headers = new Headers(init?.headers)
+    const headers = headersForFetchMerge(input, init)
     if (needsBearer) {
       const t = getToken()
       if (t) {

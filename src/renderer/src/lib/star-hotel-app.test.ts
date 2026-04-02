@@ -79,6 +79,26 @@ describe('createStarHotelApp', () => {
     expect((req as Request).url).toBe(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`)
   })
 
+  it('Bearer fetch wrapper keeps Content-Type when openapi-fetch calls fetch(Request) without init (login)', async () => {
+    const inner = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ token: 't', user: { id: 1, username: 'admin', role: 'Admin' } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const app = createStarHotelApp({
+      fetch: inner,
+      starHotel: mockPreload(),
+      getAuthToken: () => null,
+    })
+    await app.api.auth.login({ username: 'admin', password: 'changeme' })
+    expect(inner).toHaveBeenCalled()
+    const [, arg2] = inner.mock.calls[0] as [Request, RequestInit | undefined]
+    expect(arg2?.headers).toBeDefined()
+    const merged = new Headers(arg2?.headers)
+    expect(merged.get('Content-Type')).toContain('application/json')
+  })
+
   it('formatEmbeddedApiUserMessage delegates to shared helper', () => {
     const app = createStarHotelApp({
       fetch: vi.fn(),
