@@ -1,10 +1,12 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import {
   roomCreateBodySchema,
   roomIdParamsSchema,
   roomListQuerySchema,
   roomUpdateBodySchema,
 } from '@shared/schemas/room';
-import type { Router } from 'express';
+import type { Express, Router } from 'express';
+import { registerSqliteJsonEntityCrudRoutes } from '../http/sqlite-entity-json-crud';
 import {
   createSqliteDomainRouter,
   type SqliteHttpAdapterKit,
@@ -18,52 +20,22 @@ export function createRoomRouter(kit: SqliteHttpAdapterKit): Router {
     (db) => new RoomService(new RoomRepository(db)),
   );
 
-  router.get(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      const q = roomListQuerySchema.parse(req.query);
-      const svc = await getRoomService();
-      res.status(200).json(svc.list(q));
-    }),
-  );
-
-  router.get(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = roomIdParamsSchema.parse(req.params);
-      const svc = await getRoomService();
-      res.status(200).json(svc.get(id));
-    }),
-  );
-
-  router.post(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      const body = roomCreateBodySchema.parse(req.body);
-      const svc = await getRoomService();
-      res.status(201).json(svc.create(body));
-    }),
-  );
-
-  router.patch(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = roomIdParamsSchema.parse(req.params);
-      const body = roomUpdateBodySchema.parse(req.body);
-      const svc = await getRoomService();
-      res.status(200).json(svc.update(id, body));
-    }),
-  );
-
-  router.delete(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = roomIdParamsSchema.parse(req.params);
-      const svc = await getRoomService();
-      svc.delete(id);
-      res.status(204).send();
-    }),
-  );
+  registerSqliteJsonEntityCrudRoutes(router, kit, {
+    getService: getRoomService,
+    listQuerySchema: roomListQuerySchema,
+    list: (svc, q) => svc.list(q),
+    idParamsSchema: roomIdParamsSchema,
+    createBodySchema: roomCreateBodySchema,
+    updateBodySchema: roomUpdateBodySchema,
+    getById: (svc, id) => svc.get(id),
+    create: (svc, body) => svc.create(body),
+    update: (svc, id, body) => svc.update(id, body),
+    remove: (svc, id) => svc.delete(id),
+  });
 
   return router;
+}
+
+export function registerRoomRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+  app.use(EMBEDDED_API_PATHS.rooms, createRoomRouter(kit));
 }

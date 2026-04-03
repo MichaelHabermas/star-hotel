@@ -1,10 +1,12 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import {
   guestCreateBodySchema,
   guestIdParamsSchema,
   guestListQuerySchema,
   guestUpdateBodySchema,
 } from '@shared/schemas/guest';
-import type { Router } from 'express';
+import type { Express, Router } from 'express';
+import { registerSqliteJsonEntityCrudRoutes } from '../http/sqlite-entity-json-crud';
 import {
   createSqliteDomainRouter,
   type SqliteHttpAdapterKit,
@@ -18,52 +20,25 @@ export function createGuestRouter(kit: SqliteHttpAdapterKit): Router {
     (db) => new GuestService(new GuestRepository(db)),
   );
 
-  router.get(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      guestListQuerySchema.parse(req.query);
-      const svc = await getGuestService();
-      res.status(200).json(svc.list());
-    }),
-  );
-
-  router.get(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = guestIdParamsSchema.parse(req.params);
-      const svc = await getGuestService();
-      res.status(200).json(svc.get(id));
-    }),
-  );
-
-  router.post(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      const body = guestCreateBodySchema.parse(req.body);
-      const svc = await getGuestService();
-      res.status(201).json(svc.create(body));
-    }),
-  );
-
-  router.patch(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = guestIdParamsSchema.parse(req.params);
-      const body = guestUpdateBodySchema.parse(req.body);
-      const svc = await getGuestService();
-      res.status(200).json(svc.update(id, body));
-    }),
-  );
-
-  router.delete(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = guestIdParamsSchema.parse(req.params);
-      const svc = await getGuestService();
-      svc.delete(id);
-      res.status(204).send();
-    }),
-  );
+  registerSqliteJsonEntityCrudRoutes(router, kit, {
+    getService: getGuestService,
+    listQuerySchema: guestListQuerySchema,
+    list: (svc, q) => {
+      void q;
+      return svc.list();
+    },
+    idParamsSchema: guestIdParamsSchema,
+    createBodySchema: guestCreateBodySchema,
+    updateBodySchema: guestUpdateBodySchema,
+    getById: (svc, id) => svc.get(id),
+    create: (svc, body) => svc.create(body),
+    update: (svc, id, body) => svc.update(id, body),
+    remove: (svc, id) => svc.delete(id),
+  });
 
   return router;
+}
+
+export function registerGuestRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+  app.use(EMBEDDED_API_PATHS.guests, createGuestRouter(kit));
 }

@@ -1,10 +1,12 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import {
   reservationCreateBodySchema,
   reservationIdParamsSchema,
   reservationListQuerySchema,
   reservationUpdateBodySchema,
 } from '@shared/schemas/reservation';
-import type { Router } from 'express';
+import type { Express, Router } from 'express';
+import { registerSqliteJsonEntityCrudRoutes } from '../http/sqlite-entity-json-crud';
 import {
   createSqliteDomainRouter,
   type SqliteHttpAdapterKit,
@@ -18,52 +20,22 @@ export function createReservationRouter(kit: SqliteHttpAdapterKit): Router {
     (db) => new ReservationService(new ReservationRepository(db)),
   );
 
-  router.get(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      const q = reservationListQuerySchema.parse(req.query);
-      const svc = await getReservationService();
-      res.status(200).json(svc.list(q));
-    }),
-  );
-
-  router.get(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = reservationIdParamsSchema.parse(req.params);
-      const svc = await getReservationService();
-      res.status(200).json(svc.get(id));
-    }),
-  );
-
-  router.post(
-    '/',
-    kit.asyncHandler(async (req, res) => {
-      const body = reservationCreateBodySchema.parse(req.body);
-      const svc = await getReservationService();
-      res.status(201).json(svc.create(body));
-    }),
-  );
-
-  router.patch(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = reservationIdParamsSchema.parse(req.params);
-      const body = reservationUpdateBodySchema.parse(req.body);
-      const svc = await getReservationService();
-      res.status(200).json(svc.update(id, body));
-    }),
-  );
-
-  router.delete(
-    '/:id',
-    kit.asyncHandler(async (req, res) => {
-      const { id } = reservationIdParamsSchema.parse(req.params);
-      const svc = await getReservationService();
-      svc.delete(id);
-      res.status(204).send();
-    }),
-  );
+  registerSqliteJsonEntityCrudRoutes(router, kit, {
+    getService: getReservationService,
+    listQuerySchema: reservationListQuerySchema,
+    list: (svc, q) => svc.list(q),
+    idParamsSchema: reservationIdParamsSchema,
+    createBodySchema: reservationCreateBodySchema,
+    updateBodySchema: reservationUpdateBodySchema,
+    getById: (svc, id) => svc.get(id),
+    create: (svc, body) => svc.create(body),
+    update: (svc, id, body) => svc.update(id, body),
+    remove: (svc, id) => svc.delete(id),
+  });
 
   return router;
+}
+
+export function registerReservationRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+  app.use(EMBEDDED_API_PATHS.reservations, createReservationRouter(kit));
 }

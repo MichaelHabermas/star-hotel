@@ -6,11 +6,16 @@ import {
   type SqliteHttpAdapterKit,
 } from '../http/sqlite-http-adapter-kit';
 import { AuthService } from './auth-service';
+import type { StarHotelSessionStore } from './session-store';
 import { UserRepository } from './user-repository';
 
-export function registerAuthRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+export function registerAuthRoutes(
+  app: Express,
+  kit: SqliteHttpAdapterKit,
+  options: { readonly sessionStore: StarHotelSessionStore },
+): void {
   const getAuthService = kit.createLazySqliteService(
-    (db) => new AuthService(new UserRepository(db)),
+    (db) => new AuthService(new UserRepository(db), options.sessionStore),
   );
 
   const router = createSqliteDomainRouter(kit);

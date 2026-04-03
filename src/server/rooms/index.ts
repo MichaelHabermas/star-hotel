@@ -1,7 +1,7 @@
 /**
  * Rooms vertical slice — navigation map (HTTP + SQLite + shared contract).
  *
- * - Routes: mounted from `register-mvp-sqlite-api-routes.ts` (`/api/rooms`)
+ * - Routes: {@link registerRoomRoutes} (`/api/rooms`), called from `register-mvp-sqlite-api-routes.ts`
  * - HTTP adapter: `room-router.ts`, `sqlite-http-adapter-kit`
  * - Service / repo: `room-service.ts`, `room-repository.ts`
  * - Zod + OpenAPI components: `@shared/schemas/room` (see `zod-component-registry.ts`)
@@ -9,5 +9,5 @@
  */
 
 export { RoomRepository } from './room-repository';
-export { createRoomRouter } from './room-router';
+export { createRoomRouter, registerRoomRoutes } from './room-router';
 export { RoomService } from './room-service';

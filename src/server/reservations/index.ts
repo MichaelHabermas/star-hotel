@@ -1,7 +1,7 @@
 /**
  * Reservations vertical slice — navigation map (HTTP + SQLite + shared contract).
  *
- * - Routes: mounted from `register-mvp-sqlite-api-routes.ts` (`/api/reservations`)
+ * - Routes: {@link registerReservationRoutes} (`/api/reservations`), called from `register-mvp-sqlite-api-routes.ts`
  * - HTTP adapter: `reservation-router.ts`, `sqlite-http-adapter-kit`
  * - Service / repo: `reservation-service.ts`, `reservation-repository.ts`, `reservation-repository-port.ts`
  * - Domain pricing: `@domain/reservation-pricing` (totals / nights)
@@ -11,5 +11,5 @@
 
 export { ReservationRepository } from './reservation-repository';
 export type { ReservationRepositoryPort } from './reservation-repository-port';
-export { createReservationRouter } from './reservation-router';
+export { createReservationRouter, registerReservationRoutes } from './reservation-router';
 export { ReservationService } from './reservation-service';

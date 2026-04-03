@@ -79,6 +79,58 @@ describe('createStarHotelApp', () => {
     expect((req as Request).url).toBe(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`);
   });
 
+  it('Bearer wrapper attaches token for protected guests list requests', async () => {
+    const inner = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const app = createStarHotelApp({
+      fetch: inner,
+      starHotel: mockPreload(),
+      getAuthToken: () => 'session-token',
+    });
+    await app.api.guests.list({});
+    const [, init] = inner.mock.calls[0] as [Request, RequestInit];
+    expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer session-token');
+  });
+
+  it('Bearer wrapper does not attach token to login URL', async () => {
+    const inner = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ token: 't', user: { id: 1, username: 'admin', role: 'Admin' } }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+    );
+    const app = createStarHotelApp({
+      fetch: inner,
+      starHotel: mockPreload(),
+      getAuthToken: () => 'should-not-attach',
+    });
+    await app.api.auth.login({ username: 'admin', password: 'changeme' });
+    const [, init] = inner.mock.calls[0] as [Request, RequestInit];
+    expect(new Headers(init?.headers).get('Authorization')).toBeNull();
+  });
+
+  it('pingEmbeddedApi does not send Authorization on health', async () => {
+    const inner = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true }),
+    });
+    const app = createStarHotelApp({
+      fetch: inner,
+      starHotel: mockPreload(),
+      getAuthToken: () => 'tok',
+    });
+    await app.pingEmbeddedApi();
+    const [, init] = inner.mock.calls[0] as [string, RequestInit | undefined];
+    expect(new Headers(init?.headers).get('Authorization')).toBeNull();
+  });
+
   it('Bearer fetch wrapper keeps Content-Type when openapi-fetch calls fetch(Request) without init (login)', async () => {
     const inner = vi.fn().mockResolvedValue(
       new Response(

@@ -1,8 +1,6 @@
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
-import {
-  formatEmbeddedApiUserMessage as formatEmbeddedApiUserMessageShared,
-  normalizeEmbeddedApiBaseUrl,
-} from '@shared/api/embedded-http';
+import { shouldAttachBearerToEmbeddedApiUrl } from '@shared/api/embedded-api-public-access';
+import { formatEmbeddedApiUserMessage as formatEmbeddedApiUserMessageShared } from '@shared/api/embedded-http';
 import type { IpcChannel } from '@shared/ipc/channels';
 import { invokeIpcPing } from '@shared/ipc/typed-invoke';
 import type { StarHotelPreloadAPI } from '@shared/preload-contract';
@@ -48,7 +46,6 @@ function wrapFetchWithOptionalBearer(
   baseUrl: string,
   getToken: () => string | null | undefined,
 ): typeof fetch {
-  const normalized = normalizeEmbeddedApiBaseUrl(baseUrl);
   return (input, init) => {
     let url: string;
     if (typeof input === 'string') {
@@ -58,10 +55,7 @@ function wrapFetchWithOptionalBearer(
     } else {
       url = input.url;
     }
-    const needsBearer =
-      url.startsWith(normalized) &&
-      !url.includes(EMBEDDED_API_PATHS.authLogin) &&
-      !url.includes(EMBEDDED_API_PATHS.health);
+    const needsBearer = shouldAttachBearerToEmbeddedApiUrl(url, baseUrl);
     const headers = headersForFetchMerge(input, init);
     if (needsBearer) {
       const t = getToken();

@@ -1,17 +1,14 @@
 import type { LoginBody } from '@shared/schemas/auth';
 import * as argon2 from 'argon2';
 import { AuthInvalidCredentialsError } from './auth-errors';
-import {
-  createSessionToken,
-  deleteSession,
-  getSession,
-  putSession,
-  type SessionRecord,
-} from './session-store';
+import type { SessionRecord, StarHotelSessionStore } from './session-store';
 import type { UserRepository } from './user-repository';
 
 export class AuthService {
-  constructor(private readonly users: UserRepository) {}
+  constructor(
+    private readonly users: UserRepository,
+    private readonly sessions: StarHotelSessionStore,
+  ) {}
 
   async login(
     body: LoginBody,
@@ -24,19 +21,19 @@ export class AuthService {
     if (!ok) {
       throw new AuthInvalidCredentialsError();
     }
-    const token = createSessionToken();
+    const token = this.sessions.createSessionToken();
     const user: SessionRecord = {
       userId: row.UserID,
       username: row.Username,
       role: row.Role,
     };
-    putSession(token, user);
+    this.sessions.putSession(token, user);
     return { token, user: { id: row.UserID, username: row.Username, role: row.Role } };
   }
 
   logout(token: string | undefined): void {
     if (token) {
-      deleteSession(token);
+      this.sessions.deleteSession(token);
     }
   }
 
@@ -44,7 +41,7 @@ export class AuthService {
     if (!token) {
       throw new AuthInvalidCredentialsError('Not authenticated');
     }
-    const s = getSession(token);
+    const s = this.sessions.getSession(token);
     if (!s) {
       throw new AuthInvalidCredentialsError('Session expired');
     }

@@ -1,5 +1,6 @@
+import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import { daySheetReportQuerySchema, folioReportQuerySchema } from '@shared/schemas/report';
-import type { Router } from 'express';
+import type { Express, Router } from 'express';
 import {
   createSqliteDomainRouter,
   type SqliteHttpAdapterKit,
@@ -32,4 +33,8 @@ export function createReportRouter(kit: SqliteHttpAdapterKit): Router {
   );
 
   return router;
+}
+
+export function registerReportRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
+  app.use(EMBEDDED_API_PATHS.reports, createReportRouter(kit));
 }

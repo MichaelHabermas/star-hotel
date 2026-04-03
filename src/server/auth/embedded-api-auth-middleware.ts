@@ -1,51 +1,54 @@
+import { embeddedApiPathnameExemptFromBearer } from '@shared/api/embedded-api-public-access';
 import type { NextFunction, Request, Response } from 'express';
 import { sendJsonError } from '../http/json-error';
-import { getSession } from './session-store';
+import type { StarHotelSessionStore } from './session-store';
 
 type RequestWithStarHotelUser = Request & {
   starHotelUser?: { id: number; username: string; role: string };
 };
 
+export type CreateEmbeddedApiAuthMiddlewareOptions = {
+  readonly sessionStore: StarHotelSessionStore;
+  /** When true, skip Bearer checks (prefer `STAR_HOTEL_SKIP_AUTH` in Vitest). */
+  readonly skipAuth?: boolean;
+};
+
 /**
  * Requires `Authorization: Bearer <token>` for embedded API routes except auth and docs.
- * Disabled when `STAR_HOTEL_SKIP_AUTH=1` (Vitest server tests).
+ * Disabled when `STAR_HOTEL_SKIP_AUTH=1` (Vitest server tests) or {@link CreateEmbeddedApiAuthMiddlewareOptions.skipAuth}.
  */
-export function embeddedApiAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
-  if (process.env.STAR_HOTEL_SKIP_AUTH === '1') {
-    next();
-    return;
-  }
+export function createEmbeddedApiAuthMiddleware(
+  options: CreateEmbeddedApiAuthMiddlewareOptions,
+): (req: Request, res: Response, next: NextFunction) => void {
+  const { sessionStore, skipAuth } = options;
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (process.env.STAR_HOTEL_SKIP_AUTH === '1' || skipAuth) {
+      next();
+      return;
+    }
 
-  const path = req.path;
-  if (path === '/health') {
-    next();
-    return;
-  }
-  if (path.startsWith('/api/openapi') || path === '/api/docs') {
-    next();
-    return;
-  }
-  if (path.startsWith('/api/auth')) {
-    next();
-    return;
-  }
+    if (embeddedApiPathnameExemptFromBearer(req.path)) {
+      next();
+      return;
+    }
 
-  const raw = req.headers.authorization;
-  const token = raw?.startsWith('Bearer ') ? raw.slice(7) : undefined;
-  if (!token) {
-    sendJsonError(res, 401, 'UNAUTHORIZED', 'Missing or invalid session');
-    return;
-  }
-  const session = getSession(token);
-  if (!session) {
-    sendJsonError(res, 401, 'UNAUTHORIZED', 'Missing or invalid session');
-    return;
-  }
+    const raw = req.headers.authorization;
+    const token = raw?.startsWith('Bearer ') ? raw.slice(7) : undefined;
+    if (!token) {
+      sendJsonError(res, 401, 'UNAUTHORIZED', 'Missing or invalid session');
+      return;
+    }
+    const session = sessionStore.getSession(token);
+    if (!session) {
+      sendJsonError(res, 401, 'UNAUTHORIZED', 'Missing or invalid session');
+      return;
+    }
 
-  (req as RequestWithStarHotelUser).starHotelUser = {
-    id: session.userId,
-    username: session.username,
-    role: session.role,
+    (req as RequestWithStarHotelUser).starHotelUser = {
+      id: session.userId,
+      username: session.username,
+      role: session.role,
+    };
+    next();
   };
-  next();
 }

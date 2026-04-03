@@ -1,9 +1,7 @@
 import Database from 'better-sqlite3';
-import { runMigrations } from '../db/run-migrations';
-import { seedDefaultUserIfNeeded } from '../dev/seed-default-user';
-import { seedDevReservationsIfNeeded } from '../dev/seed-dev-reservations';
 import type { HotelSqlitePersistencePort } from '../ports/hotel-sqlite-persistence-port';
 import type { PersistencePort } from '../ports/persistence';
+import { runSqlitePersistenceStartup } from './sqlite-startup';
 
 export type SqlitePersistenceOptions = {
   readonly dbFilePath: string;
@@ -35,13 +33,9 @@ export function createSqlitePersistencePort(
         return;
       }
       const database = new Database(options.dbFilePath);
-      database.pragma('journal_mode = WAL');
-      database.pragma('foreign_keys = ON');
-      runMigrations(database);
-      seedDefaultUserIfNeeded(database);
-      if (options.seedDevData) {
-        seedDevReservationsIfNeeded(database);
-      }
+      runSqlitePersistenceStartup(database, {
+        ...(options.seedDevData ? { seedDevData: true } : {}),
+      });
       db = database;
     },
     async close() {

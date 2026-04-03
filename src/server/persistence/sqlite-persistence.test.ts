@@ -19,4 +19,12 @@ describe('createSqlitePersistencePort', () => {
     const p = createSqlitePersistencePort({ dbFilePath: ':memory:' });
     expect(() => p.getDatabase()).toThrow(/before isReady/);
   });
+
+  it('second isReady is a no-op', async () => {
+    const p = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    await p.isReady();
+    const first = p.getDatabase();
+    await p.isReady();
+    expect(p.getDatabase()).toBe(first);
+  });
 });

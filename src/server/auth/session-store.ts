@@ -6,20 +6,28 @@ export type SessionRecord = {
   readonly role: string;
 };
 
-const sessions = new Map<string, SessionRecord>();
+/** In-memory session backing for embedded API auth (inject for tests / future Redis, etc.). */
+export type StarHotelSessionStore = {
+  createSessionToken(): string;
+  getSession(token: string): SessionRecord | undefined;
+  putSession(token: string, record: SessionRecord): void;
+  deleteSession(token: string): void;
+};
 
-export function createSessionToken(): string {
-  return randomBytes(32).toString('hex');
-}
-
-export function putSession(token: string, record: SessionRecord): void {
-  sessions.set(token, record);
-}
-
-export function getSession(token: string): SessionRecord | undefined {
-  return sessions.get(token);
-}
-
-export function deleteSession(token: string): void {
-  sessions.delete(token);
+export function createInMemorySessionStore(): StarHotelSessionStore {
+  const sessions = new Map<string, SessionRecord>();
+  return {
+    createSessionToken() {
+      return randomBytes(32).toString('hex');
+    },
+    getSession(token: string) {
+      return sessions.get(token);
+    },
+    putSession(token: string, record: SessionRecord) {
+      sessions.set(token, record);
+    },
+    deleteSession(token: string) {
+      sessions.delete(token);
+    },
+  };
 }
