@@ -1,8 +1,10 @@
 # Star Hotel
 
-Modernized desktop replacement for the legacy VB6 + Microsoft Access hotel reservation system. **Epics E0–E9** (through reports) are complete; **E10** (packaging and course submission) is documented below and in [docs/PRD.md](docs/PRD.md). Stack: Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
+Desktop remake of the legacy VB6 + Microsoft Access hotel reservation system. The product goal is **functional parity with the legacy operator workflow** (room board, booking, customer find, room maintenance) while keeping a modern stack and stronger validation—see [docs/2026-04-03-vb6-parity-recovery-plan.md](docs/2026-04-03-vb6-parity-recovery-plan.md), [docs/VB6-LEGACY-DEEP-DIVE.md](docs/VB6-LEGACY-DEEP-DIVE.md), and day-to-day intent in [docs/OPERATOR-HANDBOOK.md](docs/OPERATOR-HANDBOOK.md).
 
-Authoritative requirements: [docs/PRD.md](docs/PRD.md).
+**Epics E0–E9** (through reports) are implemented; **E10** (packaging and course submission) is documented below and in [docs/PRD.md](docs/PRD.md). Stack: Electron + Vite + React 19 + Tailwind CSS v4 + shadcn/ui, strict TypeScript, Vitest, ESLint, and Prettier.
+
+Authoritative requirements: [docs/PRD.md](docs/PRD.md). Manual parity checks: [docs/MANUAL-QA-VB6-PARITY.md](docs/MANUAL-QA-VB6-PARITY.md).
 
 ## Prerequisites
 
@@ -11,23 +13,25 @@ Authoritative requirements: [docs/PRD.md](docs/PRD.md).
 
 ## Commands
 
-| Command             | Description                                                              |
-| ------------------- | ------------------------------------------------------------------------ |
-| `pnpm install`      | Install dependencies                                                     |
-| `pnpm dev`          | Electron + Vite dev (HMR in renderer)                                    |
-| `pnpm build`        | Production build to `out/`                                               |
-| `pnpm preview`      | Preview production build                                                 |
-| `pnpm dist`         | `pnpm build` + Electron Builder installer(s) for current OS → `release/` |
-| `pnpm dist:dir`     | Unpacked app only (quick packaging sanity check) → `release/`            |
-| `pnpm dist:linux`   | Linux portable zip (CI)                                                  |
-| `pnpm dist:mac`     | macOS DMG + zip                                                          |
-| `pnpm dist:win`     | Windows NSIS x64 installer                                               |
-| `pnpm test`         | Vitest (unit + RTL)                                                      |
-| `pnpm lint`         | ESLint                                                                   |
-| `pnpm format`       | Prettier write                                                           |
-| `pnpm format:check` | Prettier check only                                                      |
-| `pnpm typecheck`    | `tsc --noEmit` for main/preload + renderer                               |
-| `pnpm cleanup`      | Format + lint fix + typecheck (pre-commit / ship)                        |
+| Command                  | Description                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `pnpm install`           | Install dependencies                                                           |
+| `pnpm dev`               | Electron + Vite dev (HMR in renderer)                                          |
+| `pnpm build`             | Production build to `out/`                                                     |
+| `pnpm preview`           | Preview production build                                                       |
+| `pnpm dist`              | `pnpm build` + Electron Builder installer(s) for current OS → `release/`       |
+| `pnpm dist:dir`          | Unpacked app only (quick packaging sanity check) → `release/`                  |
+| `pnpm dist:linux`        | Linux portable zip (CI)                                                        |
+| `pnpm dist:mac`          | macOS DMG + zip                                                                |
+| `pnpm dist:win`          | Windows NSIS x64 installer                                                     |
+| `pnpm test`              | Vitest (unit + RTL)                                                            |
+| `pnpm lint`              | ESLint                                                                         |
+| `pnpm format`            | Prettier write                                                                 |
+| `pnpm format:check`      | Prettier check only                                                            |
+| `pnpm typecheck`         | `tsc --noEmit` for main/preload + renderer                                     |
+| `pnpm cleanup`           | Format + lint fix + typecheck (pre-commit / ship)                              |
+| `pnpm codegen:api`       | Regenerate OpenAPI JSON + `openapi-types.ts` after changing embedded API paths |
+| `pnpm codegen:api:check` | Same as `codegen:api`, then fails if generated files drift (CI)                |
 
 Single test file: `pnpm test -- src/renderer/src/lib/utils.test.ts`
 
@@ -35,17 +39,24 @@ CI (GitHub Actions): on push/PR to `main`, runs `format:check`, `lint`, `typeche
 
 ## Project layout (modular boundaries)
 
-| Path            | Role                                                                                                                                                                                                                                                                                                                                                                |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/`     | Electron main process (window lifecycle, security defaults)                                                                                                                                                                                                                                                                                                         |
-| `src/preload/`  | `contextBridge` surface (minimal until Epic E4)                                                                                                                                                                                                                                                                                                                     |
-| `src/renderer/` | React UI only — no Node, no SQLite                                                                                                                                                                                                                                                                                                                                  |
-| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                                                                                                                                                                                                                                                                                                               |
-| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there                                                                                                                                                                                                                                                                                                |
-| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                                                                                                                                                                                                                                                                                                               |
-| `docs/`         | PRD, decisions, STYLE-GUIDE, parity matrix ([PARITY-MATRIX.md](docs/PARITY-MATRIX.md)), E9 reports sign-off ([E9-REPORTS-PARITY.md](docs/E9-REPORTS-PARITY.md)), T1 states ([T1-STATE-MATRIX.md](docs/T1-STATE-MATRIX.md)), E10 packaging ([PACKAGING.md](docs/PACKAGING.md)), architecture summary ([ARCHITECTURE-SUBMISSION.md](docs/ARCHITECTURE-SUBMISSION.md)) |
-| `release/`      | Electron Builder output (installers; gitignored)                                                                                                                                                                                                                                                                                                                    |
-| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                                                                                                                                                                                                                                                                                                         |
+| Path            | Role                                                                             |
+| --------------- | -------------------------------------------------------------------------------- |
+| `src/main/`     | Electron main process (window lifecycle, security defaults)                      |
+| `src/preload/`  | Typed `contextBridge` IPC (renderer has no Node integration)                     |
+| `src/renderer/` | React UI only — no Node, no SQLite                                               |
+| `src/shared/`   | Cross-layer types (Zod DTOs land here in later epics)                            |
+| `src/server/`   | Express in main + SQLite data layer (Epics E2–E3) — see README there             |
+| `style-test/`   | Static HTML/CSS prototypes for visual A/B (Epic E1.5)                            |
+| `docs/`         | Specs, parity, packaging, architecture — [Key documentation](#key-documentation) |
+| `release/`      | Electron Builder output (installers; gitignored)                                 |
+| `knowledge/`    | Learned patterns and rules ([INDEX.md](knowledge/INDEX.md))                      |
+
+### Key documentation
+
+- **Requirements & decisions:** [PRD](docs/PRD.md), [DECISIONS](docs/DECISIONS.md), [STYLE-GUIDE](docs/STYLE-GUIDE.md)
+- **VB6 parity:** [recovery plan](docs/2026-04-03-vb6-parity-recovery-plan.md), [legacy deep dive](docs/VB6-LEGACY-DEEP-DIVE.md), [manual QA](docs/MANUAL-QA-VB6-PARITY.md), [PARITY-MATRIX](docs/PARITY-MATRIX.md), [VB6-PARITY-MATRIX](docs/VB6-PARITY-MATRIX.md), [ROUTE-MAP](docs/ROUTE-MAP.md)
+- **Operators:** [OPERATOR-HANDBOOK](docs/OPERATOR-HANDBOOK.md) (workflows under `docs/workflows/`)
+- **Shipping:** reports parity [E9-REPORTS-PARITY](docs/E9-REPORTS-PARITY.md), UI states [T1-STATE-MATRIX](docs/T1-STATE-MATRIX.md), [PACKAGING](docs/PACKAGING.md), [ARCHITECTURE-SUBMISSION](docs/ARCHITECTURE-SUBMISSION.md)
 
 Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
@@ -53,13 +64,13 @@ Performance notes (cold start methodology): [docs/PERF.md](docs/PERF.md).
 
 Telemetry is **env-gated** (see [.env.example](.env.example)). **T7 PII policy:** [docs/T7-TELEMETRY-PII.md](docs/T7-TELEMETRY-PII.md).
 
-| Topic                                | Doc / location                                                                                                              |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Structured logging (Express + main)  | `STAR_HOTEL_LOG_LEVEL`; JSON access lines — [T7 sample](docs/T7-TELEMETRY-PII.md#sample-structured-log-line-express-access) |
-| Sentry (main + renderer)             | `SENTRY_DSN`, `VITE_SENTRY_DSN`; source maps — [docs/SENTRY-SOURCE-MAPS.md](docs/SENTRY-SOURCE-MAPS.md)                     |
-| PostHog                              | `VITE_POSTHOG_KEY`, optional `VITE_POSTHOG_HOST`                                                                            |
-| Crashpad                             | [docs/CRASH-REPORTING.md](docs/CRASH-REPORTING.md), optional `SENTRY_MINIDUMP_URL`                                          |
-| Perf smoke (IPC / HTTP / list query) | Home → **Perf smoke (E7)**; methodology [docs/PERF.md](docs/PERF.md)                                                        |
+| Topic                                | Doc / location                                                                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Structured logging (Express + main)  | `STAR_HOTEL_LOG_LEVEL`; JSON access lines — [T7 sample](docs/T7-TELEMETRY-PII.md#sample-structured-log-line-express-access)               |
+| Sentry (main + renderer)             | `SENTRY_DSN`, `VITE_SENTRY_DSN`; source maps — [docs/SENTRY-SOURCE-MAPS.md](docs/SENTRY-SOURCE-MAPS.md)                                   |
+| PostHog                              | `VITE_POSTHOG_KEY`, optional `VITE_POSTHOG_HOST`                                                                                          |
+| Crashpad                             | [docs/CRASH-REPORTING.md](docs/CRASH-REPORTING.md), optional `SENTRY_MINIDUMP_URL`                                                        |
+| Perf smoke (IPC / HTTP / list query) | **Dev only** (`import.meta.env.DEV`): Room Board (`/`) → **Developer experience** → perf probes; methodology [docs/PERF.md](docs/PERF.md) |
 
 ## Embedded Express API (Epic E3)
 
