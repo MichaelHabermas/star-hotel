@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Scan shared modules so status utility strings in src/shared (e.g. room-status.ts) emit CSS. */
+@source '../../../shared';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));

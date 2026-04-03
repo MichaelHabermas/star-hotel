@@ -44,9 +44,6 @@ export function HomePage(): JSX.Element {
             </p>
           </div>
         </div>
-        <p className="text-muted-foreground hidden text-xs md:block">
-          Esc board · F1 booking · F2 report · F3 customer · F4 room
-        </p>
       </div>
 
       <RoomDashboard />
