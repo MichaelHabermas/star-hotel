@@ -66,7 +66,7 @@ describe('page smoke (StarHotelApp boundary)', () => {
         </StarHotelAppProvider>
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/room list/i)).toBeInTheDocument();
+    expect(await screen.findByText(/room maintenance ledger/i)).toBeInTheDocument();
   });
 
   it('GuestsListPage shows guest directory heading', async () => {
@@ -81,10 +81,10 @@ describe('page smoke (StarHotelApp boundary)', () => {
         </StarHotelAppProvider>
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/guest directory/i)).toBeInTheDocument();
+    expect(await screen.findByText(/guest lookup ledger/i)).toBeInTheDocument();
   });
 
-  it('RoomFormPage create shows New room', async () => {
+  it('RoomFormPage create shows room maintenance card', async () => {
     const app = createMockStarHotelApp();
     render(
       <MemoryRouter initialEntries={['/rooms/new']}>
@@ -95,10 +95,10 @@ describe('page smoke (StarHotelApp boundary)', () => {
         </StarHotelAppProvider>
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/^New room$/i)).toBeInTheDocument();
+    expect(await screen.findByText(/room maintenance card/i)).toBeInTheDocument();
   });
 
-  it('GuestFormPage create shows New guest', async () => {
+  it('GuestFormPage create shows guest card', async () => {
     const app = createMockStarHotelApp();
     render(
       <MemoryRouter initialEntries={['/guests/new']}>
@@ -109,6 +109,6 @@ describe('page smoke (StarHotelApp boundary)', () => {
         </StarHotelAppProvider>
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/^New guest$/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^Guest card$/i)).toBeInTheDocument();
   });
 });

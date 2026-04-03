@@ -38,19 +38,23 @@ export function GuestsListPage(): JSX.Element {
   const [deleting, setDeleting] = useState(false);
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
   const [findQuery, setFindQuery] = useState('');
+  const [selectedGuestId, setSelectedGuestId] = useState<number | null>(null);
 
   const columns = useMemo<ColumnDef<GuestResponse>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'ID',
-        cell: ({ getValue }) => (
-          <span className="font-mono tabular-nums">{String(getValue())}</span>
-        ),
-      },
-      {
         accessorKey: 'name',
         header: 'Name',
+        cell: ({ row }) => (
+          <button
+            type="button"
+            className="text-left"
+            onClick={() => setSelectedGuestId(row.original.id)}
+            aria-label={`Select guest ${row.original.name}`}
+          >
+            <span className="font-medium">{row.original.name}</span>
+          </button>
+        ),
       },
       {
         accessorKey: 'idNumber',
@@ -112,6 +116,8 @@ export function GuestsListPage(): JSX.Element {
       return name.includes(q) || contact.includes(q) || idNum.includes(q);
     });
   }, [list, findQuery]);
+  const selectedGuest =
+    selectedGuestId === null ? rows[0] ?? null : rows.find((guest) => guest.id === selectedGuestId) ?? rows[0] ?? null;
 
   const table = useReactTable({
     data: rows,
@@ -137,12 +143,12 @@ export function GuestsListPage(): JSX.Element {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-5">
         <div className="border-l-4 border-l-primary pl-4">
           <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Guests</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Directory for reservations — name, ID reference, and contact (tbl_guest).
+            Find-customer desk for reservations, contact lookup, and guest maintenance.
           </p>
         </div>
         <Button type="button" asChild>
@@ -150,14 +156,14 @@ export function GuestsListPage(): JSX.Element {
         </Button>
       </div>
 
-      <Card className="border-border/80 shadow-sm">
-        <CardHeader>
-          <CardTitle>Guest directory</CardTitle>
-          <CardDescription>Used by reservations and front-desk lookup.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {list.kind === 'ok' && list.rows.length > 0 ? (
-            <div className="max-w-md space-y-1">
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Find guest</CardTitle>
+            <CardDescription>Search by name, contact, or ID reference before opening the guest card.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="max-w-xl space-y-1">
               <label className="text-muted-foreground text-xs font-medium" htmlFor="guest-find">
                 Find guest
               </label>
@@ -169,6 +175,52 @@ export function GuestsListPage(): JSX.Element {
                 autoComplete="off"
               />
             </div>
+            <p className="text-muted-foreground text-sm">
+              Use the list below to open a guest card or jump into booking once identity is confirmed.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Guest card</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {selectedGuest ? (
+              <>
+                <p className="font-ui text-lg font-semibold">{selectedGuest.name}</p>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+                  <dt className="text-muted-foreground">ID / Ref</dt>
+                  <dd>{selectedGuest.idNumber ?? '—'}</dd>
+                  <dt className="text-muted-foreground">Contact</dt>
+                  <dd>{selectedGuest.contact ?? '—'}</dd>
+                </dl>
+                <div className="flex flex-col gap-2">
+                  <Button type="button" asChild>
+                    <Link to={`/guests/${selectedGuest.id}`}>Open guest card</Link>
+                  </Button>
+                  <Button type="button" variant="outline" asChild>
+                    <Link to={`/reservations/new?guestId=${selectedGuest.id}`}>Start booking</Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Select a guest from the list to inspect the card.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="border-border/80 shadow-sm">
+        <CardHeader>
+          <CardTitle>Guest lookup ledger</CardTitle>
+          <CardDescription>Lookup first, then edit the guest card if details need changing.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {list.kind === 'ok' && list.rows.length > 0 ? (
+            <p className="text-muted-foreground text-sm">
+              {rows.length} matching guest record(s).
+            </p>
           ) : null}
           {list.kind === 'loading' ? (
             <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
@@ -208,7 +260,11 @@ export function GuestsListPage(): JSX.Element {
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    key={row.id}
+                    data-state={selectedGuest?.id === row.original.id ? 'selected' : undefined}
+                    className={selectedGuest?.id === row.original.id ? 'bg-muted/40' : undefined}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

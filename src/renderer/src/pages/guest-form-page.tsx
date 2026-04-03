@@ -160,10 +160,10 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
     );
   }
 
-  const title = mode === 'create' ? 'New guest' : `Edit guest #${editId}`;
+  const title = mode === 'create' ? 'Guest card' : `Edit guest #${editId}`;
 
   return (
-    <div className="mx-auto max-w-lg p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex items-center gap-4">
         <Button type="button" variant="ghost" size="sm" asChild>
           <Link to="/guests" aria-label="Back to guests list">
@@ -172,12 +172,55 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
         </Button>
       </div>
 
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <Card className="gap-4 border-border/80 border-l-4 border-l-primary py-4 shadow-sm">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-lg">{title}</CardTitle>
+            <CardDescription id={`${formId}-hint`}>
+              Maintain guest identity, reference, and contact from one guest card.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Guest
+              </p>
+              <p className="mt-2 font-medium">{name.trim() || 'New guest'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                ID / Ref
+              </p>
+              <p className="mt-2 font-medium">{idNumber.trim() || '—'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Contact
+              </p>
+              <p className="mt-2 font-medium">{contact.trim() || '—'}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Desk guidance</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p className="text-muted-foreground">
+              Keep guest identity and contact ready for reservation lookup.
+            </p>
+            <p className="text-muted-foreground">
+              Save the guest card before returning to booking or desk lookup.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border/80 border-l-4 border-l-primary shadow-sm">
         <CardHeader>
-          <CardTitle className="font-ui text-lg">{title}</CardTitle>
-          <CardDescription id={`${formId}-hint`}>
-            Name, optional ID reference, and contact.
-          </CardDescription>
+          <CardTitle className="font-ui text-lg">Guest fields</CardTitle>
+          <CardDescription>Name, ID/reference, and contact details.</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -187,34 +230,53 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
             noValidate
             aria-describedby={`${formId}-hint`}
           >
-            <div className="space-y-2">
-              <Label htmlFor={nameId}>Name</Label>
-              <Input
-                id={nameId}
-                value={name}
-                onChange={(ev) => setName(ev.target.value)}
-                required
-                autoComplete="name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={idNumId}>ID / reference (optional)</Label>
-              <Input
-                id={idNumId}
-                value={idNumber}
-                onChange={(ev) => setIdNumber(ev.target.value)}
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={contactId}>Contact (optional)</Label>
-              <Input
-                id={contactId}
-                type="text"
-                value={contact}
-                onChange={(ev) => setContact(ev.target.value)}
-                autoComplete="off"
-              />
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Guest identity</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Use the same naming and reference style staff expects from the old guest card.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={nameId}>Name</Label>
+                  <Input
+                    id={nameId}
+                    value={name}
+                    onChange={(ev) => setName(ev.target.value)}
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={idNumId}>ID / reference (optional)</Label>
+                  <Input
+                    id={idNumId}
+                    value={idNumber}
+                    onChange={(ev) => setIdNumber(ev.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Contact</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Keep reachable contact details available for desk lookup and reservation handoff.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={contactId}>Contact (optional)</Label>
+                  <Input
+                    id={contactId}
+                    type="text"
+                    value={contact}
+                    onChange={(ev) => setContact(ev.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
             </div>
 
             {fieldErr ? (
@@ -228,13 +290,19 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
               </p>
             ) : null}
 
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={submitting}>
-                {submitting ? 'Saving…' : mode === 'create' ? 'Create guest' : 'Save changes'}
-              </Button>
-              <Button type="button" variant="outline" asChild disabled={submitting}>
-                <Link to="/guests">Cancel</Link>
-              </Button>
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
+              <div />
+              <div className="space-y-2 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <p className="font-ui text-sm font-semibold">Actions</p>
+                <div className="flex flex-col gap-2">
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? 'Saving…' : mode === 'create' ? 'Save guest card' : 'Save changes'}
+                  </Button>
+                  <Button type="button" variant="outline" asChild disabled={submitting}>
+                    <Link to="/guests">Cancel</Link>
+                  </Button>
+                </div>
+              </div>
             </div>
           </form>
         </CardContent>

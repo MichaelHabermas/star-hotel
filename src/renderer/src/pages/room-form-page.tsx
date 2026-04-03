@@ -181,10 +181,11 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
     );
   }
 
-  const title = mode === 'create' ? 'New room' : `Edit room ${roomNumber.trim() || `#${editId}`}`;
+  const title =
+    mode === 'create' ? 'Room maintenance card' : `Edit room ${roomNumber.trim() || `#${editId}`}`;
 
   return (
-    <div className="mx-auto max-w-lg p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex items-center gap-4">
         <Button type="button" variant="ghost" size="sm" asChild>
           <Link to="/rooms" aria-label="Back to rooms list">
@@ -193,12 +194,55 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
         </Button>
       </div>
 
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <Card className="gap-4 border-border/80 border-l-4 border-l-primary py-4 shadow-sm">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-lg">{title}</CardTitle>
+            <CardDescription id={`${formId}-hint`}>
+              Maintain room number, type, nightly rate, and operating status from one room card.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Room
+              </p>
+              <p className="mt-2 font-medium">{roomNumber.trim() || 'Unassigned'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Type
+              </p>
+              <p className="mt-2 font-medium">{roomType.trim() || 'Select type'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Status
+              </p>
+              <p className="mt-2 font-medium">{status}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Desk guidance</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p className="text-muted-foreground">
+              Keep room number and status current before front desk starts a new booking.
+            </p>
+            <p className="text-muted-foreground">
+              Housekeeping and maintenance states should be visible and intentional.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border/80 border-l-4 border-l-primary shadow-sm">
         <CardHeader>
-          <CardTitle className="font-ui text-lg">{title}</CardTitle>
-          <CardDescription id={`${formId}-hint`}>
-            Room type, nightly rate, and operational status.
-          </CardDescription>
+          <CardTitle className="font-ui text-lg">Room fields</CardTitle>
+          <CardDescription>Number, classification, rate, and status.</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -208,53 +252,72 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
             noValidate
             aria-describedby={`${formId}-hint`}
           >
-            <div className="space-y-2">
-              <Label htmlFor={roomNumberId}>Room number</Label>
-              <Input
-                id={roomNumberId}
-                value={roomNumber}
-                onChange={(ev) => setRoomNumber(ev.target.value)}
-                required
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={typeId}>Room type</Label>
-              <Input
-                id={typeId}
-                value={roomType}
-                onChange={(ev) => setRoomType(ev.target.value)}
-                required
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={priceId}>Nightly rate (USD)</Label>
-              <Input
-                id={priceId}
-                type="number"
-                inputMode="decimal"
-                min={0}
-                step="0.01"
-                value={price}
-                onChange={(ev) => setPrice(ev.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={statusId}>Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger id={statusId} className="w-full">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Room identity</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Keep the number and type aligned with the front-desk board.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={roomNumberId}>Room number</Label>
+                  <Input
+                    id={roomNumberId}
+                    value={roomNumber}
+                    onChange={(ev) => setRoomNumber(ev.target.value)}
+                    required
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={typeId}>Room type</Label>
+                  <Input
+                    id={typeId}
+                    value={roomType}
+                    onChange={(ev) => setRoomType(ev.target.value)}
+                    required
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Rate and condition</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Set rate and operating status before the room returns to booking.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={priceId}>Nightly rate (USD)</Label>
+                  <Input
+                    id={priceId}
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="0.01"
+                    value={price}
+                    onChange={(ev) => setPrice(ev.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={statusId}>Status</Label>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger id={statusId} className="w-full">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
 
             {fieldErr ? (
@@ -268,13 +331,19 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
               </p>
             ) : null}
 
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={submitting}>
-                {submitting ? 'Saving…' : mode === 'create' ? 'Create room' : 'Save changes'}
-              </Button>
-              <Button type="button" variant="outline" asChild disabled={submitting}>
-                <Link to="/rooms">Cancel</Link>
-              </Button>
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
+              <div />
+              <div className="space-y-2 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <p className="font-ui text-sm font-semibold">Actions</p>
+                <div className="flex flex-col gap-2">
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? 'Saving…' : mode === 'create' ? 'Save room card' : 'Save changes'}
+                  </Button>
+                  <Button type="button" variant="outline" asChild disabled={submitting}>
+                    <Link to="/rooms">Cancel</Link>
+                  </Button>
+                </div>
+              </div>
             </div>
           </form>
         </CardContent>

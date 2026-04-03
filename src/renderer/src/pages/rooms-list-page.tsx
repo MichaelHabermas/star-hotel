@@ -24,6 +24,7 @@ import {
 } from '@renderer/components/ui/table';
 import { useRoomsList } from '@renderer/features/rooms/use-rooms-list';
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { ROOM_STATUS_DASHBOARD_CLASSES, ROOM_STATUS_VALUES } from '@shared/room-status';
 import type { RoomResponse } from '@shared/schemas/room';
 import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table';
 import type { JSX } from 'react';
@@ -38,14 +39,24 @@ export function RoomsListPage(): JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<RoomResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
   const columns = useMemo<ColumnDef<RoomResponse>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'ID',
-        cell: ({ getValue }) => (
-          <span className="font-mono tabular-nums">{String(getValue())}</span>
+        id: 'room',
+        header: 'Room',
+        cell: ({ row }) => (
+          <button
+            type="button"
+            className="text-left"
+            onClick={() => setSelectedRoomId(row.original.id)}
+            aria-label={`Select room ${row.original.roomNumber ?? row.original.id}`}
+          >
+            <span className="font-mono font-semibold tabular-nums">
+              {row.original.roomNumber ?? `#${row.original.id}`}
+            </span>
+          </button>
         ),
       },
       {
@@ -60,6 +71,13 @@ export function RoomsListPage(): JSX.Element {
       {
         accessorKey: 'status',
         header: 'Status',
+        cell: ({ row }) => (
+          <span
+            className={`inline-flex rounded px-2 py-1 text-xs font-medium ${ROOM_STATUS_DASHBOARD_CLASSES[row.original.status]}`}
+          >
+            {row.original.status}
+          </span>
+        ),
       },
       {
         id: 'actions',
@@ -91,6 +109,18 @@ export function RoomsListPage(): JSX.Element {
   );
 
   const rows = list.kind === 'ok' ? list.rows : [];
+  const statusCounts = useMemo(() => {
+    const counts = Object.fromEntries(ROOM_STATUS_VALUES.map((status) => [status, 0])) as Record<
+      (typeof ROOM_STATUS_VALUES)[number],
+      number
+    >;
+    for (const row of rows) {
+      counts[row.status] += 1;
+    }
+    return counts;
+  }, [rows]);
+  const selectedRoom =
+    selectedRoomId === null ? rows[0] ?? null : rows.find((room) => room.id === selectedRoomId) ?? rows[0] ?? null;
   const table = useReactTable({
     data: rows,
     columns,
@@ -115,12 +145,12 @@ export function RoomsListPage(): JSX.Element {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-5">
         <div className="border-l-4 border-l-primary pl-4">
           <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">Rooms</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Inventory, nightly rates, and housekeeping status (tbl_room).
+            Room maintenance board for number, type, rate, and operational condition.
           </p>
         </div>
         <Button type="button" asChild>
@@ -128,11 +158,70 @@ export function RoomsListPage(): JSX.Element {
         </Button>
       </div>
 
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Status summary</CardTitle>
+            <CardDescription>Keep condition and occupancy legible before editing.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {ROOM_STATUS_VALUES.map((status) => (
+              <div
+                key={status}
+                className="flex items-center gap-2 rounded border border-border/70 bg-background/80 px-3 py-2 text-xs"
+              >
+                <span
+                  className={`inline-block size-3 rounded-sm border ${ROOM_STATUS_DASHBOARD_CLASSES[status]}`}
+                  aria-hidden
+                />
+                <span className="font-medium">{status}</span>
+                <span className="font-mono text-muted-foreground tabular-nums">
+                  {statusCounts[status]}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Room card</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {selectedRoom ? (
+              <>
+                <p className="font-ui text-lg font-semibold">
+                  Room {selectedRoom.roomNumber ?? selectedRoom.id}
+                </p>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+                  <dt className="text-muted-foreground">Type</dt>
+                  <dd>{selectedRoom.roomType}</dd>
+                  <dt className="text-muted-foreground">Rate</dt>
+                  <dd className="font-mono">{money.format(selectedRoom.price)}</dd>
+                  <dt className="text-muted-foreground">Status</dt>
+                  <dd>{selectedRoom.status}</dd>
+                </dl>
+                <div className="flex flex-col gap-2">
+                  <Button type="button" asChild>
+                    <Link to={`/rooms/${selectedRoom.id}`}>Open room card</Link>
+                  </Button>
+                  <Button type="button" variant="outline" asChild>
+                    <Link to={`/reservations/new?roomId=${selectedRoom.id}`}>Start check-in</Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Select a room from the list to inspect it.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border/80 shadow-sm">
         <CardHeader>
-          <CardTitle>Room list</CardTitle>
+          <CardTitle>Room maintenance ledger</CardTitle>
           <CardDescription>
-            Rooms available for reservation pickers and housekeeping visibility.
+            Select a room to inspect it, then open the maintenance card for editing.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -174,7 +263,11 @@ export function RoomsListPage(): JSX.Element {
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    key={row.id}
+                    data-state={selectedRoom?.id === row.original.id ? 'selected' : undefined}
+                    className={selectedRoom?.id === row.original.id ? 'bg-muted/40' : undefined}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
