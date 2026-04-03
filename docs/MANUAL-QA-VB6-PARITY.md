@@ -5,7 +5,7 @@ Use after `pnpm dev` with seeded data (default dev user). Log issues against `do
 ## Shell
 
 - [ ] Header shows live **date/time** and **User ID / role** line.
-- [ ] **Header** shows one nav row with keyboard hints; each link matches its route (no duplicate toolbar row).
+- [ ] **Header** shows one nav row with keyboard hints; labels read like legacy modules (`Room Board`, `Booking`, `Customer`, `Room`, `Report`).
 - [ ] **Keyboard:** outside text fields, Esc → `/`; F1 → `/reservations`; F2 → `/reports`; F3 → `/guests`; F4 → `/rooms`; F5 → `/admin/users` (Admin only); F6 → `/admin/module-access` (Admin only); F8 → `/account/password`. Non-admin: F5/F6 do nothing.
 
 ## Dashboard (`/`)
@@ -13,11 +13,18 @@ Use after `pnpm dev` with seeded data (default dev user). Log issues against `do
 - [ ] Four **Level** rows (4→1), **11** columns each on seeded data.
 - [ ] **Summary** strip lists five statuses with **counts** that match the legend.
 - [ ] Cell shows **room number**, **room type**, and **fill** by status.
+- [ ] Selecting a room updates the desk action panel.
+- [ ] Desk action panel can open the room card and start booking from the selected room.
+- [ ] Dev tools do not dominate the primary operator surface.
 
 ## Core flows
 
-- [ ] **Guest find:** `/guests` — filter box narrows by name, contact, or ID reference.
-- [ ] **Rooms:** create/edit includes **room number** and five **statuses**.
+- [ ] **Booking ledger:** `/reservations` shows selectable bookings and a side booking card with guest, room, stay, and folio access.
+- [ ] **Booking card:** `/reservations/new` can launch with room prefilled from the room board.
+- [ ] **Guest find:** `/guests` — filter box narrows by name, contact, or ID reference, and selecting a guest updates the guest card panel.
+- [ ] **Guest card:** create/edit feels like a guest card rather than a generic form.
+- [ ] **Rooms:** `/rooms` shows selectable rooms, status summary, and side room card actions.
+- [ ] **Room card:** create/edit includes **room number** and five **statuses** in a maintenance layout.
 - [ ] **Reports:** `/reports` hub links to day sheet; folio reachable from reservations.
 - [ ] **Admin (role Admin):** `/admin/users` — list + create user; `/admin/module-access` — link to per-user access; `/admin/users/:id/access` — toggles persist.
 - [ ] **Password:** `/account/password` — change password succeeds with valid current password.

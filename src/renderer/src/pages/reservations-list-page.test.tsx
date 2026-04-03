@@ -75,6 +75,7 @@ describe('ReservationsListPage', () => {
     const table = screen.getByRole('table', { name: /Reservations/i });
     expect(within(table).getByText('Guest One')).toBeInTheDocument();
     expect(within(table).getByText(/#2 · Standard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Booking #1/i)).toBeInTheDocument();
   });
 
   it('shows empty message when there are no reservations', async () => {
@@ -84,7 +85,7 @@ describe('ReservationsListPage', () => {
     renderListPage(app);
 
     await waitFor(() => {
-      expect(screen.getByText(/No reservations yet/i)).toBeInTheDocument();
+      expect(screen.getByText(/No bookings yet/i)).toBeInTheDocument();
     });
   });
 

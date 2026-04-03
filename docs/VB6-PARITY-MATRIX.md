@@ -3,16 +3,16 @@
 **Source:** [pyhoon/star-hotel-vb6](https://github.com/pyhoon/star-hotel-vb6) `Form/*.frm` (inventory below).  
 **Style:** Modern UI follows [STYLE-GUIDE.md](./STYLE-GUIDE.md); **behavior** targets legacy workflows.
 
-**Status legend:** `Done` | `Partial` | `N/A` | `Deferred`
+**Status legend:** `Done` | `Partial` | `Drifted` | `N/A` | `Deferred`
 
 | Legacy form | Purpose (short) | Modern route / surface | Status | Notes |
 |-------------|----------------|-------------------------|--------|--------|
 | `frmUserLogin` | Login | `/login` | Done | Argon2 vs legacy passwords |
 | `frmSplash` | Startup branding | Electron window (no separate splash yet) | Partial | Optional branded splash |
-| `frmDashboard` | Main room board | `/` | Done | Grid, legend counts, levels |
-| `frmBooking` | Reservations / booking | `/reservations`, `/reservations/:id` | Partial | Align fields/totals with `modLogic` as audited |
-| `frmFindCustomer` | Find guest | `/guests` (search) | Partial | Query matches guest name/contact |
-| `frmRoomMaintain` | Room CRUD | `/rooms`, `/rooms/:id` | Partial | Table + form |
+| `frmDashboard` | Main room board | `/` | Partial | Grid, legend counts, levels, and desk actions present; validate against legacy board behavior before marking Done |
+| `frmBooking` | Reservations / booking | `/reservations`, `/reservations/:id` | Partial | Booking ledger + check-in workspace now grouped around desk flow; keep validating fields/order against legacy form |
+| `frmFindCustomer` | Find guest | `/guests` (search) | Partial | Lookup-first customer screen and guest card present; verify whether legacy search and maintenance were combined |
+| `frmRoomMaintain` | Room CRUD | `/rooms`, `/rooms/:id` | Partial | Maintenance ledger and room card now centered on status/rate workflow; still needs direct legacy control comparison |
 | `frmRoomTypeMaintain` | Room type master | Documented: types via room form + `tbl_room.RoomType` | Partial | No separate table until schema expands |
 | `frmReport` | Reports menu | `/reports`, `/reports/day-sheet`, folio | Partial | HTML print vs Crystal |
 | `frmReportMaintain` | Report catalog | `/reports` (stub copy) | Deferred | See [DECISIONS.md](./DECISIONS.md) T5 |
@@ -29,7 +29,7 @@
 | Key | Legacy role | App action |
 |-----|-------------|------------|
 | Esc | Close / home | Navigate `/` |
-| F1 | _(added: reservations parity)_ | `/reservations` |
+| F1 | Booking | `/reservations` |
 | F2 | Report | `/reports` |
 | F3 | Customer | `/guests` |
 | F4 | Room | `/rooms` |

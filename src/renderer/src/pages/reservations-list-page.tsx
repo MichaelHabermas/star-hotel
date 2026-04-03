@@ -56,6 +56,7 @@ export function ReservationsListPage(): JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<ReservationResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
+  const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null);
 
   const guestById = useMemo(() => new Map(guests.map((g) => [g.id, g])), [guests]);
   const roomById = useMemo(() => new Map(rooms.map((r) => [r.id, r])), [rooms]);
@@ -63,10 +64,17 @@ export function ReservationsListPage(): JSX.Element {
   const columns = useMemo<ColumnDef<ReservationResponse>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'Res. ID',
-        cell: ({ getValue }) => (
-          <span className="font-mono tabular-nums">{String(getValue())}</span>
+        id: 'reservation',
+        header: 'Booking',
+        cell: ({ row }) => (
+          <button
+            type="button"
+            className="text-left"
+            onClick={() => setSelectedReservationId(row.original.id)}
+            aria-label={`Select reservation ${row.original.id}`}
+          >
+            <span className="font-mono font-semibold tabular-nums">#{row.original.id}</span>
+          </button>
         ),
       },
       {
@@ -131,6 +139,13 @@ export function ReservationsListPage(): JSX.Element {
   );
 
   const rows = list.kind === 'ok' ? list.rows : [];
+  const selectedReservation =
+    selectedReservationId === null
+      ? rows[0] ?? null
+      : rows.find((reservation) => reservation.id === selectedReservationId) ?? rows[0] ?? null;
+  const selectedGuest =
+    selectedReservation ? guestById.get(selectedReservation.guestId) ?? null : null;
+  const selectedRoom = selectedReservation ? roomById.get(selectedReservation.roomId) ?? null : null;
   const table = useReactTable({
     data: rows,
     columns,
@@ -155,19 +170,18 @@ export function ReservationsListPage(): JSX.Element {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between md:p-5">
         <div className="border-l-4 border-l-primary pl-4">
           <h1 className="font-ui text-foreground text-2xl font-semibold tracking-tight">
-            Reservations
+            Booking ledger
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Front-desk stays: guest, room, dates, and totals — same rules as the legacy check-in
-            flow.
+            Front-desk bookings, room assignments, and stay totals from the legacy check-in path.
           </p>
         </div>
         <Button type="button" asChild>
-          <Link to="/reservations/new">New reservation</Link>
+          <Link to="/reservations/new">New booking</Link>
         </Button>
       </div>
 
@@ -183,9 +197,81 @@ export function ReservationsListPage(): JSX.Element {
         </div>
       ) : null}
 
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Desk flow</CardTitle>
+            <CardDescription>Review the booking ledger, select a stay, then open the booking card or folio.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Guest
+              </p>
+              <p className="mt-2 font-medium">{selectedGuest?.name ?? 'Select booking'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Room
+              </p>
+              <p className="mt-2 font-medium">
+                {selectedRoom
+                  ? `Room ${selectedRoom.roomNumber ?? selectedRoom.id}`
+                  : 'Select booking'}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Total
+              </p>
+              <p className="mt-2 font-medium">
+                {selectedReservation ? money.format(selectedReservation.totalAmount) : '—'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Booking card</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {selectedReservation ? (
+              <>
+                <p className="font-ui text-lg font-semibold">Booking #{selectedReservation.id}</p>
+                <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+                  <dt className="text-muted-foreground">Guest</dt>
+                  <dd>{selectedGuest?.name ?? `Guest #${selectedReservation.guestId}`}</dd>
+                  <dt className="text-muted-foreground">Room</dt>
+                  <dd>
+                    {selectedRoom
+                      ? `Room ${selectedRoom.roomNumber ?? selectedRoom.id}`
+                      : `Room #${selectedReservation.roomId}`}
+                  </dd>
+                  <dt className="text-muted-foreground">Stay</dt>
+                  <dd>
+                    {selectedReservation.checkInDate} → {selectedReservation.checkOutDate}
+                  </dd>
+                </dl>
+                <div className="flex flex-col gap-2">
+                  <Button type="button" asChild>
+                    <Link to={`/reservations/${selectedReservation.id}`}>Open booking card</Link>
+                  </Button>
+                  <Button type="button" variant="outline" asChild>
+                    <Link to={`/reports/folio/${selectedReservation.id}`}>Open folio</Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Select a booking from the ledger to inspect it.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border/80 shadow-sm">
         <CardHeader>
-          <CardTitle>Reservation list</CardTitle>
+          <CardTitle>Booking ledger</CardTitle>
           <CardDescription>
             {refsLoading
               ? 'Loading reference data…'
@@ -211,7 +297,7 @@ export function ReservationsListPage(): JSX.Element {
           ) : null}
           {list.kind === 'ok' && list.rows.length === 0 ? (
             <p className="text-muted-foreground text-sm" role="status">
-              No reservations yet. Use <span className="font-medium">New reservation</span> to add
+              No bookings yet. Use <span className="font-medium">New booking</span> to add
               one.
             </p>
           ) : null}
@@ -232,7 +318,11 @@ export function ReservationsListPage(): JSX.Element {
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    key={row.id}
+                    data-state={selectedReservation?.id === row.original.id ? 'selected' : undefined}
+                    className={selectedReservation?.id === row.original.id ? 'bg-muted/40' : undefined}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

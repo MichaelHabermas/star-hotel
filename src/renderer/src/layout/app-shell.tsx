@@ -121,11 +121,11 @@ export function AppShell(): JSX.Element {
             className="border-border/60 font-ui flex flex-wrap gap-1 border-t pt-2"
             aria-label="Primary modules and keyboard shortcuts"
           >
-            <ModuleNavLink to="/" end label="Dashboard" hint="Esc" />
-            <ModuleNavLink to="/reservations" label="Reservations" hint="F1" />
+            <ModuleNavLink to="/" end label="Room Board" hint="Esc" />
+            <ModuleNavLink to="/reservations" label="Booking" hint="F1" />
             <ModuleNavLink to="/rooms" label="Rooms" hint="F4" />
-            <ModuleNavLink to="/guests" label="Guests" hint="F3" />
-            <ModuleNavLink to="/reports" label="Reports" hint="F2" />
+            <ModuleNavLink to="/guests" label="Customer" hint="F3" />
+            <ModuleNavLink to="/reports" label="Report" hint="F2" />
             <ModuleNavLink to="/account/password" label="Password" hint="F8" />
             {isAdmin ? (
               <>
