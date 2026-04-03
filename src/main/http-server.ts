@@ -12,11 +12,11 @@ export type StartEmbeddedApiServerOptions = {
  * Binds the embedded API on 127.0.0.1. Call during `app.whenReady()` before creating windows
  * so the renderer can reach `/health` immediately.
  */
-export function startEmbeddedApiServer(
+export async function startEmbeddedApiServer(
   port: number,
   options: StartEmbeddedApiServerOptions = {},
 ): Promise<http.Server> {
-  const expressApp = createServerApp({
+  const expressApp = await createServerApp({
     persistence: options.persistence,
     registerApiRoutes: options.registerApiRoutes,
   });

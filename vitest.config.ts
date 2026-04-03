@@ -18,6 +18,9 @@ const nodeTestGlobs = [
 ] as const;
 
 export default defineConfig({
+  define: {
+    'import.meta.env.STAR_HOTEL_INCLUDE_OPENAPI': JSON.stringify(true),
+  },
   plugins: [react(), tailwindcss()],
   resolve: { alias: sharedAliases },
   test: {

@@ -13,13 +13,15 @@ export type CreateServerAppOptions = {
 };
 
 /** Express app for the in-main API (no listen — main owns the HTTP server). */
-export function createServerApp(options: CreateServerAppOptions = {}): express.Express {
+export async function createServerApp(
+  options: CreateServerAppOptions = {},
+): Promise<express.Express> {
   const persistence = options.persistence ?? noopPersistencePort;
 
   const app = express();
 
   applyStarHotelExpressRequestPipeline(app);
-  registerStarHotelHealthAndOpenApi(app, persistence);
+  await registerStarHotelHealthAndOpenApi(app, persistence);
 
   options.registerApiRoutes?.(app);
 

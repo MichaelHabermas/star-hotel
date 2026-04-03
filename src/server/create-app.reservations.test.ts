@@ -34,7 +34,7 @@ describe('createServerApp — reservations API', () => {
     const { roomId, guestId } = seedRoomAndGuest(persistence.getDatabase());
 
     const kit = createSqliteHttpAdapterKit(persistence);
-    const app = createServerApp({
+    const app = await createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
         expressApp.use('/api/reservations', createReservationRouter(kit));

@@ -23,7 +23,7 @@ function seedSampleData(db: SqliteDb): { roomId: number; guestId: number } {
   return { roomId: Number(room.lastInsertRowid), guestId: Number(guest.lastInsertRowid) };
 }
 
-function createTestApp(persistence: SqlitePersistencePort) {
+async function createTestApp(persistence: SqlitePersistencePort) {
   const kit = createSqliteHttpAdapterKit(persistence);
   return createServerApp({
     persistence,
@@ -45,7 +45,7 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     await persistence.isReady();
     const { roomId, guestId } = seedSampleData(persistence.getDatabase());
 
-    const app = createTestApp(persistence);
+    const app = await createTestApp(persistence);
 
     const openApiRes = await request(app).get(EMBEDDED_API_PATHS.openapiJson).expect(200);
     expect(openApiRes.body).toMatchObject({
@@ -139,7 +139,7 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
     await persistence.isReady();
     const { roomId, guestId } = seedSampleData(persistence.getDatabase());
-    const app = createTestApp(persistence);
+    const app = await createTestApp(persistence);
 
     await request(app)
       .post('/api/reservations')
@@ -163,7 +163,7 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
     await persistence.isReady();
     const { roomId, guestId } = seedSampleData(persistence.getDatabase());
-    const app = createTestApp(persistence);
+    const app = await createTestApp(persistence);
 
     await request(app)
       .post('/api/reservations')

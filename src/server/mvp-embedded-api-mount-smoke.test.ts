@@ -28,7 +28,7 @@ describe('mountMvpSqliteEmbeddedApi (smoke)', () => {
     persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
     await persistence.isReady();
 
-    const app = createServerApp({
+    const app = await createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
         mountMvpSqliteEmbeddedApi(expressApp, persistence);

@@ -45,7 +45,7 @@ describe('createServerApp — reports API (E9)', () => {
     const { resId } = seedRoomGuestReservation(persistence.getDatabase());
 
     const kit = createSqliteHttpAdapterKit(persistence);
-    const app = createServerApp({
+    const app = await createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
         expressApp.use('/api/reports', createReportRouter(kit));
@@ -79,7 +79,7 @@ describe('createServerApp — reports API (E9)', () => {
     const { resId, roomId } = seedRoomGuestReservation(persistence.getDatabase());
 
     const kit = createSqliteHttpAdapterKit(persistence);
-    const app = createServerApp({
+    const app = await createServerApp({
       persistence,
       registerApiRoutes: (expressApp) => {
         expressApp.use('/api/reports', createReportRouter(kit));

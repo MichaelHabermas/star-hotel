@@ -6,13 +6,13 @@ import type { PersistencePort } from './ports/persistence';
 
 describe('createServerApp', () => {
   it('GET /health returns ok', async () => {
-    const app = createServerApp();
+    const app = await createServerApp();
     const res = await request(app).get(EMBEDDED_API_PATHS.health).expect(200);
     expect(res.body).toEqual({ ok: true });
   });
 
   it('GET /health includes CORS for localhost Origin (browser + Vite dev)', async () => {
-    const app = createServerApp();
+    const app = await createServerApp();
     const res = await request(app)
       .get(EMBEDDED_API_PATHS.health)
       .set('Origin', 'http://localhost:5173')
@@ -22,7 +22,7 @@ describe('createServerApp', () => {
   });
 
   it('OPTIONS /health preflight succeeds for localhost Origin', async () => {
-    const app = createServerApp();
+    const app = await createServerApp();
     await request(app)
       .options(EMBEDDED_API_PATHS.health)
       .set('Origin', 'http://localhost:5173')
@@ -40,7 +40,7 @@ describe('createServerApp', () => {
         /* test */
       },
     };
-    const app = createServerApp({ persistence });
+    const app = await createServerApp({ persistence });
     await request(app).get(EMBEDDED_API_PATHS.health).expect(200);
     expect(ready).toBe(true);
   });

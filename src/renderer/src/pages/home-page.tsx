@@ -105,121 +105,123 @@ export function HomePage(): JSX.Element {
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Developer experience</CardTitle>
-          <CardDescription>
-            Electron + Vite + React 19 + Tailwind v4 + shadcn/ui. Embedded Express API is reached
-            only through <span className="font-mono">StarHotelApp.api</span> (Epic E4).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <p className="text-muted-foreground text-sm">
-            Preload bridge (read-only):{' '}
-            <span className="font-mono">{starHotel.getEnvironment().platform}</span>
-          </p>
-          <p className="text-muted-foreground text-sm">
-            API base: <span className="font-mono">{starHotel.getEnvironment().apiBaseUrl}</span>
-          </p>
-          {starHotel.getEnvironment().platform === 'unknown' ? (
-            <p className="text-muted-foreground text-xs">
-              Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>
-              ). API health still works if the embedded server is running.
+      {import.meta.env.DEV ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Developer experience</CardTitle>
+            <CardDescription>
+              Electron + Vite + React 19 + Tailwind v4 + shadcn/ui. Embedded Express API is reached
+              only through <span className="font-mono">StarHotelApp.api</span> (Epic E4).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="text-muted-foreground text-sm">
+              Preload bridge (read-only):{' '}
+              <span className="font-mono">{starHotel.getEnvironment().platform}</span>
             </p>
-          ) : null}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={async () => {
-                try {
-                  await starHotel.pingEmbeddedApi();
-                  console.info('[starHotelApp] embedded API health ok');
-                } catch (err) {
-                  console.warn('[starHotelApp] embedded API health failed', err);
-                }
-              }}
-            >
-              Test API health
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={async () => {
-                try {
-                  await starHotel.pingIpc();
-                  console.info('[starHotelApp] IPC ping ok');
-                } catch (err) {
-                  console.warn('[starHotelApp] IPC ping failed', err);
-                }
-              }}
-            >
-              Test IPC
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={perfSmoke.kind === 'loading'}
-              onClick={async () => {
-                setPerfSmoke({ kind: 'loading' });
-                try {
-                  const result = await runPerfSmoke(starHotel);
-                  setPerfSmoke({ kind: 'ok', result });
-                } catch (err) {
-                  setPerfSmoke({
-                    kind: 'err',
-                    message: err instanceof Error ? err.message : String(err),
-                  });
-                }
-              }}
-            >
-              Perf smoke (E7)
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              disabled={reservationSmoke.kind === 'loading'}
-              onClick={async () => {
-                setReservationSmoke({ kind: 'loading' });
-                try {
-                  const rows = await starHotel.api.reservations.list({});
-                  setReservationSmoke({ kind: 'ok', count: rows.length });
-                  capturePostHogWorkflow('workflow_list_reservations', { count: rows.length });
-                } catch (err) {
-                  setReservationSmoke({
-                    kind: 'err',
-                    message: starHotel.formatEmbeddedApiUserMessage(err),
-                  });
-                }
-              }}
-            >
-              List reservations
-            </Button>
-          </div>
-          {reservationSmoke.kind === 'ok' ? (
-            <p className="text-muted-foreground text-sm" role="status">
-              Reservations loaded: {reservationSmoke.count} row(s).
+            <p className="text-muted-foreground text-sm">
+              API base: <span className="font-mono">{starHotel.getEnvironment().apiBaseUrl}</span>
             </p>
-          ) : null}
-          {reservationSmoke.kind === 'err' ? (
-            <p className="text-destructive text-sm" role="alert">
-              {reservationSmoke.message}
-            </p>
-          ) : null}
-          {perfSmoke.kind === 'ok' ? (
-            <p className="text-muted-foreground text-xs font-mono" role="status">
-              Perf: HTTP health {perfSmoke.result.embeddedApiRttMs} ms · IPC{' '}
-              {perfSmoke.result.ipcRttMs} ms · GET /api/reservations{' '}
-              {perfSmoke.result.reservationListMs} ms (see docs/PERF.md)
-            </p>
-          ) : null}
-          {perfSmoke.kind === 'err' ? (
-            <p className="text-destructive text-sm" role="alert">
-              {perfSmoke.message}
-            </p>
-          ) : null}
-        </CardContent>
-      </Card>
+            {starHotel.getEnvironment().platform === 'unknown' ? (
+              <p className="text-muted-foreground text-xs">
+                Plain browser preview: IPC needs Electron (<span className="font-mono">pnpm dev</span>
+                ). API health still works if the embedded server is running.
+              </p>
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    await starHotel.pingEmbeddedApi();
+                    console.info('[starHotelApp] embedded API health ok');
+                  } catch (err) {
+                    console.warn('[starHotelApp] embedded API health failed', err);
+                  }
+                }}
+              >
+                Test API health
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await starHotel.pingIpc();
+                    console.info('[starHotelApp] IPC ping ok');
+                  } catch (err) {
+                    console.warn('[starHotelApp] IPC ping failed', err);
+                  }
+                }}
+              >
+                Test IPC
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={perfSmoke.kind === 'loading'}
+                onClick={async () => {
+                  setPerfSmoke({ kind: 'loading' });
+                  try {
+                    const result = await runPerfSmoke(starHotel);
+                    setPerfSmoke({ kind: 'ok', result });
+                  } catch (err) {
+                    setPerfSmoke({
+                      kind: 'err',
+                      message: err instanceof Error ? err.message : String(err),
+                    });
+                  }
+                }}
+              >
+                Perf smoke (E7)
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                disabled={reservationSmoke.kind === 'loading'}
+                onClick={async () => {
+                  setReservationSmoke({ kind: 'loading' });
+                  try {
+                    const rows = await starHotel.api.reservations.list({});
+                    setReservationSmoke({ kind: 'ok', count: rows.length });
+                    capturePostHogWorkflow('workflow_list_reservations', { count: rows.length });
+                  } catch (err) {
+                    setReservationSmoke({
+                      kind: 'err',
+                      message: starHotel.formatEmbeddedApiUserMessage(err),
+                    });
+                  }
+                }}
+              >
+                List reservations
+              </Button>
+            </div>
+            {reservationSmoke.kind === 'ok' ? (
+              <p className="text-muted-foreground text-sm" role="status">
+                Reservations loaded: {reservationSmoke.count} row(s).
+              </p>
+            ) : null}
+            {reservationSmoke.kind === 'err' ? (
+              <p className="text-destructive text-sm" role="alert">
+                {reservationSmoke.message}
+              </p>
+            ) : null}
+            {perfSmoke.kind === 'ok' ? (
+              <p className="text-muted-foreground text-xs font-mono" role="status">
+                Perf: HTTP health {perfSmoke.result.embeddedApiRttMs} ms · IPC{' '}
+                {perfSmoke.result.ipcRttMs} ms · GET /api/reservations{' '}
+                {perfSmoke.result.reservationListMs} ms (see docs/PERF.md)
+              </p>
+            ) : null}
+            {perfSmoke.kind === 'err' ? (
+              <p className="text-destructive text-sm" role="alert">
+                {perfSmoke.message}
+              </p>
+            ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

@@ -8,7 +8,6 @@ import express, {
 import { mapErrorToHttp } from './http/json-error';
 import { createHttpAccessLogMiddleware } from './logging/http-access-middleware';
 import { embeddedApiLogger } from './logging/structured-logger';
-import { registerOpenApiRoutes } from './openapi/register-openapi-routes';
 import type { PersistencePort } from './ports/persistence';
 
 /**
@@ -51,16 +50,19 @@ export function applyStarHotelExpressRequestPipeline(app: express.Express): void
   app.use(createHttpAccessLogMiddleware(embeddedApiLogger));
 }
 
-/** `/health` waits on persistence; OpenAPI + Swagger JSON mount. */
-export function registerStarHotelHealthAndOpenApi(
+/** `/health` waits on persistence; OpenAPI + Swagger (dev / Vitest only — omitted from packaged main bundle). */
+export async function registerStarHotelHealthAndOpenApi(
   app: express.Express,
   persistence: PersistencePort,
-): void {
+): Promise<void> {
   app.get(EMBEDDED_API_PATHS.health, async (_req, res) => {
     await persistence.isReady();
     res.status(200).json({ ok: true });
   });
-  registerOpenApiRoutes(app);
+  if (import.meta.env.STAR_HOTEL_INCLUDE_OPENAPI) {
+    const { registerOpenApiRoutes } = await import('./openapi/register-openapi-routes.js');
+    registerOpenApiRoutes(app);
+  }
 }
 
 export function createStarHotelApiErrorHandler(): ErrorRequestHandler {

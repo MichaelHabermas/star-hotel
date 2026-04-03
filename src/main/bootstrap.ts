@@ -32,7 +32,9 @@ export async function startStarHotelMain(d: StarHotelMainDeps): Promise<void> {
   try {
     await d.ensureEmbeddedApiAndIpc();
     d.logger.info(`[star-hotel] API ${d.apiBaseUrl} (see docs/PERF.md)`);
-    d.logger.info(`[star-hotel] Swagger UI ${d.apiBaseUrl}/api/docs`);
+    if (import.meta.env.STAR_HOTEL_INCLUDE_OPENAPI) {
+      d.logger.info(`[star-hotel] Swagger UI ${d.apiBaseUrl}/api/docs`);
+    }
   } catch (err) {
     d.logger.error('[star-hotel] embedded API server failed to start', err);
     d.app.quit();
