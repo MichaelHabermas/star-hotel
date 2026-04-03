@@ -39,8 +39,8 @@ export function HomePage(): JSX.Element {
               Room board
             </h1>
             <p className="text-muted-foreground text-sm">
-              Front desk board for room status, room cards, and booking handoff. Use the board to
-              select a room, then continue directly into room maintenance or check-in.
+              Front desk board for room status, room cards, and booking handoff. Click a room to
+              open its live desk action, then use the desk card for alternate room or booking work.
             </p>
           </div>
         </div>
@@ -50,14 +50,17 @@ export function HomePage(): JSX.Element {
             <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Main desk flow
             </p>
-            <p className="mt-2 text-foreground">Select room, review status, open room card.</p>
+            <p className="mt-2 text-foreground">
+              Click room, open live stay or check-in, review desk card.
+            </p>
           </div>
           <div className="rounded-lg border border-border/70 bg-background/80 p-3">
             <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Booking handoff
             </p>
             <p className="mt-2 text-foreground">
-              Start check-in from the selected room without leaving the board context.
+              Open booked stays and new check-ins directly from the room tile instead of leaving the
+              board first.
             </p>
           </div>
           <div className="rounded-lg border border-border/70 bg-background/80 p-3">
