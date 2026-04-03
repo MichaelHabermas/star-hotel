@@ -263,7 +263,8 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
                 <div className="space-y-1">
                   <h2 className="font-ui text-base font-semibold">Contact</h2>
                   <p className="text-muted-foreground text-sm">
-                    Keep reachable contact details available for desk lookup and reservation handoff.
+                    Keep reachable contact details available for desk lookup and reservation
+                    handoff.
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -296,7 +297,11 @@ export function GuestFormPage({ mode }: GuestFormPageProps): JSX.Element {
                 <p className="font-ui text-sm font-semibold">Actions</p>
                 <div className="flex flex-col gap-2">
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? 'Saving…' : mode === 'create' ? 'Save guest card' : 'Save changes'}
+                    {submitting
+                      ? 'Saving…'
+                      : mode === 'create'
+                        ? 'Save guest card'
+                        : 'Save changes'}
                   </Button>
                   <Button type="button" variant="outline" asChild disabled={submitting}>
                     <Link to="/guests">Cancel</Link>

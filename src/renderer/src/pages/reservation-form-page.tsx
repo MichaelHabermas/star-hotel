@@ -66,9 +66,11 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
   const { catalog, setDeleteErr, createPreview } = editor;
   const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog;
   const selectedGuest =
-    editor.guestId === '' ? null : guests.find((guest) => guest.id === Number(editor.guestId)) ?? null;
+    editor.guestId === ''
+      ? null
+      : (guests.find((guest) => guest.id === Number(editor.guestId)) ?? null);
   const selectedRoom =
-    editor.roomId === '' ? null : rooms.find((room) => room.id === Number(editor.roomId)) ?? null;
+    editor.roomId === '' ? null : (rooms.find((room) => room.id === Number(editor.roomId)) ?? null);
 
   if (mode === 'edit' && !editIdValid) {
     return (
@@ -144,7 +146,9 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
                 Guest
               </p>
               <p className="mt-2 font-medium">{selectedGuest?.name ?? 'Select guest'}</p>
-              <p className="mt-1 text-muted-foreground">{selectedGuest?.contact ?? 'No contact loaded'}</p>
+              <p className="mt-1 text-muted-foreground">
+                {selectedGuest?.contact ?? 'No contact loaded'}
+              </p>
             </div>
             <div className="rounded-lg border border-border/70 bg-background/80 p-3">
               <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">

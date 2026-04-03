@@ -141,11 +141,14 @@ export function ReservationsListPage(): JSX.Element {
   const rows = list.kind === 'ok' ? list.rows : [];
   const selectedReservation =
     selectedReservationId === null
-      ? rows[0] ?? null
-      : rows.find((reservation) => reservation.id === selectedReservationId) ?? rows[0] ?? null;
-  const selectedGuest =
-    selectedReservation ? guestById.get(selectedReservation.guestId) ?? null : null;
-  const selectedRoom = selectedReservation ? roomById.get(selectedReservation.roomId) ?? null : null;
+      ? (rows[0] ?? null)
+      : (rows.find((reservation) => reservation.id === selectedReservationId) ?? rows[0] ?? null);
+  const selectedGuest = selectedReservation
+    ? (guestById.get(selectedReservation.guestId) ?? null)
+    : null;
+  const selectedRoom = selectedReservation
+    ? (roomById.get(selectedReservation.roomId) ?? null)
+    : null;
   const table = useReactTable({
     data: rows,
     columns,
@@ -201,7 +204,9 @@ export function ReservationsListPage(): JSX.Element {
         <Card className="gap-4 py-4">
           <CardHeader className="pb-0">
             <CardTitle className="font-ui text-base">Desk flow</CardTitle>
-            <CardDescription>Review the booking ledger, select a stay, then open the booking card or folio.</CardDescription>
+            <CardDescription>
+              Review the booking ledger, select a stay, then open the booking card or folio.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 text-sm md:grid-cols-3">
             <div className="rounded-lg border border-border/70 bg-background/80 p-3">
@@ -263,7 +268,9 @@ export function ReservationsListPage(): JSX.Element {
                 </div>
               </>
             ) : (
-              <p className="text-muted-foreground">Select a booking from the ledger to inspect it.</p>
+              <p className="text-muted-foreground">
+                Select a booking from the ledger to inspect it.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -297,8 +304,7 @@ export function ReservationsListPage(): JSX.Element {
           ) : null}
           {list.kind === 'ok' && list.rows.length === 0 ? (
             <p className="text-muted-foreground text-sm" role="status">
-              No bookings yet. Use <span className="font-medium">New booking</span> to add
-              one.
+              No bookings yet. Use <span className="font-medium">New booking</span> to add one.
             </p>
           ) : null}
           {list.kind === 'ok' && list.rows.length > 0 ? (
@@ -320,8 +326,12 @@ export function ReservationsListPage(): JSX.Element {
                 {table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={selectedReservation?.id === row.original.id ? 'selected' : undefined}
-                    className={selectedReservation?.id === row.original.id ? 'bg-muted/40' : undefined}
+                    data-state={
+                      selectedReservation?.id === row.original.id ? 'selected' : undefined
+                    }
+                    className={
+                      selectedReservation?.id === row.original.id ? 'bg-muted/40' : undefined
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

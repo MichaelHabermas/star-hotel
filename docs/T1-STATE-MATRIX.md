@@ -7,7 +7,7 @@
 | Screen / route | Loading | Empty | Error | Partial |
 | ---------------- | --------- | ------- | ------- | --------- |
 | `/login` | Sign-in button shows “Signing in…” while request runs | N/A (form always visible) | Inline alert with API message on failed login | N/A |
-| `/` (Operations hub) | Perf smoke buttons show loading while each probe runs | N/A | Perf / reservation smoke errors shown in card | N/A |
+| `/` (Room Board) | Perf smoke buttons show loading while each probe runs | N/A | Perf / reservation smoke errors shown in collapsed dev tools | N/A |
 | `/reservations` | “Loading reservations…” (`aria-live`) | “No reservations yet” + CTA | Banner with message + Retry | Catalog error banner + Retry catalog; list may still show if reservations loaded |
 | `/reservations/new`, `/reservations/:id` | “Loading reservation…” (edit) | N/A | Load error + Retry / Back; submit error under form | Catalog error for guest/room pickers + Retry |
 | `/rooms` | “Loading rooms…” | “No rooms yet” + CTA | Message + Retry | N/A |

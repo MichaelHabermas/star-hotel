@@ -21,9 +21,9 @@ Exactly **one** row becomes the MVP parity form ([PRD US5.1](./PRD.md)). Default
 
 ### Shell navigation (implemented)
 
-- **Room board** (legacy main grid) = route **`/`** (“Dashboard”).
+- **Room board** (legacy main grid) = route **`/`** (“Room Board”).
 - **Room master list / CRUD** = **`/rooms`** (distinct from the board).
-- **Single header nav row** shows module links with keyboard hints (Esc, F1–F4, F8; F5/F6 **Admin only**). F7 was removed (duplicate of Esc/home). See [VB6-PARITY-MATRIX.md](./VB6-PARITY-MATRIX.md#keyboard-mapping-frozen).
+- **Single header nav row** shows legacy-style module links with keyboard hints (`Room Board`, `Booking`, `Customer`, `Room`, `Report`, `Password`; Esc, F1–F4, F8; F5/F6 **Admin only**). F7 was removed (duplicate of Esc/home). See [VB6-PARITY-MATRIX.md](./VB6-PARITY-MATRIX.md#keyboard-mapping-frozen).
 
 ### Traceability
 

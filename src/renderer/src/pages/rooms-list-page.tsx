@@ -108,7 +108,7 @@ export function RoomsListPage(): JSX.Element {
     [],
   );
 
-  const rows = list.kind === 'ok' ? list.rows : [];
+  const rows = useMemo(() => (list.kind === 'ok' ? list.rows : []), [list]);
   const statusCounts = useMemo(() => {
     const counts = Object.fromEntries(ROOM_STATUS_VALUES.map((status) => [status, 0])) as Record<
       (typeof ROOM_STATUS_VALUES)[number],
@@ -120,7 +120,9 @@ export function RoomsListPage(): JSX.Element {
     return counts;
   }, [rows]);
   const selectedRoom =
-    selectedRoomId === null ? rows[0] ?? null : rows.find((room) => room.id === selectedRoomId) ?? rows[0] ?? null;
+    selectedRoomId === null
+      ? (rows[0] ?? null)
+      : (rows.find((room) => room.id === selectedRoomId) ?? rows[0] ?? null);
   const table = useReactTable({
     data: rows,
     columns,

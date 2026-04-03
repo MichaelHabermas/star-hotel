@@ -117,7 +117,9 @@ export function GuestsListPage(): JSX.Element {
     });
   }, [list, findQuery]);
   const selectedGuest =
-    selectedGuestId === null ? rows[0] ?? null : rows.find((guest) => guest.id === selectedGuestId) ?? rows[0] ?? null;
+    selectedGuestId === null
+      ? (rows[0] ?? null)
+      : (rows.find((guest) => guest.id === selectedGuestId) ?? rows[0] ?? null);
 
   const table = useReactTable({
     data: rows,
@@ -160,7 +162,9 @@ export function GuestsListPage(): JSX.Element {
         <Card className="gap-4 py-4">
           <CardHeader className="pb-0">
             <CardTitle className="font-ui text-base">Find guest</CardTitle>
-            <CardDescription>Search by name, contact, or ID reference before opening the guest card.</CardDescription>
+            <CardDescription>
+              Search by name, contact, or ID reference before opening the guest card.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="max-w-xl space-y-1">
@@ -176,7 +180,8 @@ export function GuestsListPage(): JSX.Element {
               />
             </div>
             <p className="text-muted-foreground text-sm">
-              Use the list below to open a guest card or jump into booking once identity is confirmed.
+              Use the list below to open a guest card or jump into booking once identity is
+              confirmed.
             </p>
           </CardContent>
         </Card>
@@ -205,7 +210,9 @@ export function GuestsListPage(): JSX.Element {
                 </div>
               </>
             ) : (
-              <p className="text-muted-foreground">Select a guest from the list to inspect the card.</p>
+              <p className="text-muted-foreground">
+                Select a guest from the list to inspect the card.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -214,13 +221,13 @@ export function GuestsListPage(): JSX.Element {
       <Card className="border-border/80 shadow-sm">
         <CardHeader>
           <CardTitle>Guest lookup ledger</CardTitle>
-          <CardDescription>Lookup first, then edit the guest card if details need changing.</CardDescription>
+          <CardDescription>
+            Lookup first, then edit the guest card if details need changing.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {list.kind === 'ok' && list.rows.length > 0 ? (
-            <p className="text-muted-foreground text-sm">
-              {rows.length} matching guest record(s).
-            </p>
+            <p className="text-muted-foreground text-sm">{rows.length} matching guest record(s).</p>
           ) : null}
           {list.kind === 'loading' ? (
             <p className="text-muted-foreground text-sm" role="status" aria-live="polite">

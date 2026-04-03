@@ -15,10 +15,10 @@ export function ReportsHubPage(): JSX.Element {
     <div className="mx-auto max-w-3xl space-y-6 p-4 md:p-6">
       <div>
         <h1 className="font-display text-foreground text-2xl font-semibold tracking-tight">
-          Reports
+          Report desk
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Operational print views — aligned with legacy F2 / report entry.
+          Operational print views for the legacy F2 report path.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
