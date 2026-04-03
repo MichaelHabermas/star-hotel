@@ -8,7 +8,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { useReservationEditor } from './use-reservation-editor';
 
 const guest: GuestResponse = { id: 1, name: 'A', idNumber: null, contact: null };
-const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'vacant' };
+const room: RoomResponse = {
+  id: 1,
+  roomNumber: '101',
+  roomType: 'Standard',
+  price: 100,
+  status: 'Open',
+};
 
 const defaultReservation: ReservationResponse = {
   id: 1,

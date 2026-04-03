@@ -3,9 +3,15 @@ import type { NextFunction, Request, Response } from 'express';
 import { sendJsonError } from '../http/json-error';
 import type { StarHotelSessionStore } from './session-store';
 
+export type StarHotelAuthenticatedUser = { id: number; username: string; role: string };
+
 type RequestWithStarHotelUser = Request & {
-  starHotelUser?: { id: number; username: string; role: string };
+  starHotelUser?: StarHotelAuthenticatedUser;
 };
+
+export function getStarHotelUser(req: Request): StarHotelAuthenticatedUser | undefined {
+  return (req as RequestWithStarHotelUser).starHotelUser;
+}
 
 export type CreateEmbeddedApiAuthMiddlewareOptions = {
   readonly sessionStore: StarHotelSessionStore;

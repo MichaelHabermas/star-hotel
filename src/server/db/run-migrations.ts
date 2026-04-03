@@ -41,6 +41,32 @@ CREATE INDEX IF NOT EXISTS idx_reservation_guest ON tbl_reservation(GuestID);
 CREATE INDEX IF NOT EXISTS idx_reservation_room_dates ON tbl_reservation(RoomID, CheckInDate, CheckOutDate);
 `,
   },
+  {
+    version: 2,
+    sql: `
+ALTER TABLE tbl_room ADD COLUMN RoomNumber TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_tbl_room_RoomNumber ON tbl_room(RoomNumber) WHERE RoomNumber IS NOT NULL;
+
+UPDATE tbl_room SET RoomNumber = 'L' || printf('%06d', RoomID) WHERE RoomNumber IS NULL;
+
+UPDATE tbl_room SET Status = CASE
+  WHEN lower(trim(Status)) IN ('available', 'vacant', 'open') THEN 'Open'
+  WHEN lower(trim(Status)) = 'booked' THEN 'Booked'
+  WHEN lower(trim(Status)) = 'occupied' THEN 'Occupied'
+  WHEN lower(trim(Status)) IN ('housekeeping', 'hk') THEN 'Housekeeping'
+  WHEN lower(trim(Status)) = 'maintenance' THEN 'Maintenance'
+  ELSE 'Open'
+END;
+
+CREATE TABLE IF NOT EXISTS tbl_user_module_access (
+  UserID INTEGER NOT NULL,
+  ModuleKey TEXT NOT NULL,
+  PRIMARY KEY (UserID, ModuleKey),
+  FOREIGN KEY (UserID) REFERENCES tbl_user(UserID) ON DELETE CASCADE
+);
+`,
+  },
 ];
 
 /**

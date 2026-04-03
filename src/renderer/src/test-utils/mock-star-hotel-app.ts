@@ -7,6 +7,7 @@ function mockApi() {
       login: vi.fn(),
       logout: vi.fn(),
       me: vi.fn(),
+      changePassword: vi.fn(),
     },
     guests: {
       list: vi.fn(),
@@ -32,6 +33,14 @@ function mockApi() {
     reports: {
       getFolio: vi.fn(),
       getDaySheet: vi.fn(),
+    },
+    users: {
+      list: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      getModules: vi.fn(),
+      putModules: vi.fn(),
     },
   };
 }

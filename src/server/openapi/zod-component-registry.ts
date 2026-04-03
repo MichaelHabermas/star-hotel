@@ -1,4 +1,7 @@
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { hotelModuleKeySchema } from '../../shared/hotel-modules';
+import { authUserResponseSchema } from '../../shared/schemas/auth';
+import { changePasswordBodySchema } from '../../shared/schemas/auth-password';
 import {
   guestCreateBodySchema,
   guestResponseSchema,
@@ -22,9 +25,19 @@ import {
   roomResponseSchema,
   roomUpdateBodySchema,
 } from '../../shared/schemas/room';
+import {
+  userAdminCreateBodySchema,
+  userAdminResponseSchema,
+  userAdminUpdateBodySchema,
+  userModulesDetailResponseSchema,
+  userModulesPutBodySchema,
+} from '../../shared/schemas/user-admin';
 
 const registry = new OpenAPIRegistry();
 
+registry.register('AuthUser', authUserResponseSchema);
+registry.register('HotelModuleKey', hotelModuleKeySchema);
+registry.register('ChangePasswordBody', changePasswordBodySchema);
 registry.register('Guest', guestResponseSchema);
 registry.register('GuestCreate', guestCreateBodySchema);
 registry.register('GuestPatch', guestUpdateBodySchema);
@@ -43,6 +56,12 @@ registry.register('FolioGuest', folioGuestSchema);
 registry.register('FolioRoom', folioRoomSchema);
 registry.register('DaySheetReport', daySheetReportResponseSchema);
 registry.register('DaySheetLine', daySheetLineSchema);
+
+registry.register('UserAdmin', userAdminResponseSchema);
+registry.register('UserAdminCreate', userAdminCreateBodySchema);
+registry.register('UserAdminPatch', userAdminUpdateBodySchema);
+registry.register('UserModulesPut', userModulesPutBodySchema);
+registry.register('UserModulesDetail', userModulesDetailResponseSchema);
 
 const generator = new OpenApiGeneratorV3(registry.definitions);
 

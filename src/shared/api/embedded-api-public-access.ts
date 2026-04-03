@@ -15,7 +15,8 @@ export function embeddedApiPathnameExemptFromBearer(pathname: string): boolean {
   if (pathname === EMBEDDED_API_PATHS.docs) {
     return true;
   }
-  if (pathname === EMBEDDED_API_PATHS.auth || pathname.startsWith(`${EMBEDDED_API_PATHS.auth}/`)) {
+  /** Only login is unauthenticated; other `/api/auth/*` routes require Bearer when enabled. */
+  if (pathname === EMBEDDED_API_PATHS.authLogin) {
     return true;
   }
   return false;

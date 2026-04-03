@@ -1,5 +1,6 @@
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import { loginBodySchema } from '@shared/schemas/auth';
+import { changePasswordBodySchema } from '@shared/schemas/auth-password';
 import type { Express } from 'express';
 import {
   createSqliteDomainRouter,
@@ -7,6 +8,7 @@ import {
 } from '../http/sqlite-http-adapter-kit';
 import { AuthService } from './auth-service';
 import type { StarHotelSessionStore } from './session-store';
+import { UserModuleRepository } from './user-module-repository';
 import { UserRepository } from './user-repository';
 
 export function registerAuthRoutes(
@@ -15,7 +17,8 @@ export function registerAuthRoutes(
   options: { readonly sessionStore: StarHotelSessionStore },
 ): void {
   const getAuthService = kit.createLazySqliteService(
-    (db) => new AuthService(new UserRepository(db), options.sessionStore),
+    (db) =>
+      new AuthService(new UserRepository(db), options.sessionStore, new UserModuleRepository(db)),
   );
 
   const router = createSqliteDomainRouter(kit);
@@ -47,8 +50,21 @@ export function registerAuthRoutes(
       const raw = req.headers.authorization;
       const token = raw?.startsWith('Bearer ') ? raw.slice(7) : undefined;
       const svc = await getAuthService();
-      const user = svc.me(token);
-      res.status(200).json({ user });
+      const payload = svc.me(token);
+      res.status(200).json(payload);
+    }),
+  );
+
+  router.post(
+    '/change-password',
+    kit.asyncHandler(async (req, res) => {
+      const body = changePasswordBodySchema.parse(req.body);
+      const raw = req.headers.authorization;
+      const token = raw?.startsWith('Bearer ') ? raw.slice(7) : undefined;
+      const svc = await getAuthService();
+      const { user } = svc.me(token);
+      await svc.changePassword(user.id, body);
+      res.status(204).send();
     }),
   );
 

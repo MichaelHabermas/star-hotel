@@ -15,8 +15,10 @@ function jsonResponse(data: unknown, init?: ResponseInit): Response {
 describe('createRoomsHttpClient', () => {
   it('lists rooms with optional status filter', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
-      expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/rooms?status=Vacant');
-      return jsonResponse([{ id: 1, roomType: 'Std', price: 99, status: 'Vacant' }]);
+      expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/rooms?status=Open');
+      return jsonResponse([
+        { id: 1, roomNumber: '101', roomType: 'Std', price: 99, status: 'Open' },
+      ]);
     });
 
     const client = createRoomsHttpClient({
@@ -24,15 +26,21 @@ describe('createRoomsHttpClient', () => {
       fetch: fetchMock as typeof fetch,
     });
 
-    const rows = await client.list({ status: 'Vacant' });
+    const rows = await client.list({ status: 'Open' });
     expect(rows).toHaveLength(1);
-    expect(rows[0].status).toBe('Vacant');
+    expect(rows[0].status).toBe('Open');
   });
 
   it('gets room by id', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       expect(requestUrl(input)).toBe('http://127.0.0.1:1/api/rooms/3');
-      return jsonResponse({ id: 3, roomType: 'Suite', price: 200, status: 'Occupied' });
+      return jsonResponse({
+        id: 3,
+        roomNumber: '303',
+        roomType: 'Suite',
+        price: 200,
+        status: 'Occupied',
+      });
     });
 
     const client = createRoomsHttpClient({

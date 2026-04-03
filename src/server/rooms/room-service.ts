@@ -1,3 +1,4 @@
+import { normalizeRoomStatusOrOpen } from '@shared/room-status';
 import type {
   RoomCreateBody,
   RoomListQuery,
@@ -10,9 +11,10 @@ import type { RoomRepository, RoomRow } from './room-repository';
 function rowToResponse(row: RoomRow): RoomResponse {
   return {
     id: row.RoomID,
+    roomNumber: row.RoomNumber,
     roomType: row.RoomType,
     price: row.Price,
-    status: row.Status,
+    status: normalizeRoomStatusOrOpen(row.Status),
   };
 }
 
@@ -33,6 +35,7 @@ export class RoomService {
 
   create(body: RoomCreateBody): RoomResponse {
     const id = this.repo.insert({
+      RoomNumber: body.roomNumber,
       RoomType: body.roomType,
       Price: body.price,
       Status: body.status,
@@ -47,11 +50,13 @@ export class RoomService {
     }
     const row: RoomRow = {
       RoomID: existing.RoomID,
+      RoomNumber: body.roomNumber ?? existing.RoomNumber,
       RoomType: body.roomType ?? existing.RoomType,
       Price: body.price ?? existing.Price,
       Status: body.status ?? existing.Status,
     };
     this.repo.update(roomId, {
+      RoomNumber: row.RoomNumber,
       RoomType: row.RoomType,
       Price: row.Price,
       Status: row.Status,

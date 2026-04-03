@@ -5,6 +5,7 @@ type SqliteDatabase = InstanceType<typeof DatabaseType>;
 
 export type RoomRow = {
   RoomID: number;
+  RoomNumber: string | null;
   RoomType: string;
   Price: number;
   Status: string;
@@ -17,18 +18,20 @@ export class RoomRepository {
     if (query.status !== undefined) {
       return this.db
         .prepare(
-          `SELECT RoomID, RoomType, Price, Status FROM tbl_room WHERE Status = ? ORDER BY RoomID ASC`,
+          `SELECT RoomID, RoomNumber, RoomType, Price, Status FROM tbl_room WHERE Status = ? ORDER BY RoomNumber ASC, RoomID ASC`,
         )
         .all(query.status) as RoomRow[];
     }
     return this.db
-      .prepare(`SELECT RoomID, RoomType, Price, Status FROM tbl_room ORDER BY RoomID ASC`)
+      .prepare(
+        `SELECT RoomID, RoomNumber, RoomType, Price, Status FROM tbl_room ORDER BY RoomNumber ASC, RoomID ASC`,
+      )
       .all() as RoomRow[];
   }
 
   getById(roomId: number): RoomRow | undefined {
     return this.db
-      .prepare(`SELECT RoomID, RoomType, Price, Status FROM tbl_room WHERE RoomID = ?`)
+      .prepare(`SELECT RoomID, RoomNumber, RoomType, Price, Status FROM tbl_room WHERE RoomID = ?`)
       .get(roomId) as RoomRow | undefined;
   }
 
@@ -41,15 +44,17 @@ export class RoomRepository {
 
   insert(row: Omit<RoomRow, 'RoomID'>): number {
     const result = this.db
-      .prepare(`INSERT INTO tbl_room (RoomType, Price, Status) VALUES (?, ?, ?)`)
-      .run(row.RoomType, row.Price, row.Status);
+      .prepare(`INSERT INTO tbl_room (RoomNumber, RoomType, Price, Status) VALUES (?, ?, ?, ?)`)
+      .run(row.RoomNumber, row.RoomType, row.Price, row.Status);
     return Number(result.lastInsertRowid);
   }
 
   update(roomId: number, row: Omit<RoomRow, 'RoomID'>): void {
     this.db
-      .prepare(`UPDATE tbl_room SET RoomType = ?, Price = ?, Status = ? WHERE RoomID = ?`)
-      .run(row.RoomType, row.Price, row.Status, roomId);
+      .prepare(
+        `UPDATE tbl_room SET RoomNumber = ?, RoomType = ?, Price = ?, Status = ? WHERE RoomID = ?`,
+      )
+      .run(row.RoomNumber, row.RoomType, row.Price, row.Status, roomId);
   }
 
   delete(roomId: number): boolean {

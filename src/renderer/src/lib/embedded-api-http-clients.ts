@@ -6,6 +6,7 @@ import {
   type ReservationsHttpClient,
 } from '@shared/api/reservations-http-client';
 import { createRoomsHttpClient, type RoomsHttpClient } from '@shared/api/rooms-http-client';
+import { createUsersHttpClient, type UsersHttpClient } from '@shared/api/users-http-client';
 
 /** Bundle of typed openapi-fetch clients for the embedded Express API (loopback). */
 export type EmbeddedApiHttpClients = {
@@ -14,6 +15,7 @@ export type EmbeddedApiHttpClients = {
   readonly guests: GuestsHttpClient;
   readonly rooms: RoomsHttpClient;
   readonly reports: ReportsHttpClient;
+  readonly users: UsersHttpClient;
 };
 
 export function createEmbeddedApiHttpClients(deps: {
@@ -26,5 +28,6 @@ export function createEmbeddedApiHttpClients(deps: {
     guests: createGuestsHttpClient(deps),
     rooms: createRoomsHttpClient(deps),
     reports: createReportsHttpClient(deps),
+    users: createUsersHttpClient(deps),
   };
 }

@@ -14,17 +14,30 @@ export type ReservationEditorOptions = {
   readonly editId: number;
   readonly editIdValid: boolean;
   readonly navigate: NavigateFunction;
+  readonly initialGuestId?: string;
+  readonly initialRoomId?: string;
+  readonly initialCheckInDate?: string;
+  readonly initialCheckOutDate?: string;
 };
 
 export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorOptions) {
-  const { mode, editId, editIdValid, navigate } = opts;
+  const {
+    mode,
+    editId,
+    editIdValid,
+    navigate,
+    initialGuestId = '',
+    initialRoomId = '',
+    initialCheckInDate = '',
+    initialCheckOutDate = '',
+  } = opts;
   const catalog = useGuestRoomCatalog(app);
   const { rooms } = catalog;
 
-  const [guestId, setGuestId] = useState<string>('');
-  const [roomId, setRoomId] = useState<string>('');
-  const [checkInDate, setCheckInDate] = useState('');
-  const [checkOutDate, setCheckOutDate] = useState('');
+  const [guestId, setGuestId] = useState<string>(initialGuestId);
+  const [roomId, setRoomId] = useState<string>(initialRoomId);
+  const [checkInDate, setCheckInDate] = useState(initialCheckInDate);
+  const [checkOutDate, setCheckOutDate] = useState(initialCheckOutDate);
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');

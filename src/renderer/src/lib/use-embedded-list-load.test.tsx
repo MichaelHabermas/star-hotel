@@ -25,4 +25,20 @@ describe('useEmbeddedListLoad', () => {
       expect(result.current.list).toEqual({ kind: 'err', message: 'boom' });
     });
   });
+
+  it('calls load once when load is a new function each render (inline lambdas)', async () => {
+    const loadImpl = vi.fn().mockResolvedValue([{ id: 1 }]);
+    const { result, rerender } = renderHook(() =>
+      useEmbeddedListLoad<{ id: number }>({
+        load: () => loadImpl(),
+        formatError: (e) => String(e),
+      }),
+    );
+    rerender();
+    rerender();
+    await waitFor(() => {
+      expect(result.current.list).toEqual({ kind: 'ok', rows: [{ id: 1 }] });
+    });
+    expect(loadImpl).toHaveBeenCalledTimes(1);
+  });
 });

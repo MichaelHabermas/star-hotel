@@ -13,7 +13,9 @@ type SqliteDb = ReturnType<SqlitePersistencePort['getDatabase']>;
 
 function seedSampleData(db: SqliteDb): { roomId: number; guestId: number } {
   const room = db
-    .prepare(`INSERT INTO tbl_room (RoomType, Price, Status) VALUES ('Deluxe', 150, 'Available')`)
+    .prepare(
+      `INSERT INTO tbl_room (RoomNumber, RoomType, Price, Status) VALUES ('501', 'Deluxe', 150, 'Open')`,
+    )
     .run();
   const guest = db
     .prepare(
@@ -80,12 +82,13 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
     expect(roomsRes.body).toHaveLength(1);
     expect(roomsRes.body[0]).toMatchObject({
       id: roomId,
+      roomNumber: '501',
       roomType: 'Deluxe',
       price: 150,
-      status: 'Available',
+      status: 'Open',
     });
 
-    const filtered = await request(app).get('/api/rooms?status=Available').expect(200);
+    const filtered = await request(app).get('/api/rooms?status=Open').expect(200);
     expect(filtered.body).toHaveLength(1);
 
     const emptyFilter = await request(app).get('/api/rooms?status=Occupied').expect(200);
@@ -104,7 +107,7 @@ describe('createServerApp — guests, rooms, OpenAPI', () => {
 
     const createdRoom = await request(app)
       .post('/api/rooms')
-      .send({ roomType: 'Penthouse', price: 300, status: 'Available' })
+      .send({ roomNumber: 'PH1', roomType: 'Penthouse', price: 300, status: 'Open' })
       .expect(201);
     const newRoomId = createdRoom.body.id as number;
     expect(newRoomId).toBeGreaterThan(0);

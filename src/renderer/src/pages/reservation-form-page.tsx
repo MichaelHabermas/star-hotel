@@ -27,7 +27,7 @@ import { useReservationEditor } from '@renderer/features/reservations/use-reserv
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
 import type { JSX } from 'react';
 import { useId } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 type ReservationFormPageProps = {
   readonly mode: 'create' | 'edit';
@@ -39,18 +39,36 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
   const starHotel = useStarHotelApp();
   const navigate = useNavigate();
   const { reservationId: idParam } = useParams<{ reservationId: string }>();
+  const [searchParams] = useSearchParams();
   const formId = useId();
   const guestSelectId = `${formId}-guest`;
   const roomSelectId = `${formId}-room`;
   const checkInId = `${formId}-checkin`;
   const checkOutId = `${formId}-checkout`;
+  const selectedRoomId = searchParams.get('roomId') ?? '';
+  const selectedGuestId = searchParams.get('guestId') ?? '';
+  const prefillCheckInDate = searchParams.get('checkInDate') ?? '';
+  const prefillCheckOutDate = searchParams.get('checkOutDate') ?? '';
 
   const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN;
   const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0;
 
-  const editor = useReservationEditor(starHotel, { mode, editId, editIdValid, navigate });
+  const editor = useReservationEditor(starHotel, {
+    mode,
+    editId,
+    editIdValid,
+    navigate,
+    initialGuestId: mode === 'create' ? selectedGuestId : '',
+    initialRoomId: mode === 'create' ? selectedRoomId : '',
+    initialCheckInDate: mode === 'create' ? prefillCheckInDate : '',
+    initialCheckOutDate: mode === 'create' ? prefillCheckOutDate : '',
+  });
   const { catalog, setDeleteErr, createPreview } = editor;
   const { guests, rooms, loading: refsLoading, error: refsErr, reload: reloadCatalog } = catalog;
+  const selectedGuest =
+    editor.guestId === '' ? null : guests.find((guest) => guest.id === Number(editor.guestId)) ?? null;
+  const selectedRoom =
+    editor.roomId === '' ? null : rooms.find((room) => room.id === Number(editor.roomId)) ?? null;
 
   if (mode === 'edit' && !editIdValid) {
     return (
@@ -93,14 +111,14 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
     );
   }
 
-  const title = mode === 'create' ? 'New reservation' : `Edit reservation #${editId}`;
+  const title = mode === 'create' ? 'Check-in workspace' : `Edit reservation #${editId}`;
   const description =
     mode === 'create'
-      ? 'Select guest, room, and stay dates. Estimated total uses the same nightly rate and night count as the server.'
-      : 'Update stay details. Total is recalculated when dates or room change.';
+      ? 'Assign guest and room, confirm stay dates, and review the charge preview before saving.'
+      : 'Update guest, room, or stay dates from one operator workspace. Total is recalculated when room or dates change.';
 
   return (
-    <div className="mx-auto max-w-lg p-4 md:p-6">
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
       <div className="mb-6 flex flex-wrap items-center gap-4">
         <Button type="button" variant="ghost" size="sm" asChild>
           <Link to="/reservations" aria-label="Back to reservations list">
@@ -114,10 +132,77 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
         ) : null}
       </div>
 
+      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <Card className="gap-4 border-border/80 border-l-4 border-l-primary py-4 shadow-sm">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-lg">{title}</CardTitle>
+            <CardDescription id={`${formId}-hint`}>{description}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Guest
+              </p>
+              <p className="mt-2 font-medium">{selectedGuest?.name ?? 'Select guest'}</p>
+              <p className="mt-1 text-muted-foreground">{selectedGuest?.contact ?? 'No contact loaded'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Room
+              </p>
+              <p className="mt-2 font-medium">
+                {selectedRoom
+                  ? `Room ${selectedRoom.roomNumber ?? selectedRoom.id}`
+                  : 'Select room'}
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                {selectedRoom
+                  ? `${selectedRoom.roomType} · ${selectedRoom.status}`
+                  : 'No room assigned yet'}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3">
+              <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Charge preview
+              </p>
+              <p className="mt-2 font-medium">
+                {mode === 'edit' && editor.totalAmount !== null
+                  ? money.format(editor.totalAmount)
+                  : createPreview.total !== null
+                    ? money.format(createPreview.total)
+                    : 'Awaiting dates'}
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                {mode === 'edit'
+                  ? 'Server total for the current stay.'
+                  : createPreview.nights !== null
+                    ? `${createPreview.nights} night(s)`
+                    : 'Select room and dates to calculate.'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="gap-4 py-4">
+          <CardHeader className="pb-0">
+            <CardTitle className="font-ui text-base">Front desk notes</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <p className="text-muted-foreground">
+              Confirm room status before assigning the stay. Open rooms can go straight to booking;
+              occupied or maintenance rooms should be reviewed before check-in.
+            </p>
+            <p className="text-muted-foreground">
+              Save only after guest, room, and dates are all confirmed.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border/80 border-l-4 border-l-primary shadow-sm">
         <CardHeader>
-          <CardTitle className="font-ui text-lg">{title}</CardTitle>
-          <CardDescription id={`${formId}-hint`}>{description}</CardDescription>
+          <CardTitle className="font-ui text-lg">Stay details</CardTitle>
+          <CardDescription>Guest, room, dates, and save actions.</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -162,157 +247,181 @@ export function ReservationFormPage({ mode }: ReservationFormPageProps): JSX.Ele
               </p>
             ) : null}
 
-            <div className="space-y-2">
-              <Label htmlFor={guestSelectId}>Guest</Label>
-              <Select
-                value={editor.guestId === '' ? undefined : editor.guestId}
-                onValueChange={editor.setGuestId}
-                disabled={refsLoading || guests.length === 0}
-                required
-              >
-                <SelectTrigger id={guestSelectId} aria-required className="w-full">
-                  <SelectValue placeholder="Choose a guest" />
-                </SelectTrigger>
-                <SelectContent>
-                  {guests.map((g) => (
-                    <SelectItem key={g.id} value={String(g.id)}>
-                      {g.name}
-                      {g.contact ? ` — ${g.contact}` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Guest and room</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Match the guest to the room before confirming stay dates.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={guestSelectId}>Guest</Label>
+                  <Select
+                    value={editor.guestId === '' ? undefined : editor.guestId}
+                    onValueChange={editor.setGuestId}
+                    disabled={refsLoading || guests.length === 0}
+                    required
+                  >
+                    <SelectTrigger id={guestSelectId} aria-required className="w-full">
+                      <SelectValue placeholder="Choose a guest" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {guests.map((g) => (
+                        <SelectItem key={g.id} value={String(g.id)}>
+                          {g.name}
+                          {g.contact ? ` — ${g.contact}` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={roomSelectId}>Room</Label>
+                  <Select
+                    value={editor.roomId === '' ? undefined : editor.roomId}
+                    onValueChange={editor.setRoomId}
+                    disabled={refsLoading || rooms.length === 0}
+                    required
+                  >
+                    <SelectTrigger id={roomSelectId} aria-required className="w-full">
+                      <SelectValue placeholder="Choose a room" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rooms.map((r) => (
+                        <SelectItem key={r.id} value={String(r.id)}>
+                          {r.roomNumber ? `Room ${r.roomNumber}` : `Room #${r.id}`} · {r.roomType}
+                          {` — ${money.format(r.price)} (${r.status})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <h2 className="font-ui text-base font-semibold">Stay dates</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Confirm arrival and departure, then verify the charge preview.
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor={checkInId}>Check-in date</Label>
+                    <Input
+                      id={checkInId}
+                      type="date"
+                      value={editor.checkInDate}
+                      onChange={(ev) => editor.setCheckInDate(ev.target.value)}
+                      required
+                      aria-required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={checkOutId}>Check-out date</Label>
+                    <Input
+                      id={checkOutId}
+                      type="date"
+                      value={editor.checkOutDate}
+                      onChange={(ev) => editor.setCheckOutDate(ev.target.value)}
+                      required
+                      aria-required
+                    />
+                  </div>
+                </div>
+
+                {mode === 'create' && createPreview.hint ? (
+                  <p className="text-muted-foreground text-sm" role="status">
+                    {createPreview.hint}
+                  </p>
+                ) : null}
+                {mode === 'create' &&
+                createPreview.nights !== null &&
+                createPreview.total !== null &&
+                !createPreview.hint ? (
+                  <div
+                    className="border-border bg-background rounded-lg border px-4 py-3 text-sm"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <p className="text-muted-foreground">
+                      Estimated stay:{' '}
+                      <span className="text-foreground font-medium">
+                        {createPreview.nights} night(s)
+                      </span>
+                    </p>
+                    <p className="text-muted-foreground mt-1">
+                      Estimated total:{' '}
+                      <span className="text-foreground font-semibold tabular-nums">
+                        {money.format(createPreview.total)}
+                      </span>
+                    </p>
+                  </div>
+                ) : null}
+
+                {mode === 'edit' && editor.totalAmount !== null ? (
+                  <p className="text-muted-foreground text-sm">
+                    Current total:{' '}
+                    <span className="text-foreground font-medium">
+                      {money.format(editor.totalAmount)}
+                    </span>
+                  </p>
+                ) : null}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor={roomSelectId}>Room</Label>
-              <Select
-                value={editor.roomId === '' ? undefined : editor.roomId}
-                onValueChange={editor.setRoomId}
-                disabled={refsLoading || rooms.length === 0}
-                required
-              >
-                <SelectTrigger id={roomSelectId} aria-required className="w-full">
-                  <SelectValue placeholder="Choose a room" />
-                </SelectTrigger>
-                <SelectContent>
-                  {rooms.map((r) => (
-                    <SelectItem key={r.id} value={String(r.id)}>
-                      #{r.id} · {r.roomType} — {money.format(r.price)} ({r.status})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor={checkInId}>Check-in date</Label>
-                <Input
-                  id={checkInId}
-                  type="date"
-                  value={editor.checkInDate}
-                  onChange={(ev) => editor.setCheckInDate(ev.target.value)}
-                  required
-                  aria-required
-                />
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
+              <div className="space-y-4">
+                {editor.fieldErr ? (
+                  <p className="text-destructive text-sm" role="alert">
+                    {editor.fieldErr}
+                  </p>
+                ) : null}
+                {editor.submitErr ? (
+                  <p className="text-destructive text-sm" role="alert" aria-live="assertive">
+                    {editor.submitErr}
+                  </p>
+                ) : null}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={checkOutId}>Check-out date</Label>
-                <Input
-                  id={checkOutId}
-                  type="date"
-                  value={editor.checkOutDate}
-                  onChange={(ev) => editor.setCheckOutDate(ev.target.value)}
-                  required
-                  aria-required
-                />
+              <div className="space-y-2 rounded-xl border border-border/70 bg-muted/10 p-4">
+                <p className="font-ui text-sm font-semibold">Actions</p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="submit"
+                    disabled={
+                      editor.submitting ||
+                      refsLoading ||
+                      Boolean(refsErr) ||
+                      guests.length === 0 ||
+                      rooms.length === 0
+                    }
+                  >
+                    {editor.submitting
+                      ? 'Saving…'
+                      : mode === 'create'
+                        ? 'Save booking'
+                        : 'Save changes'}
+                  </Button>
+                  <Button type="button" variant="outline" asChild disabled={editor.submitting}>
+                    <Link to="/reservations">Cancel</Link>
+                  </Button>
+                  {mode === 'edit' ? (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      disabled={editor.submitting}
+                      onClick={() => {
+                        setDeleteErr(null);
+                        editor.setDeleteOpen(true);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  ) : null}
+                </div>
               </div>
-            </div>
-
-            {mode === 'create' && createPreview.hint ? (
-              <p className="text-muted-foreground text-sm" role="status">
-                {createPreview.hint}
-              </p>
-            ) : null}
-            {mode === 'create' &&
-            createPreview.nights !== null &&
-            createPreview.total !== null &&
-            !createPreview.hint ? (
-              <div
-                className="border-border bg-muted/30 rounded-lg border px-4 py-3 text-sm"
-                role="status"
-                aria-live="polite"
-              >
-                <p className="text-muted-foreground">
-                  Estimated stay:{' '}
-                  <span className="text-foreground font-medium">
-                    {createPreview.nights} night(s)
-                  </span>
-                </p>
-                <p className="text-muted-foreground mt-1">
-                  Estimated total:{' '}
-                  <span className="text-foreground font-semibold tabular-nums">
-                    {money.format(createPreview.total)}
-                  </span>
-                </p>
-              </div>
-            ) : null}
-
-            {mode === 'edit' && editor.totalAmount !== null ? (
-              <p className="text-muted-foreground text-sm">
-                Current total:{' '}
-                <span className="text-foreground font-medium">
-                  {money.format(editor.totalAmount)}
-                </span>
-              </p>
-            ) : null}
-
-            {editor.fieldErr ? (
-              <p className="text-destructive text-sm" role="alert">
-                {editor.fieldErr}
-              </p>
-            ) : null}
-            {editor.submitErr ? (
-              <p className="text-destructive text-sm" role="alert" aria-live="assertive">
-                {editor.submitErr}
-              </p>
-            ) : null}
-
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="submit"
-                disabled={
-                  editor.submitting ||
-                  refsLoading ||
-                  Boolean(refsErr) ||
-                  guests.length === 0 ||
-                  rooms.length === 0
-                }
-              >
-                {editor.submitting
-                  ? 'Saving…'
-                  : mode === 'create'
-                    ? 'Create reservation'
-                    : 'Save changes'}
-              </Button>
-              <Button type="button" variant="outline" asChild disabled={editor.submitting}>
-                <Link to="/reservations">Cancel</Link>
-              </Button>
-              {mode === 'edit' ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  className="sm:ml-auto"
-                  disabled={editor.submitting}
-                  onClick={() => {
-                    setDeleteErr(null);
-                    editor.setDeleteOpen(true);
-                  }}
-                >
-                  Delete
-                </Button>
-              ) : null}
             </div>
           </form>
         </CardContent>

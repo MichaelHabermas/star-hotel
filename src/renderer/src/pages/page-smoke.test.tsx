@@ -11,6 +11,10 @@ import { LoginPage } from './login-page';
 import { RoomFormPage } from './room-form-page';
 import { RoomsListPage } from './rooms-list-page';
 
+vi.mock('@renderer/features/dashboard/room-dashboard', () => ({
+  RoomDashboard: () => <div data-testid="room-dashboard" />,
+}));
+
 describe('page smoke (StarHotelApp boundary)', () => {
   afterEach(() => {
     cleanup();
@@ -38,7 +42,7 @@ describe('page smoke (StarHotelApp boundary)', () => {
     expect(screen.getAllByText(/^Sign in$/i).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('HomePage shows operations hub', () => {
+  it('HomePage shows room board', async () => {
     const app = createMockStarHotelApp();
     render(
       <MemoryRouter>
@@ -47,7 +51,7 @@ describe('page smoke (StarHotelApp boundary)', () => {
         </StarHotelAppProvider>
       </MemoryRouter>,
     );
-    expect(screen.getByRole('heading', { name: /operations hub/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /room board/i })).toBeInTheDocument();
   });
 
   it('RoomsListPage shows room list heading', async () => {

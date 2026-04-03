@@ -30,6 +30,7 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
     { name: 'rooms' },
     { name: 'reservations' },
     { name: 'reports' },
+    { name: 'users' },
   ],
   paths: {
     [EMBEDDED_API_PATHS.health]: {
@@ -79,17 +80,13 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  required: ['token', 'user'],
+                  required: ['token', 'user', 'moduleKeys'],
                   properties: {
                     token: { type: 'string' },
-                    user: {
-                      type: 'object',
-                      required: ['id', 'username', 'role'],
-                      properties: {
-                        id: { type: 'integer' },
-                        username: { type: 'string' },
-                        role: { type: 'string' },
-                      },
+                    user: { $ref: '#/components/schemas/AuthUser' },
+                    moduleKeys: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/HotelModuleKey' },
                     },
                   },
                 },
@@ -120,16 +117,12 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  required: ['user'],
+                  required: ['user', 'moduleKeys'],
                   properties: {
-                    user: {
-                      type: 'object',
-                      required: ['id', 'username', 'role'],
-                      properties: {
-                        id: { type: 'integer' },
-                        username: { type: 'string' },
-                        role: { type: 'string' },
-                      },
+                    user: { $ref: '#/components/schemas/AuthUser' },
+                    moduleKeys: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/HotelModuleKey' },
                     },
                   },
                 },
@@ -137,6 +130,22 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
             },
           },
           '401': { description: 'Not authenticated' },
+        },
+      },
+    },
+    [EMBEDDED_API_PATHS.authChangePassword]: {
+      post: {
+        tags: ['auth'],
+        summary: 'Change password (requires Bearer token)',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/ChangePasswordBody' } },
+          },
+        },
+        responses: {
+          '204': { description: 'No content' },
+          '401': { description: 'Invalid credentials' },
         },
       },
     },
@@ -466,6 +475,122 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         },
       },
     },
+    [EMBEDDED_API_PATHS.users]: {
+      get: {
+        tags: ['users'],
+        summary: 'List users (Admin)',
+        responses: {
+          '200': {
+            description: 'User array',
+            content: {
+              'application/json': {
+                schema: { type: 'array', items: { $ref: '#/components/schemas/UserAdmin' } },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+        },
+      },
+      post: {
+        tags: ['users'],
+        summary: 'Create user (Admin)',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/UserAdminCreate' } },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Created',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/UserAdmin' } },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '409': { description: 'Username conflict' },
+        },
+      },
+    },
+    [EMBEDDED_API_PATH_TEMPLATES.userById]: {
+      patch: {
+        tags: ['users'],
+        summary: 'Update user (Admin)',
+        parameters: [{ $ref: '#/components/parameters/UserId' }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/UserAdminPatch' } },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/UserAdmin' } },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '409': { description: 'Conflict' },
+        },
+      },
+      delete: {
+        tags: ['users'],
+        summary: 'Delete user (Admin)',
+        parameters: [{ $ref: '#/components/parameters/UserId' }],
+        responses: {
+          '204': { description: 'No content' },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '404': { $ref: '#/components/responses/NotFound' },
+          '409': { description: 'Last admin' },
+        },
+      },
+    },
+    [EMBEDDED_API_PATH_TEMPLATES.userModules]: {
+      get: {
+        tags: ['users'],
+        summary: 'Get module access for user (Admin)',
+        parameters: [{ $ref: '#/components/parameters/UserId' }],
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/UserModulesDetail' } },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+      put: {
+        tags: ['users'],
+        summary: 'Replace module access for user (Admin)',
+        parameters: [{ $ref: '#/components/parameters/UserId' }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/UserModulesPut' } },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'OK',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/UserModulesDetail' } },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '403': { description: 'Forbidden' },
+          '404': { $ref: '#/components/responses/NotFound' },
+        },
+      },
+    },
   },
   components: {
     ...zodComponents,
@@ -483,6 +608,12 @@ export const starHotelOpenApiDocument: Record<string, unknown> = {
         schema: { type: 'integer', minimum: 1 },
       },
       ReservationId: {
+        name: 'id',
+        in: 'path',
+        required: true,
+        schema: { type: 'integer', minimum: 1 },
+      },
+      UserId: {
         name: 'id',
         in: 'path',
         required: true,

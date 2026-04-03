@@ -4,9 +4,10 @@ import type { SqliteHttpAdapterKit } from './http/sqlite-http-adapter-kit';
 import { registerReportRoutes } from './reports/report-router';
 import { registerReservationRoutes } from './reservations/reservation-router';
 import { registerRoomRoutes } from './rooms/room-router';
+import { registerUserAdminRoutes } from './users/register-user-admin-routes';
 
 /**
- * Orchestrates MVP domain REST mount order (guests, rooms, reservations, reports).
+ * Orchestrates MVP domain REST mount order (guests, rooms, reservations, reports, users).
  * Per-slice registration lives next to each router.
  */
 export function registerMvpSqliteApiRoutes(app: Express, kit: SqliteHttpAdapterKit): void {
@@ -14,4 +15,5 @@ export function registerMvpSqliteApiRoutes(app: Express, kit: SqliteHttpAdapterK
   registerRoomRoutes(app, kit);
   registerReservationRoutes(app, kit);
   registerReportRoutes(app, kit);
+  registerUserAdminRoutes(app, kit);
 }

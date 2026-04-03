@@ -13,7 +13,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ReservationsListPage } from './reservations-list-page';
 
 const guest: GuestResponse = { id: 3, name: 'Guest One', idNumber: null, contact: null };
-const room: RoomResponse = { id: 2, roomType: 'Standard', price: 100, status: 'Vacant' };
+const room: RoomResponse = {
+  id: 2,
+  roomNumber: '201',
+  roomType: 'Standard',
+  price: 100,
+  status: 'Open',
+};
 
 const reservation: ReservationResponse = {
   id: 1,

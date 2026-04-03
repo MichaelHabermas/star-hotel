@@ -33,7 +33,7 @@ describe('runMigrations', () => {
     const versions = db.prepare('SELECT version FROM schema_migrations ORDER BY version').all() as {
       version: number;
     }[];
-    expect(versions.map((v) => v.version)).toEqual([1]);
+    expect(versions.map((v) => v.version)).toEqual([1, 2]);
 
     const bookingIndex = db
       .prepare(

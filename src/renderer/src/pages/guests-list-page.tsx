@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@renderer/components/ui/dialog';
+import { Input } from '@renderer/components/ui/input';
 import {
   Table,
   TableBody,
@@ -36,6 +37,7 @@ export function GuestsListPage(): JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<GuestResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
+  const [findQuery, setFindQuery] = useState('');
 
   const columns = useMemo<ColumnDef<GuestResponse>[]>(
     () => [
@@ -95,7 +97,22 @@ export function GuestsListPage(): JSX.Element {
     [],
   );
 
-  const rows = list.kind === 'ok' ? list.rows : [];
+  const rows = useMemo(() => {
+    if (list.kind !== 'ok') {
+      return [];
+    }
+    const q = findQuery.trim().toLowerCase();
+    if (!q) {
+      return list.rows;
+    }
+    return list.rows.filter((g) => {
+      const name = g.name.toLowerCase();
+      const contact = (g.contact ?? '').toLowerCase();
+      const idNum = (g.idNumber ?? '').toLowerCase();
+      return name.includes(q) || contact.includes(q) || idNum.includes(q);
+    });
+  }, [list, findQuery]);
+
   const table = useReactTable({
     data: rows,
     columns,
@@ -139,6 +156,20 @@ export function GuestsListPage(): JSX.Element {
           <CardDescription>Used by reservations and front-desk lookup.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {list.kind === 'ok' && list.rows.length > 0 ? (
+            <div className="max-w-md space-y-1">
+              <label className="text-muted-foreground text-xs font-medium" htmlFor="guest-find">
+                Find guest
+              </label>
+              <Input
+                id="guest-find"
+                placeholder="Name, contact, or ID reference"
+                value={findQuery}
+                onChange={(ev) => setFindQuery(ev.target.value)}
+                autoComplete="off"
+              />
+            </div>
+          ) : null}
           {list.kind === 'loading' ? (
             <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
               Loading guests…

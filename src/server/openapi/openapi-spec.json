@@ -28,6 +28,9 @@
     },
     {
       "name": "reports"
+    },
+    {
+      "name": "users"
     }
   ],
   "paths": {
@@ -98,29 +101,20 @@
                   "type": "object",
                   "required": [
                     "token",
-                    "user"
+                    "user",
+                    "moduleKeys"
                   ],
                   "properties": {
                     "token": {
                       "type": "string"
                     },
                     "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "username",
-                        "role"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "username": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
+                      "$ref": "#/components/schemas/AuthUser"
+                    },
+                    "moduleKeys": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HotelModuleKey"
                       }
                     }
                   }
@@ -161,26 +155,17 @@
                 "schema": {
                   "type": "object",
                   "required": [
-                    "user"
+                    "user",
+                    "moduleKeys"
                   ],
                   "properties": {
                     "user": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "username",
-                        "role"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "integer"
-                        },
-                        "username": {
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        }
+                      "$ref": "#/components/schemas/AuthUser"
+                    },
+                    "moduleKeys": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/HotelModuleKey"
                       }
                     }
                   }
@@ -190,6 +175,32 @@
           },
           "401": {
             "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Change password (requires Bearer token)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Invalid credentials"
           }
         }
       }
@@ -726,10 +737,277 @@
           }
         }
       }
+    },
+    "/api/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "List users (Admin)",
+        "responses": {
+          "200": {
+            "description": "User array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAdmin"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Create user (Admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdmin"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "409": {
+            "description": "Username conflict"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "patch": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Update user (Admin)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdmin"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Delete user (Admin)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "Last admin"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/modules": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get module access for user (Admin)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModulesDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Replace module access for user (Admin)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserModulesPut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModulesDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AuthUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "role"
+        ]
+      },
+      "HotelModuleKey": {
+        "type": "string",
+        "enum": [
+          "close",
+          "reports",
+          "customers",
+          "rooms",
+          "users",
+          "access",
+          "alerts",
+          "security"
+        ]
+      },
+      "ChangePasswordBody": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "additionalProperties": false
+      },
       "Guest": {
         "type": "object",
         "properties": {
@@ -800,6 +1078,10 @@
           "id": {
             "type": "number"
           },
+          "roomNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "roomType": {
             "type": "string"
           },
@@ -807,11 +1089,19 @@
             "type": "number"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "Open",
+              "Booked",
+              "Occupied",
+              "Housekeeping",
+              "Maintenance"
+            ]
           }
         },
         "required": [
           "id",
+          "roomNumber",
           "roomType",
           "price",
           "status"
@@ -820,6 +1110,12 @@
       "RoomCreate": {
         "type": "object",
         "properties": {
+          "roomNumber": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16,
+            "pattern": "^[0-9A-Za-z-]+$"
+          },
           "roomType": {
             "type": "string",
             "minLength": 1
@@ -830,10 +1126,17 @@
           },
           "status": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "Open",
+              "Booked",
+              "Occupied",
+              "Housekeeping",
+              "Maintenance"
+            ]
           }
         },
         "required": [
+          "roomNumber",
           "roomType",
           "price",
           "status"
@@ -843,6 +1146,12 @@
       "RoomPatch": {
         "type": "object",
         "properties": {
+          "roomNumber": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16,
+            "pattern": "^[0-9A-Za-z-]+$"
+          },
           "roomType": {
             "type": "string",
             "minLength": 1
@@ -853,7 +1162,13 @@
           },
           "status": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "Open",
+              "Booked",
+              "Occupied",
+              "Housekeeping",
+              "Maintenance"
+            ]
           }
         },
         "additionalProperties": false
@@ -1226,6 +1541,125 @@
           "checkInDate",
           "checkOutDate"
         ]
+      },
+      "UserAdmin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "role"
+        ]
+      },
+      "UserAdminCreate": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "UserAdminPatch": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserModulesPut": {
+        "type": "object",
+        "properties": {
+          "moduleKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "close",
+                "reports",
+                "customers",
+                "rooms",
+                "users",
+                "access",
+                "alerts",
+                "security"
+              ]
+            }
+          }
+        },
+        "required": [
+          "moduleKeys"
+        ],
+        "additionalProperties": false
+      },
+      "UserModulesDetail": {
+        "type": "object",
+        "properties": {
+          "accessMode": {
+            "type": "string",
+            "enum": [
+              "default",
+              "custom"
+            ]
+          },
+          "moduleKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "close",
+                "reports",
+                "customers",
+                "rooms",
+                "users",
+                "access",
+                "alerts",
+                "security"
+              ]
+            }
+          }
+        },
+        "required": [
+          "accessMode",
+          "moduleKeys"
+        ]
       }
     },
     "parameters": {
@@ -1248,6 +1682,15 @@
         }
       },
       "ReservationId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "UserId": {
         "name": "id",
         "in": "path",
         "required": true,

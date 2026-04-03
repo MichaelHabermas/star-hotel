@@ -11,6 +11,7 @@ export const EMBEDDED_API_PATHS = {
   authLogin: '/api/auth/login',
   authLogout: '/api/auth/logout',
   authMe: '/api/auth/me',
+  authChangePassword: '/api/auth/change-password',
   guests: '/api/guests',
   guestById: (id: number): string => `/api/guests/${id}`,
   rooms: '/api/rooms',
@@ -21,6 +22,10 @@ export const EMBEDDED_API_PATHS = {
   reports: '/api/reports',
   reportsFolio: '/api/reports/folio',
   reportsDaySheet: '/api/reports/day-sheet',
+  /** Admin user CRUD + per-user module access (legacy frmUserMaintain / frmModuleAccess). */
+  users: '/api/users',
+  userById: (id: number): string => `/api/users/${id}`,
+  userModules: (id: number): string => `/api/users/${id}/modules`,
 } as const;
 
 /**
@@ -30,6 +35,8 @@ export const EMBEDDED_API_PATH_TEMPLATES = {
   guestById: '/api/guests/{id}',
   roomById: '/api/rooms/{id}',
   reservationById: '/api/reservations/{id}',
+  userById: '/api/users/{id}',
+  userModules: '/api/users/{id}/modules',
 } as const;
 
 /** OpenAPI 3 `paths` keys — must match `starHotelOpenApiDocument.paths`. */
@@ -38,6 +45,7 @@ export const EMBEDDED_OPENAPI_DOCUMENTED_PATHS = [
   EMBEDDED_API_PATHS.authLogin,
   EMBEDDED_API_PATHS.authLogout,
   EMBEDDED_API_PATHS.authMe,
+  EMBEDDED_API_PATHS.authChangePassword,
   EMBEDDED_API_PATHS.guests,
   EMBEDDED_API_PATH_TEMPLATES.guestById,
   EMBEDDED_API_PATHS.rooms,
@@ -46,4 +54,7 @@ export const EMBEDDED_OPENAPI_DOCUMENTED_PATHS = [
   EMBEDDED_API_PATH_TEMPLATES.reservationById,
   EMBEDDED_API_PATHS.reportsFolio,
   EMBEDDED_API_PATHS.reportsDaySheet,
+  EMBEDDED_API_PATHS.users,
+  EMBEDDED_API_PATH_TEMPLATES.userById,
+  EMBEDDED_API_PATH_TEMPLATES.userModules,
 ] as const;

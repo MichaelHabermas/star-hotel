@@ -18,3 +18,11 @@ export function RequireGuest({ children }: { readonly children: ReactNode }): JS
   }
   return <>{children}</>;
 }
+
+export function RequireAdmin(): JSX.Element {
+  const { user } = useAuth();
+  if (!user || user.role.trim().toLowerCase() !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+  return <Outlet />;
+}

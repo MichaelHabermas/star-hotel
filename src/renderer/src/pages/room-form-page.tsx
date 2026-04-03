@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@renderer/components/ui/select';
 import { useStarHotelApp } from '@renderer/lib/use-star-hotel-app';
+import { ROOM_STATUS_VALUES } from '@shared/room-status';
 import { roomCreateBodySchema, roomUpdateBodySchema } from '@shared/schemas/room';
 import type { FormEvent, JSX } from 'react';
 import { useCallback, useEffect, useId, useState } from 'react';
@@ -25,13 +26,14 @@ type RoomFormPageProps = {
   readonly mode: 'create' | 'edit';
 };
 
-const STATUSES = ['Available', 'Occupied'] as const;
+const STATUSES = ROOM_STATUS_VALUES;
 
 export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
   const starHotel = useStarHotelApp();
   const navigate = useNavigate();
   const { roomId: idParam } = useParams<{ roomId: string }>();
   const formId = useId();
+  const roomNumberId = `${formId}-room-number`;
   const priceId = `${formId}-price`;
   const typeId = `${formId}-type`;
   const statusId = `${formId}-status`;
@@ -39,6 +41,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
   const editId = mode === 'edit' && idParam ? Number.parseInt(idParam, 10) : NaN;
   const editIdValid = mode === 'edit' && Number.isFinite(editId) && editId > 0;
 
+  const [roomNumber, setRoomNumber] = useState('');
   const [roomType, setRoomType] = useState('');
   const [price, setPrice] = useState('');
   const [status, setStatus] = useState<string>(STATUSES[0]);
@@ -57,6 +60,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
     setLoadErr(null);
     try {
       const r = await starHotel.api.rooms.get(editId);
+      setRoomNumber(r.roomNumber ?? '');
       setRoomType(r.roomType);
       setPrice(String(r.price));
       setStatus(r.status);
@@ -83,6 +87,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
     const priceNum = Number.parseFloat(price);
     if (mode === 'create') {
       const parsed = roomCreateBodySchema.safeParse({
+        roomNumber: roomNumber.trim(),
         roomType: roomType.trim(),
         price: priceNum,
         status,
@@ -107,6 +112,9 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
       return;
     }
     const body: Record<string, unknown> = {};
+    if (roomNumber.trim() !== '') {
+      body.roomNumber = roomNumber.trim();
+    }
     if (roomType.trim() !== '') {
       body.roomType = roomType.trim();
     }
@@ -173,7 +181,7 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
     );
   }
 
-  const title = mode === 'create' ? 'New room' : `Edit room #${editId}`;
+  const title = mode === 'create' ? 'New room' : `Edit room ${roomNumber.trim() || `#${editId}`}`;
 
   return (
     <div className="mx-auto max-w-lg p-4 md:p-6">
@@ -200,6 +208,16 @@ export function RoomFormPage({ mode }: RoomFormPageProps): JSX.Element {
             noValidate
             aria-describedby={`${formId}-hint`}
           >
+            <div className="space-y-2">
+              <Label htmlFor={roomNumberId}>Room number</Label>
+              <Input
+                id={roomNumberId}
+                value={roomNumber}
+                onChange={(ev) => setRoomNumber(ev.target.value)}
+                required
+                autoComplete="off"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor={typeId}>Room type</Label>
               <Input

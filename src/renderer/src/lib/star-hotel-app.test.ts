@@ -1,4 +1,5 @@
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
+import { HOTEL_MODULE_KEYS } from '@shared/hotel-modules';
 import { IPC_CHANNELS } from '@shared/ipc/channels';
 import type { StarHotelPreloadAPI } from '@shared/preload-contract';
 import { describe, expect, it, vi } from 'vitest';
@@ -99,7 +100,11 @@ describe('createStarHotelApp', () => {
   it('Bearer wrapper does not attach token to login URL', async () => {
     const inner = vi.fn().mockResolvedValue(
       new Response(
-        JSON.stringify({ token: 't', user: { id: 1, username: 'admin', role: 'Admin' } }),
+        JSON.stringify({
+          token: 't',
+          user: { id: 1, username: 'admin', role: 'Admin' },
+          moduleKeys: [...HOTEL_MODULE_KEYS],
+        }),
         {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -134,7 +139,11 @@ describe('createStarHotelApp', () => {
   it('Bearer fetch wrapper keeps Content-Type when openapi-fetch calls fetch(Request) without init (login)', async () => {
     const inner = vi.fn().mockResolvedValue(
       new Response(
-        JSON.stringify({ token: 't', user: { id: 1, username: 'admin', role: 'Admin' } }),
+        JSON.stringify({
+          token: 't',
+          user: { id: 1, username: 'admin', role: 'Admin' },
+          moduleKeys: [...HOTEL_MODULE_KEYS],
+        }),
         {
           status: 200,
           headers: { 'Content-Type': 'application/json' },

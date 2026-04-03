@@ -8,7 +8,9 @@ function seedRoomAndGuest(db: ReturnType<SqlitePersistencePort['getDatabase']>):
   guestId: number;
 } {
   const room = db
-    .prepare(`INSERT INTO tbl_room (RoomType, Price, Status) VALUES ('Standard', 100, 'Available')`)
+    .prepare(
+      `INSERT INTO tbl_room (RoomNumber, RoomType, Price, Status) VALUES ('602', 'Standard', 100, 'Open')`,
+    )
     .run();
   const guest = db
     .prepare(`INSERT INTO tbl_guest (Name, ID_Number, Contact) VALUES ('Ada', null, null)`)

@@ -6,13 +6,17 @@ import { RoomService } from './room-service';
 
 describe('RoomService', () => {
   it('list maps rows to API shape', () => {
-    const rows: RoomRow[] = [{ RoomID: 2, RoomType: 'Std', Price: 100, Status: 'Vacant' }];
+    const rows: RoomRow[] = [
+      { RoomID: 2, RoomNumber: '201', RoomType: 'Std', Price: 100, Status: 'Open' },
+    ];
     const repo = {
       list: () => rows,
       getById: () => undefined,
     } as unknown as RoomRepository;
     const svc = new RoomService(repo);
-    expect(svc.list({})).toEqual([{ id: 2, roomType: 'Std', price: 100, status: 'Vacant' }]);
+    expect(svc.list({})).toEqual([
+      { id: 2, roomNumber: '201', roomType: 'Std', price: 100, status: 'Open' },
+    ]);
   });
 
   it('get throws when missing', () => {
@@ -29,16 +33,25 @@ describe('RoomService', () => {
       list: () => [],
       getById: (id: number) =>
         id === 7
-          ? ({ RoomID: 7, RoomType: 'Suite', Price: 200, Status: 'Available' } satisfies RoomRow)
+          ? ({
+              RoomID: 7,
+              RoomNumber: '701',
+              RoomType: 'Suite',
+              Price: 200,
+              Status: 'Open',
+            } satisfies RoomRow)
           : undefined,
       insert: () => 7,
     } as unknown as RoomRepository;
     const svc = new RoomService(repo);
-    expect(svc.create({ roomType: 'Suite', price: 200, status: 'Available' })).toEqual({
+    expect(
+      svc.create({ roomNumber: '701', roomType: 'Suite', price: 200, status: 'Open' }),
+    ).toEqual({
       id: 7,
+      roomNumber: '701',
       roomType: 'Suite',
       price: 200,
-      status: 'Available',
+      status: 'Open',
     });
   });
 
@@ -46,7 +59,13 @@ describe('RoomService', () => {
     const repo = {
       list: () => [],
       getById: () =>
-        ({ RoomID: 1, RoomType: 'A', Price: 50, Status: 'Available' }) satisfies RoomRow,
+        ({
+          RoomID: 1,
+          RoomNumber: '101',
+          RoomType: 'A',
+          Price: 50,
+          Status: 'Open',
+        }) satisfies RoomRow,
       countReservationsForRoom: () => 1,
       delete: () => true,
     } as unknown as RoomRepository;

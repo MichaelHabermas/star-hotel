@@ -7,7 +7,7 @@ Authoritative mapping from VB6 assets (see [PRE-SEARCH.md](./PRE-SEARCH.md)) to 
 | Legacy asset (typical path) | Purpose | Key logic / modules | Planned React route | Primary epic |
 | ---------------------------- | --------- | --------------------- | --------------------- | -------------- |
 | `Form/frmLogin.frm` (or equivalent) | Operator authentication | `tbl_user`, password upgrade (Argon2) | `/login` | E8 (US8.1) |
-| `Form/frmMain.frm` | Hub / navigation shell | Menu → form dispatch | `/` (dashboard hub) | E8 (US8.2) |
+| `Form/frmDashboard.frm` | Main room board + toolbar | Level grid, legend, F-keys | `/` (room board), `/reports`, `/admin/*` | E8 (US8.2) |
 | `Form/frmRoom.frm` (or `Room.frm`) | Room CRUD, status, rates | `tbl_room` | `/rooms`, `/rooms/:id` | E8 (US8.3); candidate **E5** MVP |
 | `Form/frmGuest.frm` (or equivalent) | Guest CRUD | `tbl_guest` | `/guests`, `/guests/:id` | E8 (US8.4); candidate **E5** MVP |
 | `Form/frmCheckIn.frm` / reservation UI | Reservations, check-in/out, totals | `tbl_reservation`, `modLogic.bas` (rate calc) | `/reservations`, `/reservations/:id` | E8 (US8.5); **preferred E5** slice per [DECISIONS T2](./DECISIONS.md) |
@@ -18,6 +18,12 @@ Authoritative mapping from VB6 assets (see [PRE-SEARCH.md](./PRE-SEARCH.md)) to 
 ### E5 MVP note
 
 Exactly **one** row becomes the MVP parity form ([PRD US5.1](./PRD.md)). Default priority is **T2** in [DECISIONS.md](./DECISIONS.md); if the team picks a different entity, update this table and DECISIONS together.
+
+### Shell navigation (implemented)
+
+- **Room board** (legacy main grid) = route **`/`** (“Dashboard”).
+- **Room master list / CRUD** = **`/rooms`** (distinct from the board).
+- **Single header nav row** shows module links with keyboard hints (Esc, F1–F4, F8; F5/F6 **Admin only**). F7 was removed (duplicate of Esc/home). See [VB6-PARITY-MATRIX.md](./VB6-PARITY-MATRIX.md#keyboard-mapping-frozen).
 
 ### Traceability
 

@@ -12,7 +12,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ReservationFormPage } from './reservation-form-page';
 
 const guest: GuestResponse = { id: 1, name: 'Guest One', idNumber: null, contact: null };
-const room: RoomResponse = { id: 1, roomType: 'Standard', price: 100, status: 'vacant' };
+const room: RoomResponse = {
+  id: 1,
+  roomNumber: '101',
+  roomType: 'Standard',
+  price: 100,
+  status: 'Open',
+};
 
 function createListApp(overrides?: {
   readonly guestsList?: () => Promise<GuestResponse[]>;
@@ -33,9 +39,9 @@ function createListApp(overrides?: {
   return app;
 }
 
-function renderCreatePage(app: MockStarHotelApp) {
+function renderCreatePage(app: MockStarHotelApp, entry = '/reservations/new') {
   return render(
-    <MemoryRouter initialEntries={['/reservations/new']}>
+    <MemoryRouter initialEntries={[entry]}>
       <StarHotelAppProvider app={asStarHotelApp(app)}>
         <Routes>
           <Route path="/reservations/new" element={<ReservationFormPage mode="create" />} />
@@ -74,12 +80,21 @@ describe('ReservationFormPage', () => {
     expect(form).not.toBeNull();
 
     const submitBtn = within(form as HTMLElement).getByRole('button', {
-      name: /Create reservation/i,
+      name: /Save booking/i,
     });
     fireEvent.click(submitBtn);
 
     const alert = await within(form as HTMLElement).findByRole('alert');
     expect(alert.textContent).not.toMatch(/Could not load guests or rooms/i);
     expect(alert.textContent?.length).toBeGreaterThan(0);
+  });
+
+  it('prefills the selected room when launched from the room board', async () => {
+    const app = createListApp();
+
+    renderCreatePage(app, '/reservations/new?roomId=1');
+
+    expect(await screen.findByText(/Check-in workspace/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/Room 101/i)).length).toBeGreaterThan(0);
   });
 });

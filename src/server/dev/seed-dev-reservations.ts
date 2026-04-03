@@ -1,4 +1,5 @@
 import { DEV_SEED_RESERVATIONS_ANCHOR_DATE } from '@shared/constants';
+import type { RoomStatus } from '@shared/room-status';
 import type DatabaseType from 'better-sqlite3';
 import { ReservationRepository } from '../reservations/reservation-repository';
 import { ReservationService } from '../reservations/reservation-service';
@@ -11,26 +12,39 @@ export const DEV_FAKE_RESERVATION_COUNT = 40;
 const SEED_GUEST_ROW_COUNT = 45;
 
 const ANCHOR_CHECK_IN = DEV_SEED_RESERVATIONS_ANCHOR_DATE;
-const SEED_ROOM_ROWS: readonly { type: string; price: number; status: string }[] = [
-  { type: 'Standard', price: 99, status: 'Available' },
-  { type: 'Standard', price: 109, status: 'Available' },
-  { type: 'Deluxe', price: 149, status: 'Available' },
-  { type: 'Deluxe', price: 159, status: 'Available' },
-  { type: 'Suite', price: 229, status: 'Available' },
-  { type: 'Standard', price: 95, status: 'Available' },
-  { type: 'Deluxe', price: 169, status: 'Occupied' },
-  { type: 'Standard', price: 104, status: 'Available' },
-  { type: 'Suite', price: 259, status: 'Available' },
-  { type: 'Deluxe', price: 139, status: 'Available' },
-  { type: 'Standard', price: 89, status: 'Available' },
-  { type: 'Deluxe', price: 179, status: 'Available' },
-  { type: 'Suite', price: 289, status: 'Available' },
-  { type: 'Standard', price: 119, status: 'Available' },
-  { type: 'Deluxe', price: 154, status: 'Available' },
-  { type: 'Standard', price: 92, status: 'Available' },
-  { type: 'Suite', price: 239, status: 'Available' },
-  { type: 'Deluxe', price: 164, status: 'Available' },
+
+const ROOM_TYPES = ['Standard', 'Deluxe', 'Suite'] as const;
+
+/** Legacy board: four levels × 11 columns = 44 cells; statuses cycle for legend coverage. */
+const STATUS_CYCLE: readonly RoomStatus[] = [
+  'Open',
+  'Booked',
+  'Occupied',
+  'Housekeeping',
+  'Maintenance',
 ];
+
+function buildDashboardRooms(): readonly {
+  roomNumber: string;
+  type: string;
+  price: number;
+  status: RoomStatus;
+}[] {
+  const rows: { roomNumber: string; type: string; price: number; status: RoomStatus }[] = [];
+  for (let level = 4; level >= 1; level -= 1) {
+    for (let col = 1; col <= 11; col += 1) {
+      const roomNumber = `${level}${String(col).padStart(2, '0')}`;
+      const idx = (4 - level) * 11 + (col - 1);
+      const type = ROOM_TYPES[idx % ROOM_TYPES.length]!;
+      const price = 89 + (idx % 17) * 10;
+      const status = STATUS_CYCLE[idx % STATUS_CYCLE.length]!;
+      rows.push({ roomNumber, type, price, status });
+    }
+  }
+  return rows;
+}
+
+const SEED_ROOM_ROWS = buildDashboardRooms();
 
 const FIRST_NAMES = [
   'Alex',
@@ -105,11 +119,16 @@ function ensureSeedRooms(db: SqliteDatabase): void {
     return;
   }
   const ins = db.prepare(
-    'INSERT INTO tbl_room (RoomType, Price, Status) VALUES (@type, @price, @status)',
+    'INSERT INTO tbl_room (RoomNumber, RoomType, Price, Status) VALUES (@roomNumber, @type, @price, @status)',
   );
   const run = db.transaction(() => {
     for (const r of SEED_ROOM_ROWS) {
-      ins.run({ type: r.type, price: r.price, status: r.status });
+      ins.run({
+        roomNumber: r.roomNumber,
+        type: r.type,
+        price: r.price,
+        status: r.status,
+      });
     }
   });
   run();
@@ -150,7 +169,9 @@ export function seedDevReservationsIfNeeded(db: SqliteDatabase): void {
   ensureSeedGuests(db);
 
   const roomIds = (
-    db.prepare('SELECT RoomID FROM tbl_room ORDER BY RoomID ASC').all() as { RoomID: number }[]
+    db.prepare('SELECT RoomID FROM tbl_room ORDER BY RoomNumber ASC, RoomID ASC').all() as {
+      RoomID: number;
+    }[]
   ).map((r) => r.RoomID);
   const guestIds = (
     db.prepare('SELECT GuestID FROM tbl_guest ORDER BY GuestID ASC').all() as { GuestID: number }[]
