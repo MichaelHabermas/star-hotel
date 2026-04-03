@@ -1,6 +1,6 @@
 import type { ReservationListQuery } from '@shared/schemas/reservation';
 import { describe, expect, it } from 'vitest';
-import { computeReservationTotal, countStayNights } from '../../domain/reservation-pricing';
+import { computeStayPricing } from '../../domain/reservation-pricing';
 import { GuestNotFoundError } from '../guests/guest-errors';
 import { RoomNotFoundError } from '../rooms/room-errors';
 import { ReservationConflictError, ReservationNotFoundError } from './reservation-errors';
@@ -144,9 +144,7 @@ describe('ReservationService', () => {
       checkOutDate: '2026-06-04',
     });
 
-    expect(res.totalAmount).toBe(
-      computeReservationTotal(countStayNights('2026-06-01', '2026-06-04'), 100),
-    );
+    expect(res.totalAmount).toBe(computeStayPricing('2026-06-01', '2026-06-04', 100).total);
     expect(res).toMatchObject({
       roomId: 1,
       guestId: 10,

@@ -1,4 +1,4 @@
-import { computeReservationTotal, countStayNights } from '@domain/reservation-pricing';
+import { computeStayPricing } from '@domain/reservation-pricing';
 import type { StarHotelApp } from '@renderer/lib/star-hotel-app';
 import {
   reservationCreateBodySchema,
@@ -193,15 +193,14 @@ export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorO
       return { nights: null, total: null, hint: null };
     }
     try {
-      const nights = countStayNights(checkInDate, checkOutDate);
+      const { nights, total } = computeStayPricing(checkInDate, checkOutDate, room.price);
       if (nights === 0) {
         return {
           nights: 0,
-          total: 0,
+          total,
           hint: 'Same check-in and check-out: 0 nights (total $0.00 until you extend the stay).',
         };
       }
-      const total = computeReservationTotal(nights, room.price);
       return { nights, total, hint: null };
     } catch {
       return {

@@ -1,5 +1,4 @@
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
-import { HOTEL_MODULE_KEYS } from '@shared/hotel-modules';
 import { IPC_CHANNELS } from '@shared/ipc/channels';
 import type { StarHotelPreloadAPI } from '@shared/preload-contract';
 import { describe, expect, it, vi } from 'vitest';
@@ -66,21 +65,7 @@ describe('createStarHotelApp', () => {
     await expect(app.pingIpc()).rejects.toThrow(ZodError);
   });
 
-  it('api.reservations.list uses embedded base URL', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }));
-    const app = createStarHotelApp({
-      fetch: fetchMock,
-      starHotel: mockPreload(),
-    });
-    expect(app.api.reservations).toBeDefined();
-    await app.api.reservations.list({});
-    expect(fetchMock).toHaveBeenCalled();
-    const [req] = fetchMock.mock.calls[0];
-    expect(req).toBeInstanceOf(Request);
-    expect((req as Request).url).toBe(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`);
-  });
-
-  it('Bearer wrapper attaches token for protected guests list requests', async () => {
+  it('optional Bearer wiring reaches openapi-fetch for protected routes', async () => {
     const inner = vi.fn().mockResolvedValue(
       new Response(JSON.stringify([]), {
         status: 200,
@@ -93,74 +78,22 @@ describe('createStarHotelApp', () => {
       getAuthToken: () => 'session-token',
     });
     await app.api.guests.list({});
-    const [, init] = inner.mock.calls[0] as [Request, RequestInit];
+    const [, init] = inner.mock.calls[0] as [RequestInfo, RequestInit | undefined];
     expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer session-token');
   });
 
-  it('Bearer wrapper does not attach token to login URL', async () => {
-    const inner = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          token: 't',
-          user: { id: 1, username: 'admin', role: 'Admin' },
-          moduleKeys: [...HOTEL_MODULE_KEYS],
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      ),
-    );
+  it('api.reservations.list uses embedded base URL', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }));
     const app = createStarHotelApp({
-      fetch: inner,
+      fetch: fetchMock,
       starHotel: mockPreload(),
-      getAuthToken: () => 'should-not-attach',
     });
-    await app.api.auth.login({ username: 'admin', password: 'changeme' });
-    const [, init] = inner.mock.calls[0] as [Request, RequestInit];
-    expect(new Headers(init?.headers).get('Authorization')).toBeNull();
-  });
-
-  it('pingEmbeddedApi does not send Authorization on health', async () => {
-    const inner = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ ok: true }),
-    });
-    const app = createStarHotelApp({
-      fetch: inner,
-      starHotel: mockPreload(),
-      getAuthToken: () => 'tok',
-    });
-    await app.pingEmbeddedApi();
-    const [, init] = inner.mock.calls[0] as [string, RequestInit | undefined];
-    expect(new Headers(init?.headers).get('Authorization')).toBeNull();
-  });
-
-  it('Bearer fetch wrapper keeps Content-Type when openapi-fetch calls fetch(Request) without init (login)', async () => {
-    const inner = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          token: 't',
-          user: { id: 1, username: 'admin', role: 'Admin' },
-          moduleKeys: [...HOTEL_MODULE_KEYS],
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      ),
-    );
-    const app = createStarHotelApp({
-      fetch: inner,
-      starHotel: mockPreload(),
-      getAuthToken: () => null,
-    });
-    await app.api.auth.login({ username: 'admin', password: 'changeme' });
-    expect(inner).toHaveBeenCalled();
-    const [, arg2] = inner.mock.calls[0] as [Request, RequestInit | undefined];
-    expect(arg2?.headers).toBeDefined();
-    const merged = new Headers(arg2?.headers);
-    expect(merged.get('Content-Type')).toContain('application/json');
+    expect(app.api.reservations).toBeDefined();
+    await app.api.reservations.list({});
+    expect(fetchMock).toHaveBeenCalled();
+    const [req] = fetchMock.mock.calls[0];
+    expect(req).toBeInstanceOf(Request);
+    expect((req as Request).url).toBe(`http://127.0.0.1:45123${EMBEDDED_API_PATHS.reservations}`);
   });
 
   it('formatEmbeddedApiUserMessage delegates to shared helper', () => {

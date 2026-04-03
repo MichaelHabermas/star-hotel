@@ -1,6 +1,6 @@
 import { EMBEDDED_API_PATHS } from '@shared/api/embedded-api-paths';
 import request from 'supertest';
-import { afterEach, beforeEach, describe, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createServerApp } from './create-app';
 import { mountMvpSqliteEmbeddedApi } from './mvp-sqlite-api-composition';
 import {
@@ -38,5 +38,31 @@ describe('mountMvpSqliteEmbeddedApi (smoke)', () => {
     await request(app).get(EMBEDDED_API_PATHS.health).expect(200).expect({ ok: true });
 
     await request(app).get(EMBEDDED_API_PATHS.guests).expect(401);
+  });
+
+  it('login returns a token and Bearer authorizes guests list', async () => {
+    persistence = createSqlitePersistencePort({ dbFilePath: ':memory:' });
+    await persistence.isReady();
+
+    const app = await createServerApp({
+      persistence,
+      registerApiRoutes: (expressApp) => {
+        mountMvpSqliteEmbeddedApi(expressApp, persistence);
+      },
+    });
+
+    const login = await request(app)
+      .post(EMBEDDED_API_PATHS.authLogin)
+      .send({ username: 'admin', password: 'changeme' })
+      .expect(200);
+
+    const token = login.body.token as string;
+    expect(typeof token).toBe('string');
+    expect(token.length).toBeGreaterThan(0);
+
+    await request(app)
+      .get(EMBEDDED_API_PATHS.guests)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
   });
 });

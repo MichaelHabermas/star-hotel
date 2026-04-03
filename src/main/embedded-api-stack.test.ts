@@ -104,4 +104,43 @@ describe('createEmbeddedApiStack', () => {
     expect(fakeServer.close).toHaveBeenCalled();
     expect(persistenceClose).toHaveBeenCalled();
   });
+
+  it('forwards resolved TCP port and persistence into startEmbeddedApiServer', async () => {
+    const persistenceClose = vi.fn(async () => {});
+    const fakePersistence = {
+      isReady: async () => {},
+      close: persistenceClose,
+      getDatabase: () => {
+        throw new Error('not used in this test');
+      },
+    };
+    const createPersistence = vi.fn(() => fakePersistence);
+
+    const fakeServer = {
+      close: vi.fn((cb: (err?: Error) => void) => {
+        cb();
+      }),
+    } as unknown as http.Server;
+    const startServer = vi.fn(async () => fakeServer);
+
+    const stack = createEmbeddedApiStack({
+      getUserDataPath: () => '/fake/user/Data',
+      env: { STAR_HOTEL_PORT: '41234' },
+      createSqlitePersistencePort: createPersistence,
+      startEmbeddedApiServer: startServer,
+    });
+
+    expect(stack.apiPort).toBe(41234);
+    expect(stack.apiBaseUrl).toContain('41234');
+
+    await stack.ensureEmbeddedApiAndIpc();
+
+    expect(startServer).toHaveBeenCalledWith(
+      41234,
+      expect.objectContaining({
+        persistence: fakePersistence,
+        registerApiRoutes: expect.any(Function),
+      }),
+    );
+  });
 });

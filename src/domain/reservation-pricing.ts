@@ -70,3 +70,16 @@ export function computeReservationTotal(nights: number, pricePerNight: number): 
   const raw = nights * pricePerNight;
   return Math.round(raw * 100) / 100;
 }
+
+/**
+ * Single entry for “calendar stay × nightly rate” used by reservation service and UI preview
+ * so totals cannot drift between layers.
+ */
+export function computeStayPricing(
+  checkInIso: string,
+  checkOutIso: string,
+  pricePerNight: number,
+): { nights: number; total: number } {
+  const nights = countStayNights(checkInIso, checkOutIso);
+  return { nights, total: computeReservationTotal(nights, pricePerNight) };
+}

@@ -4,7 +4,7 @@ import type {
   ReservationResponse,
   ReservationUpdateBody,
 } from '@shared/schemas/reservation';
-import { computeReservationTotal, countStayNights } from '../../domain/reservation-pricing';
+import { computeStayPricing } from '../../domain/reservation-pricing';
 import { mapSqliteConstraintError } from '../db/db-errors';
 import { GuestNotFoundError } from '../guests/guest-errors';
 import { RoomNotFoundError } from '../rooms/room-errors';
@@ -54,8 +54,7 @@ export class ReservationService {
 
   private computeTotal(roomId: number, checkIn: string, checkOut: string): number {
     const price = this.assertRoomAndPrice(roomId);
-    const nights = countStayNights(checkIn, checkOut);
-    return computeReservationTotal(nights, price);
+    return computeStayPricing(checkIn, checkOut, price).total;
   }
 
   create(body: ReservationCreateBody): ReservationResponse {

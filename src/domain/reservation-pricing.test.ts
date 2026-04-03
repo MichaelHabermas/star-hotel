@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   InvalidIsoDateError,
   computeReservationTotal,
+  computeStayPricing,
   countStayNights,
 } from './reservation-pricing';
 
@@ -50,5 +51,25 @@ describe('computeReservationTotal', () => {
 
   it('rejects negative nights', () => {
     expect(() => computeReservationTotal(-1, 10)).toThrow(RangeError);
+  });
+});
+
+describe('computeStayPricing', () => {
+  it('matches separate countStayNights + computeReservationTotal', () => {
+    const checkIn = '2026-06-01';
+    const checkOut = '2026-06-04';
+    const price = 100;
+    expect(computeStayPricing(checkIn, checkOut, price)).toEqual({
+      nights: countStayNights(checkIn, checkOut),
+      total: computeReservationTotal(countStayNights(checkIn, checkOut), price),
+    });
+  });
+
+  it('returns zero nights and zero total for same-day stay', () => {
+    expect(computeStayPricing('2026-01-10', '2026-01-10', 50)).toEqual({ nights: 0, total: 0 });
+  });
+
+  it('propagates invalid date errors', () => {
+    expect(() => computeStayPricing('2026-01-12', '2026-01-10', 1)).toThrow(InvalidIsoDateError);
   });
 });
