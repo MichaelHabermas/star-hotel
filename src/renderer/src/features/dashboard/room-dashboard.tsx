@@ -14,9 +14,6 @@ import type { JSX, KeyboardEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const LEVELS_DESC = [4, 3, 2, 1] as const;
-const BOARD_COLUMNS = 11;
-
 type ReservationSnapshot = {
   readonly active: ReservationResponse | null;
   readonly upcoming: ReservationResponse | null;
@@ -29,11 +26,51 @@ type DeskAction = {
   readonly hint: string;
 };
 
-type BoardRoomPosition = {
-  readonly room: RoomResponse;
-  readonly level: number;
-  readonly col: number;
+type LegacyBoardLevel = {
+  readonly label: string;
+  readonly rows: readonly (readonly number[])[];
 };
+
+type LegacyBoardPosition = {
+  readonly slotId: number;
+  readonly levelLabel: string;
+  readonly rowIndex: number;
+  readonly colIndex: number;
+};
+
+type StatusCommand = {
+  readonly label: string;
+  readonly nextStatus: RoomStatus;
+};
+
+const LEGACY_BOARD_LAYOUT: readonly LegacyBoardLevel[] = [
+  { label: 'Level 4', rows: [[45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]] },
+  { label: 'Level 3', rows: [[34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]] },
+  {
+    label: 'Level 2',
+    rows: [
+      [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+      [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+    ],
+  },
+  { label: 'Level 1', rows: [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]] },
+] as const;
+
+const LEGACY_BOARD_POSITIONS: readonly LegacyBoardPosition[] = (() => {
+  const positions: LegacyBoardPosition[] = [];
+  let rowIndex = 0;
+  for (const level of LEGACY_BOARD_LAYOUT) {
+    for (const row of level.rows) {
+      row.forEach((slotId, colIndex) => {
+        positions.push({ slotId, levelLabel: level.label, rowIndex, colIndex });
+      });
+      rowIndex += 1;
+    }
+  }
+  return positions;
+})();
+
+const LEGACY_SLOT_IDS = new Set(LEGACY_BOARD_POSITIONS.map((position) => position.slotId));
 
 function todayIsoDate(): string {
   const d = new Date();
@@ -41,48 +78,6 @@ function todayIsoDate(): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
-}
-
-function parseBoardCell(roomNumber: string | null): { level: number; col: number } | null {
-  if (!roomNumber) {
-    return null;
-  }
-  const m = /^([1-4])(\d{2})$/.exec(roomNumber.trim());
-  if (!m) {
-    return null;
-  }
-  const col = Number(m[2]);
-  if (col < 1 || col > BOARD_COLUMNS) {
-    return null;
-  }
-  return { level: Number(m[1]), col };
-}
-
-function buildBoard(rows: RoomResponse[]): Map<string, RoomResponse> {
-  const map = new Map<string, RoomResponse>();
-  for (const room of rows) {
-    const pos = parseBoardCell(room.roomNumber);
-    if (!pos) {
-      continue;
-    }
-    map.set(`${pos.level}-${pos.col}`, room);
-  }
-  return map;
-}
-
-function buildBoardPositions(rows: RoomResponse[]): BoardRoomPosition[] {
-  return rows
-    .map((room) => {
-      const pos = parseBoardCell(room.roomNumber);
-      return pos ? { room, level: pos.level, col: pos.col } : null;
-    })
-    .filter((value): value is BoardRoomPosition => value !== null)
-    .sort((a, b) => {
-      if (a.level !== b.level) {
-        return b.level - a.level;
-      }
-      return a.col - b.col;
-    });
 }
 
 function buildReservationSnapshots(
@@ -107,7 +102,6 @@ function buildReservationSnapshots(
       }
       return a.checkInDate.localeCompare(b.checkInDate);
     });
-
     snapshots.set(roomId, {
       active:
         sorted.find(
@@ -117,7 +111,6 @@ function buildReservationSnapshots(
       latest: sorted.at(-1) ?? null,
     });
   }
-
   return snapshots;
 }
 
@@ -138,45 +131,38 @@ function getPrimaryDeskAction(
 ): DeskAction {
   if (snapshot?.active) {
     return {
-      label: 'Open active stay',
+      label: 'Open booking',
       to: `/reservations/${snapshot.active.id}`,
-      hint: `Stay #${snapshot.active.id} is in house until ${snapshot.active.checkOutDate}.`,
+      hint: `Occupied stay #${snapshot.active.id} checks out ${snapshot.active.checkOutDate}.`,
     };
   }
-  if (room.status === 'Booked' && snapshot?.upcoming) {
+  if (snapshot?.upcoming) {
     return {
-      label: 'Open booked stay',
+      label: 'Open booking',
       to: `/reservations/${snapshot.upcoming.id}`,
-      hint: `Booking #${snapshot.upcoming.id} arrives on ${snapshot.upcoming.checkInDate}.`,
+      hint: `Booked stay #${snapshot.upcoming.id} arrives ${snapshot.upcoming.checkInDate}.`,
     };
   }
-  if (room.status === 'Open') {
+  if (snapshot?.latest && room.status !== 'Open') {
     return {
-      label: 'Start check-in',
-      to: `/reservations/new?roomId=${room.id}`,
-      hint: 'Launch a new booking directly from the room board.',
-    };
-  }
-  if (snapshot?.latest) {
-    return {
-      label: 'Open latest booking',
+      label: 'Open booking',
       to: `/reservations/${snapshot.latest.id}`,
-      hint: `Review booking #${snapshot.latest.id} tied to this room.`,
+      hint: `Latest booking #${snapshot.latest.id} is tied to this room.`,
     };
   }
   return {
-    label: 'Open room card',
-    to: `/rooms/${room.id}`,
-    hint: 'Open the room maintenance card for this room.',
+    label: 'New booking',
+    to: `/reservations/new?roomId=${room.id}`,
+    hint: 'Open the booking screen with this room already selected.',
   };
 }
 
 function describeReservation(snapshot: ReservationSnapshot | undefined): string {
   if (snapshot?.active) {
-    return `In house · out ${snapshot.active.checkOutDate}`;
+    return `Occupied until ${snapshot.active.checkOutDate}`;
   }
   if (snapshot?.upcoming) {
-    return `Arrives ${snapshot.upcoming.checkInDate}`;
+    return `Booked for ${snapshot.upcoming.checkInDate}`;
   }
   if (snapshot?.latest) {
     return `Booking #${snapshot.latest.id}`;
@@ -184,66 +170,80 @@ function describeReservation(snapshot: ReservationSnapshot | undefined): string 
   return 'No booking on file';
 }
 
-function describeBoardCell(room: RoomResponse): string {
-  const pos = parseBoardCell(room.roomNumber);
-  if (!pos) {
-    return 'Off board';
+function getStatusCommands(room: RoomResponse): readonly StatusCommand[] {
+  switch (room.status) {
+    case 'Open':
+      return [
+        { label: 'Housekeeping', nextStatus: 'Housekeeping' },
+        { label: 'Maintenance', nextStatus: 'Maintenance' },
+      ];
+    case 'Housekeeping':
+      return [
+        { label: 'Free', nextStatus: 'Open' },
+        { label: 'Maintenance', nextStatus: 'Maintenance' },
+      ];
+    case 'Maintenance':
+      return [{ label: 'Free', nextStatus: 'Open' }];
+    default:
+      return [];
   }
-  return `${pos.level}${String(pos.col).padStart(2, '0')}`;
 }
 
-function findRoomByDirection(
-  currentRoomId: number,
-  positions: BoardRoomPosition[],
+function findPosition(slotId: number): LegacyBoardPosition | undefined {
+  return LEGACY_BOARD_POSITIONS.find((position) => position.slotId === slotId);
+}
+
+function findSlotByDirection(
+  currentSlotId: number,
   direction: 'left' | 'right' | 'up' | 'down' | 'home' | 'end',
-): RoomResponse | null {
-  const current = positions.find((position) => position.room.id === currentRoomId);
+): number {
+  const current = findPosition(currentSlotId);
   if (!current) {
-    return positions[0]?.room ?? null;
+    return currentSlotId;
   }
 
   if (direction === 'home' || direction === 'end') {
-    const rowPositions = positions
-      .filter((position) => position.level === current.level)
-      .sort((a, b) => a.col - b.col);
-    return (direction === 'home' ? rowPositions[0] : rowPositions.at(-1))?.room ?? current.room;
+    const rowPositions = LEGACY_BOARD_POSITIONS.filter(
+      (position) => position.rowIndex === current.rowIndex,
+    ).sort((a, b) => a.colIndex - b.colIndex);
+    return (direction === 'home' ? rowPositions[0] : rowPositions.at(-1))?.slotId ?? currentSlotId;
   }
 
-  const candidates = positions.filter((position) => {
+  const candidates = LEGACY_BOARD_POSITIONS.filter((position) => {
     switch (direction) {
       case 'left':
-        return position.level === current.level && position.col < current.col;
+        return position.rowIndex === current.rowIndex && position.colIndex < current.colIndex;
       case 'right':
-        return position.level === current.level && position.col > current.col;
+        return position.rowIndex === current.rowIndex && position.colIndex > current.colIndex;
       case 'up':
-        return position.col === current.col && position.level > current.level;
+        return position.colIndex === current.colIndex && position.rowIndex < current.rowIndex;
       case 'down':
-        return position.col === current.col && position.level < current.level;
+        return position.colIndex === current.colIndex && position.rowIndex > current.rowIndex;
       default:
         return false;
     }
   });
 
   if (candidates.length === 0) {
-    return current.room;
+    return currentSlotId;
   }
 
   const sorted = [...candidates].sort((a, b) => {
     switch (direction) {
       case 'left':
-        return b.col - a.col;
+        return b.colIndex - a.colIndex;
       case 'right':
-        return a.col - b.col;
+        return a.colIndex - b.colIndex;
       case 'up':
-        return a.level - b.level;
+        return b.rowIndex - a.rowIndex;
       case 'down':
-        return b.level - a.level;
+        return a.rowIndex - b.rowIndex;
       default:
         return 0;
     }
   });
 
-  return sorted[0]?.room ?? current.room;
+  return sorted[0]?.slotId ?? currentSlotId;
 }
 
 export function RoomDashboard(): JSX.Element {
@@ -252,14 +252,17 @@ export function RoomDashboard(): JSX.Element {
   const { list: reservationsList, reload: reloadReservations } = useReservationsList(starHotel);
   const navigate = useNavigate();
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [statusChangeState, setStatusChangeState] = useState<
+    { kind: 'idle' } | { kind: 'loading'; label: string } | { kind: 'err'; message: string }
+  >({ kind: 'idle' });
   const today = useMemo(() => todayIsoDate(), []);
   const roomButtonRefs = useRef(new Map<number, HTMLButtonElement>());
 
-  const board = useMemo(() => {
+  const roomById = useMemo(() => {
     if (list.kind !== 'ok') {
-      return new Map<string, RoomResponse>();
+      return new Map<number, RoomResponse>();
     }
-    return buildBoard(list.rows);
+    return new Map(list.rows.map((room) => [room.id, room]));
   }, [list]);
 
   const reservationSnapshots = useMemo(() => {
@@ -276,11 +279,11 @@ export function RoomDashboard(): JSX.Element {
     return countByStatus(list.rows);
   }, [list]);
 
-  const boardPositions = useMemo(() => {
+  const mappedRooms = useMemo(() => {
     if (list.kind !== 'ok') {
       return [];
     }
-    return buildBoardPositions(list.rows);
+    return list.rows.filter((room) => LEGACY_SLOT_IDS.has(room.id));
   }, [list]);
 
   const overflowRooms = useMemo(() => {
@@ -288,34 +291,27 @@ export function RoomDashboard(): JSX.Element {
       return [];
     }
     return [...list.rows]
-      .filter((room) => parseBoardCell(room.roomNumber) === null)
+      .filter((room) => !LEGACY_SLOT_IDS.has(room.id))
       .sort((a, b) => (a.roomNumber ?? '').localeCompare(b.roomNumber ?? ''));
   }, [list]);
-
-  const mappedRoomCount = boardPositions.length;
 
   const selectedRoom = useMemo(() => {
     if (list.kind !== 'ok') {
       return null;
     }
-    if (selectedRoomId === null) {
-      return list.rows[0] ?? null;
+    if (selectedRoomId !== null) {
+      return list.rows.find((room) => room.id === selectedRoomId) ?? null;
     }
-    return list.rows.find((row) => row.id === selectedRoomId) ?? list.rows[0] ?? null;
-  }, [list, selectedRoomId]);
+    return mappedRooms[0] ?? overflowRooms[0] ?? list.rows[0] ?? null;
+  }, [list, mappedRooms, overflowRooms, selectedRoomId]);
 
   useEffect(() => {
-    if (list.kind !== 'ok') {
+    if (selectedRoom) {
+      setSelectedRoomId(selectedRoom.id);
       return;
     }
-    if (list.rows.length === 0) {
-      setSelectedRoomId(null);
-      return;
-    }
-    if (selectedRoomId === null || !list.rows.some((row) => row.id === selectedRoomId)) {
-      setSelectedRoomId(list.rows[0]?.id ?? null);
-    }
-  }, [list, selectedRoomId]);
+    setSelectedRoomId(null);
+  }, [selectedRoom]);
 
   if (list.kind === 'loading' || reservationsList.kind === 'loading') {
     return (
@@ -367,16 +363,20 @@ export function RoomDashboard(): JSX.Element {
     roomButtonRefs.current.delete(roomId);
   }
 
+  function focusRoom(roomId: number): void {
+    setSelectedRoomId(roomId);
+    roomButtonRefs.current.get(roomId)?.focus();
+  }
+
   function moveSelection(
-    roomId: number,
+    currentRoomId: number,
     direction: 'left' | 'right' | 'up' | 'down' | 'home' | 'end',
   ): void {
-    const nextRoom = findRoomByDirection(roomId, boardPositions, direction);
-    if (!nextRoom) {
-      return;
+    const nextSlotId = findSlotByDirection(currentRoomId, direction);
+    const nextRoom = roomById.get(nextSlotId);
+    if (nextRoom) {
+      focusRoom(nextRoom.id);
     }
-    setSelectedRoomId(nextRoom.id);
-    roomButtonRefs.current.get(nextRoom.id)?.focus();
   }
 
   function handleBoardKeyDown(
@@ -412,7 +412,6 @@ export function RoomDashboard(): JSX.Element {
       case 'Enter':
       case ' ':
         event.preventDefault();
-        setSelectedRoomId(room.id);
         void navigate(primaryAction.to);
         break;
       default:
@@ -420,104 +419,126 @@ export function RoomDashboard(): JSX.Element {
     }
   }
 
+  async function changeRoomStatus(room: RoomResponse, nextStatus: RoomStatus): Promise<void> {
+    setStatusChangeState({ kind: 'loading', label: nextStatus });
+    try {
+      await starHotel.api.rooms.update(room.id, { status: nextStatus });
+      await reload();
+      setSelectedRoomId(room.id);
+      setStatusChangeState({ kind: 'idle' });
+    } catch (error) {
+      setStatusChangeState({
+        kind: 'err',
+        message: starHotel.formatEmbeddedApiUserMessage(error),
+      });
+    }
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-3 border-border/80 border-b pb-4">
-        <div>
-          <p className="text-muted-foreground font-ui text-xs tracking-wide uppercase">Summary</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {ROOM_STATUS_VALUES.map((status) => (
-              <div
-                key={status}
-                className="border-border/60 flex items-center gap-2 rounded-md border px-2 py-1 text-xs"
-              >
-                <span
-                  className={`inline-block size-3 shrink-0 rounded-sm border ${ROOM_STATUS_DASHBOARD_CLASSES[status]}`}
-                  aria-hidden
-                />
-                <span className="font-ui font-medium">{status}</span>
-                <span className="text-muted-foreground font-mono tabular-nums">
-                  {statusCounts?.[status] ?? 0}
-                </span>
-              </div>
-            ))}
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2 border-border/80 border-b pb-3">
+        <p className="text-muted-foreground font-ui text-xs tracking-wide uppercase">Summary</p>
+        {ROOM_STATUS_VALUES.map((status) => (
+          <div
+            key={status}
+            className="border-border/60 flex items-center gap-2 rounded-md border px-2 py-1 text-xs"
+          >
+            <span
+              className={`inline-block size-3 shrink-0 rounded-sm border ${ROOM_STATUS_DASHBOARD_CLASSES[status]}`}
+              aria-hidden
+            />
+            <span className="font-ui font-medium">{status}</span>
+            <span className="text-muted-foreground font-mono tabular-nums">
+              {statusCounts?.[status] ?? 0}
+            </span>
           </div>
-        </div>
+        ))}
       </div>
 
-      {mappedRoomCount === 0 && overflowRooms.length > 0 ? (
-        <div className="rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2 text-sm text-amber-950">
-          Current room numbers do not populate the legacy room grid, so the usable rooms are listed
-          below in the room ledger.
+      {mappedRooms.length === 0 && overflowRooms.length > 0 ? (
+        <div className="rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+          Current room records do not match the legacy fixed board slots, so the usable rooms are
+          listed below instead of showing an empty board.
         </div>
       ) : null}
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="space-y-3" aria-label="Room status by level" role="grid">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-muted-foreground font-ui text-xs">
-              Arrow keys move around the board. Press Enter to open the active room.
-            </p>
-            <p className="text-muted-foreground font-mono text-[0.7rem]">
-              {mappedRoomCount} mapped / {list.rows.length} total
-            </p>
-          </div>
-          {LEVELS_DESC.map((level) => (
-            <div key={level}>
-              <p className="text-muted-foreground mb-1 font-ui text-xs font-semibold">
-                Level {level}
-              </p>
-              <div className="grid grid-cols-11 gap-1 sm:gap-1.5" role="row">
-                {Array.from({ length: BOARD_COLUMNS }, (_, index) => {
-                  const col = index + 1;
-                  const key = `${level}-${col}`;
-                  const room = board.get(key);
-                  const label = room?.roomNumber ?? `${level}${String(col).padStart(2, '0')}`;
-                  const selected = room ? selectedRoom?.id === room.id : false;
-                  const snapshot = room ? reservationSnapshots.get(room.id) : undefined;
-                  if (!room) {
-                    return (
-                      <div
-                        key={key}
-                        className="border-border/40 bg-muted/10 flex min-h-[2.6rem] flex-col justify-center rounded border border-dashed px-0.5 py-0.5 text-center text-[0.65rem] text-muted-foreground/80 sm:text-xs"
-                        title="Empty legacy board slot"
-                      >
-                        <span className="font-mono font-semibold tabular-nums">{label}</span>
-                        <span className="mt-0.5">—</span>
-                      </div>
-                    );
-                  }
-
-                  const primaryAction = getPrimaryDeskAction(room, snapshot);
-                  return (
-                    <button
-                      key={key}
-                      ref={(node) => setRoomButtonRef(room.id, node)}
-                      type="button"
-                      onClick={() => {
-                        setSelectedRoomId(room.id);
-                        void navigate(primaryAction.to);
-                      }}
-                      onMouseEnter={() => setSelectedRoomId(room.id)}
-                      onFocus={() => setSelectedRoomId(room.id)}
-                      onKeyDown={(event) => handleBoardKeyDown(room, primaryAction, event)}
-                      className={`flex min-h-[2.8rem] flex-col justify-center rounded border px-1 py-0.5 text-center text-[0.65rem] leading-tight transition sm:text-xs ${ROOM_STATUS_DASHBOARD_CLASSES[room.status]} ${
-                        selected ? 'ring-ring ring-2 ring-offset-1' : 'hover:brightness-95'
-                      }`}
-                      aria-pressed={selected}
-                      aria-current={selected ? 'true' : undefined}
-                      title={`${room.roomNumber ?? room.id} · ${room.roomType} · ${room.status} · ${primaryAction.label}`}
-                    >
-                      <span className="font-mono font-semibold tabular-nums">{label}</span>
-                      <span className="mt-0.5 line-clamp-1 text-[0.6rem] opacity-90 sm:text-[0.68rem]">
-                        {room.status}
-                      </span>
-                    </button>
-                  );
-                })}
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="space-y-3">
+          {mappedRooms.length > 0 ? (
+            <div className="space-y-3" aria-label="Room status by level" role="grid">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-muted-foreground font-ui text-xs">
+                  Fixed room board from the original app. Arrow keys move. Enter opens booking.
+                </p>
+                <p className="text-muted-foreground font-mono text-[0.7rem]">
+                  {mappedRooms.length} mapped / {list.rows.length} total
+                </p>
               </div>
+              {LEGACY_BOARD_LAYOUT.map((level) => (
+                <div key={level.label} className="space-y-1">
+                  <p className="text-muted-foreground font-ui text-xs font-semibold">
+                    {level.label}
+                  </p>
+                  {level.rows.map((row, rowIndex) => (
+                    <div
+                      key={`${level.label}-${rowIndex}`}
+                      className="grid grid-cols-11 gap-1 sm:gap-1.5"
+                      role="row"
+                    >
+                      {row.map((slotId) => {
+                        const room = roomById.get(slotId);
+                        if (!room) {
+                          return (
+                            <div
+                              key={slotId}
+                              className="border-border/35 bg-muted/10 flex min-h-[2.7rem] flex-col justify-center rounded border border-dashed px-1 py-0.5 text-center text-[0.65rem] text-muted-foreground/70 sm:text-xs"
+                              title={`Legacy slot ${String(slotId).padStart(2, '0')}`}
+                            >
+                              <span className="font-mono tabular-nums">
+                                {String(slotId).padStart(2, '0')}
+                              </span>
+                            </div>
+                          );
+                        }
+
+                        const selected = selectedRoom?.id === room.id;
+                        const snapshot = reservationSnapshots.get(room.id);
+                        const primaryAction = getPrimaryDeskAction(room, snapshot);
+                        const displayLabel = room.roomNumber ?? String(room.id).padStart(2, '0');
+                        return (
+                          <button
+                            key={slotId}
+                            ref={(node) => setRoomButtonRef(room.id, node)}
+                            type="button"
+                            onClick={() => {
+                              setSelectedRoomId(room.id);
+                              void navigate(primaryAction.to);
+                            }}
+                            onFocus={() => setSelectedRoomId(room.id)}
+                            onMouseEnter={() => setSelectedRoomId(room.id)}
+                            onKeyDown={(event) => handleBoardKeyDown(room, primaryAction, event)}
+                            className={`flex min-h-[4.2rem] flex-col justify-center rounded border px-1 py-1 text-center text-[0.65rem] leading-tight transition sm:text-xs ${ROOM_STATUS_DASHBOARD_CLASSES[room.status]} ${
+                              selected ? 'ring-ring ring-2 ring-offset-1' : 'hover:brightness-95'
+                            }`}
+                            aria-pressed={selected}
+                            aria-current={selected ? 'true' : undefined}
+                            title={`${displayLabel} · ${room.roomType} · ${room.status} · ${primaryAction.label}`}
+                          >
+                            <span className="font-mono font-semibold tabular-nums">
+                              {displayLabel}
+                            </span>
+                            <span className="mt-0.5 line-clamp-2 text-[0.6rem] opacity-95 sm:text-[0.68rem]">
+                              {room.roomType}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
-          ))}
+          ) : null}
 
           {overflowRooms.length > 0 ? (
             <Card className="border-border/80 bg-card/70 py-3">
@@ -526,10 +547,10 @@ export function RoomDashboard(): JSX.Element {
               </CardHeader>
               <CardContent className="space-y-2 px-3">
                 <p className="text-muted-foreground text-xs">
-                  Rooms outside the fixed legacy grid. Select a row to open its live desk action.
+                  Rooms outside the legacy fixed board. Select a row to open booking or room work.
                 </p>
                 <div className="overflow-hidden rounded-md border border-border/70">
-                  <div className="bg-muted/40 grid grid-cols-[6rem_7rem_minmax(0,1fr)_8rem] gap-2 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground">
+                  <div className="bg-muted/40 grid grid-cols-[6rem_6rem_minmax(0,1fr)_7rem] gap-2 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground">
                     <span>Room</span>
                     <span>Status</span>
                     <span>Booking</span>
@@ -538,6 +559,7 @@ export function RoomDashboard(): JSX.Element {
                   {overflowRooms.map((room) => {
                     const snapshot = reservationSnapshots.get(room.id);
                     const primaryAction = getPrimaryDeskAction(room, snapshot);
+                    const selected = selectedRoom?.id === room.id;
                     return (
                       <button
                         key={room.id}
@@ -546,12 +568,10 @@ export function RoomDashboard(): JSX.Element {
                           setSelectedRoomId(room.id);
                           void navigate(primaryAction.to);
                         }}
-                        onMouseEnter={() => setSelectedRoomId(room.id)}
                         onFocus={() => setSelectedRoomId(room.id)}
-                        className={`grid w-full grid-cols-[6rem_7rem_minmax(0,1fr)_8rem] gap-2 border-t border-border/60 px-3 py-2 text-left text-sm transition ${
-                          selectedRoom?.id === room.id
-                            ? 'bg-secondary/60'
-                            : 'bg-background hover:bg-muted/40'
+                        onMouseEnter={() => setSelectedRoomId(room.id)}
+                        className={`grid w-full grid-cols-[6rem_6rem_minmax(0,1fr)_7rem] gap-2 border-t border-border/60 px-3 py-2 text-left text-sm ${
+                          selected ? 'bg-secondary/60' : 'bg-background hover:bg-muted/40'
                         }`}
                         title={`${room.roomNumber ?? room.id} · ${primaryAction.label}`}
                       >
@@ -576,7 +596,7 @@ export function RoomDashboard(): JSX.Element {
 
         <Card className="gap-2 self-start py-3">
           <CardHeader className="px-3 pb-0">
-            <CardTitle className="font-ui text-base">Desk card</CardTitle>
+            <CardTitle className="font-ui text-base">Room menu</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 px-3">
             {selectedRoom ? (
@@ -598,8 +618,12 @@ export function RoomDashboard(): JSX.Element {
                     <span className="font-mono">${selectedRoom.price.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-muted-foreground">Board</span>
-                    <span className="font-mono">{describeBoardCell(selectedRoom)}</span>
+                    <span className="text-muted-foreground">Slot</span>
+                    <span className="font-mono">
+                      {LEGACY_SLOT_IDS.has(selectedRoom.id)
+                        ? String(selectedRoom.id).padStart(2, '0')
+                        : 'Overflow'}
+                    </span>
                   </div>
                   <div className="flex items-start justify-between gap-2">
                     <span className="text-muted-foreground">Booking</span>
@@ -616,18 +640,49 @@ export function RoomDashboard(): JSX.Element {
                     </Button>
                   ) : null}
                   <Button type="button" variant="secondary" asChild>
-                    <Link to={`/rooms/${selectedRoom.id}`}>Open room card</Link>
+                    <Link to={`/rooms/${selectedRoom.id}`}>Edit room</Link>
                   </Button>
                 </div>
 
-                {selectedPrimaryAction ? (
-                  <p className="text-muted-foreground text-xs leading-snug">
-                    {selectedPrimaryAction.hint}
+                {getStatusCommands(selectedRoom).length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                      Change status
+                    </p>
+                    <div className="grid gap-2">
+                      {getStatusCommands(selectedRoom).map((command) => (
+                        <Button
+                          key={command.label}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={statusChangeState.kind === 'loading'}
+                          onClick={() => void changeRoomStatus(selectedRoom, command.nextStatus)}
+                        >
+                          {command.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                <p className="text-muted-foreground text-xs leading-snug">
+                  {selectedPrimaryAction?.hint}
+                </p>
+
+                {statusChangeState.kind === 'loading' ? (
+                  <p className="text-muted-foreground text-xs" role="status">
+                    Updating room to {statusChangeState.label}…
+                  </p>
+                ) : null}
+                {statusChangeState.kind === 'err' ? (
+                  <p className="text-destructive text-xs" role="alert">
+                    {statusChangeState.message}
                   </p>
                 ) : null}
               </>
             ) : (
-              <p className="text-muted-foreground text-sm">No rooms available on the board.</p>
+              <p className="text-muted-foreground text-sm">No rooms available.</p>
             )}
           </CardContent>
         </Card>

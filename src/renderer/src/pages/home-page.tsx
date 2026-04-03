@@ -31,48 +31,22 @@ export function HomePage(): JSX.Element {
 
   return (
     <div className="mx-auto max-w-6xl flex-col gap-6 p-4 md:p-6">
-      <div className="mb-4 flex flex-col gap-4 rounded-xl border border-border/80 bg-card/70 p-4 shadow-sm md:p-5">
+      <div className="mb-3 flex items-center justify-between gap-4 border-b border-border/80 pb-3">
         <div className="flex items-center gap-3">
-          <Hotel className="text-primary size-10 shrink-0" aria-hidden />
+          <Hotel className="text-primary size-8 shrink-0" aria-hidden />
           <div>
             <h1 className="font-display text-foreground text-2xl font-semibold tracking-tight">
               Room board
             </h1>
             <p className="text-muted-foreground text-sm">
-              Front desk board for room status, room cards, and booking handoff. Click a room to
-              open its live desk action, then use the desk card for alternate room or booking work.
+              Legacy front-desk board. Open booking from the room tile, edit room from the room
+              menu, and use F1 to F4 for module switches.
             </p>
           </div>
         </div>
-
-        <div className="grid gap-3 text-sm md:grid-cols-3">
-          <div className="rounded-lg border border-border/70 bg-background/80 p-3">
-            <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Main desk flow
-            </p>
-            <p className="mt-2 text-foreground">
-              Click room, open live stay or check-in, review desk card.
-            </p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background/80 p-3">
-            <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Booking handoff
-            </p>
-            <p className="mt-2 text-foreground">
-              Open booked stays and new check-ins directly from the room tile instead of leaving the
-              board first.
-            </p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background/80 p-3">
-            <p className="font-ui text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Keyboard hints
-            </p>
-            <p className="mt-2 text-foreground">
-              Esc for board, F1 reservations, F3 guests, F4 rooms, F2 reports, arrows on the board,
-              Enter to open the active room.
-            </p>
-          </div>
-        </div>
+        <p className="text-muted-foreground hidden text-xs md:block">
+          Esc board · F1 booking · F2 report · F3 customer · F4 room
+        </p>
       </div>
 
       <RoomDashboard />
