@@ -255,8 +255,15 @@ export function RoomDashboard(): JSX.Element {
   const [statusChangeState, setStatusChangeState] = useState<
     { kind: 'idle' } | { kind: 'loading'; label: string } | { kind: 'err'; message: string }
   >({ kind: 'idle' });
-  const today = useMemo(() => todayIsoDate(), []);
+  const [today, setToday] = useState(() => todayIsoDate());
   const roomButtonRefs = useRef(new Map<number, HTMLButtonElement>());
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setToday(todayIsoDate());
+    }, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const roomById = useMemo(() => {
     if (list.kind !== 'ok') {

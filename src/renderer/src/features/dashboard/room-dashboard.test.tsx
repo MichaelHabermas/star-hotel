@@ -2,10 +2,10 @@ import { StarHotelAppProvider } from '@renderer/lib/star-hotel-app-provider';
 import { asStarHotelApp, createMockStarHotelApp } from '@renderer/test-utils/mock-star-hotel-app';
 import type { ReservationResponse } from '@shared/schemas/reservation';
 import type { RoomResponse } from '@shared/schemas/room';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { JSX } from 'react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RoomDashboard } from './room-dashboard';
 
 function LocationProbe(): JSX.Element {
@@ -126,6 +126,50 @@ describe('RoomDashboard', () => {
     expect(
       screen.getByRole('button', { name: /ph1 maintenance no booking on file new booking/i }),
     ).toBeInTheDocument();
+  });
+
+  it('recomputes booking snapshot when the calendar day advances while mounted', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+    vi.setSystemTime(new Date(2020, 0, 1, 14, 0, 0));
+
+    renderDashboard({
+      rooms: [
+        {
+          id: 45,
+          roomNumber: '401',
+          roomType: 'Suite',
+          price: 200,
+          status: 'Booked',
+        },
+      ],
+      reservations: [
+        {
+          id: 77,
+          roomId: 45,
+          guestId: 8,
+          checkInDate: '2020-01-02',
+          checkOutDate: '2020-01-05',
+          totalAmount: 600,
+        },
+      ],
+    });
+
+    const roomButton = await screen.findByRole('button', { name: /401 suite/i });
+    fireEvent.click(roomButton);
+
+    expect(await screen.findByText(/Booked for 2020-01-02/i)).toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(26 * 60 * 60 * 1000);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Occupied until 2020-01-05/i)).toBeInTheDocument();
+    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('moves across the board with arrow keys and opens the next room with Enter', async () => {

@@ -150,6 +150,33 @@ describe('useReservationEditor', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
+  it('syncs create prefill when initial room id changes (e.g. new search params)', async () => {
+    const { app } = createMockApp();
+    const navigate = vi.fn();
+
+    const { result, rerender } = renderHook(
+      (props: { initialRoomId: string }) =>
+        useReservationEditor(asStarHotelApp(app), {
+          mode: 'create',
+          editId: 0,
+          editIdValid: false,
+          navigate,
+          initialRoomId: props.initialRoomId,
+        }),
+      { initialProps: { initialRoomId: '1' } },
+    );
+
+    await waitFor(() => {
+      expect(result.current.catalog.loading).toBe(false);
+    });
+
+    expect(result.current.roomId).toBe('1');
+
+    rerender({ initialRoomId: '2' });
+
+    expect(result.current.roomId).toBe('2');
+  });
+
   it('sets loadErr when edit load fails', async () => {
     const { app } = createMockApp({
       getImpl: () => Promise.reject(new Error('not found')),

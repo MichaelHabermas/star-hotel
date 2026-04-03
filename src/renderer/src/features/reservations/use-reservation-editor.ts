@@ -80,6 +80,16 @@ export function useReservationEditor(app: StarHotelApp, opts: ReservationEditorO
     }
   }, [mode, loadReservation]);
 
+  useEffect(() => {
+    if (mode !== 'create') {
+      return;
+    }
+    setGuestId(initialGuestId);
+    setRoomId(initialRoomId);
+    setCheckInDate(initialCheckInDate);
+    setCheckOutDate(initialCheckOutDate);
+  }, [mode, initialGuestId, initialRoomId, initialCheckInDate, initialCheckOutDate]);
+
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
