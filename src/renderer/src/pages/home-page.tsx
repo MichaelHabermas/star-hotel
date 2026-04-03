@@ -68,7 +68,8 @@ export function HomePage(): JSX.Element {
               Keyboard hints
             </p>
             <p className="mt-2 text-foreground">
-              Esc for board, F1 reservations, F3 guests, F4 rooms, F2 reports.
+              Esc for board, F1 reservations, F3 guests, F4 rooms, F2 reports, arrows on the board,
+              Enter to open the active room.
             </p>
           </div>
         </div>

@@ -63,9 +63,7 @@ describe('RoomDashboard', () => {
       ],
     });
 
-    const roomButton = await screen.findByRole('button', {
-      name: /101 standard no booking on file/i,
-    });
+    const roomButton = await screen.findByRole('button', { name: /101 open/i });
     fireEvent.click(roomButton);
 
     await waitFor(() => {
@@ -96,7 +94,7 @@ describe('RoomDashboard', () => {
       ],
     });
 
-    const roomButton = await screen.findByRole('button', { name: /104 suite arrives 2099-08-01/i });
+    const roomButton = await screen.findByRole('button', { name: /104 booked/i });
     fireEvent.click(roomButton);
 
     await waitFor(() => {
@@ -126,7 +124,41 @@ describe('RoomDashboard', () => {
 
     expect(await screen.findByText(/additional rooms/i)).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /501 penthouse maintenance no booking on file/i }),
+      screen.getByRole('button', { name: /501 maintenance no booking on file/i }),
     ).toBeInTheDocument();
+  });
+
+  it('moves across the board with arrow keys and opens the next room with Enter', async () => {
+    renderDashboard({
+      rooms: [
+        {
+          id: 1,
+          roomNumber: '101',
+          roomType: 'Standard',
+          price: 95,
+          status: 'Open',
+        },
+        {
+          id: 2,
+          roomNumber: '102',
+          roomType: 'Deluxe',
+          price: 120,
+          status: 'Open',
+        },
+      ],
+    });
+
+    const room101 = await screen.findByRole('button', { name: /101 open/i });
+    room101.focus();
+    fireEvent.keyDown(room101, { key: 'ArrowRight' });
+
+    const room102 = screen.getByRole('button', { name: /102 open/i });
+    expect(room102).toHaveFocus();
+
+    fireEvent.keyDown(room102, { key: 'Enter' });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/reservations/new?roomId=2');
+    });
   });
 });
